@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   define: {
     __BUILD_DATE__: JSON.stringify("2026-01-15"),
+    __APP_VERSION__: JSON.stringify("test"),
   },
   test: {
     environment: "jsdom",

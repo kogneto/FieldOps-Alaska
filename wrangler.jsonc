@@ -13,4 +13,23 @@
   "no_bundle": true,
   "rules": [{ "type": "ESModule", "globs": ["**/*.mjs", "**/*.js"] }],
   "assets": { "binding": "ASSETS", "directory": ".output/public" },
+
+  // Feedback notes from testers. No name, email or IP address is stored.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fieldops-feedback",
+      "database_id": "7de48522-b81f-4f3d-9980-52df1f5e3581",
+      "migrations_dir": "migrations",
+    },
+  ],
+  // Spam limit for /api/feedback, keyed by the sender's IP address. The address
+  // is only counted, never stored. Approximate and per Cloudflare location; the
+  // daily cap in the handler is the hard backstop.
+  // Daily at 09:17 UTC: delete feedback notes older than 90 days
+  // (src/server/purge-plugin.ts).
+  "triggers": { "crons": ["17 9 * * *"] },
+  "ratelimits": [
+    { "name": "FEEDBACK_LIMITER", "namespace_id": "4101", "simple": { "limit": 5, "period": 60 } },
+  ],
 }

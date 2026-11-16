@@ -1,17 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import {
-  ArrowLeft,
-  Lock,
-  MapPin,
-  ShieldAlert,
-  Snowflake,
-  BadgeCheck,
-  MessageSquareWarning,
-} from "lucide-react";
+import { ArrowLeft, Lock, MapPin, ShieldAlert, Snowflake, BadgeCheck } from "lucide-react";
 import { AppShell, Disclaimer, ModeIcon, SaveButton, SourceTag } from "@/components/fo";
 import { confidentialityRule, getOperator, getSite } from "@/lib/data";
 import { mapsUrl, platformFrom } from "@/lib/maps";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/sites/$id")({
   loader: ({ params }) => {
@@ -55,6 +46,7 @@ function SitePage() {
   return (
     <AppShell
       title={site.name}
+      recordId={site.id}
       back={
         <Link
           to="/directory"
@@ -157,17 +149,6 @@ function SitePage() {
         </div>
       </Section>
 
-      <Button
-        variant="outline"
-        size="lg"
-        onClick={() =>
-          alert("Prototype: a field report would be queued and sent when you have signal.")
-        }
-        className="mt-6 w-full border-2 border-primary uppercase text-primary"
-      >
-        <MessageSquareWarning className="h-5 w-5" />
-        Report a change
-      </Button>
       <Disclaimer />
     </AppShell>
   );

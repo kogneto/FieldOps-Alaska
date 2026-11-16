@@ -47,6 +47,10 @@ if (!existsSync(".output/public/sw.js")) {
 // wrangler would prefer over wrangler.jsonc. Remove it so wrangler.jsonc wins.
 rmSync(".wrangler/deploy", { recursive: true, force: true });
 
+// Bring the feedback database up to date before the code that uses it goes
+// live. Already-applied migrations are skipped.
+run("wrangler", ["d1", "migrations", "apply", "DB", "--remote"]);
+
 const branch = git("rev-parse", "--abbrev-ref", "HEAD");
 const commit = (git("rev-parse", "HEAD") ?? "").slice(0, 7);
 run("wrangler", ["deploy", "--message", `${branch}@${commit}`]);

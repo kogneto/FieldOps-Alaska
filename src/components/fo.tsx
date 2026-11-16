@@ -1,5 +1,16 @@
-import { Link } from "@tanstack/react-router";
-import { Home, Search, ListChecks, Plane, Ship, Truck, Star, Wifi, WifiOff } from "lucide-react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import {
+  Home,
+  Search,
+  ListChecks,
+  MessageSquareWarning,
+  Plane,
+  Ship,
+  Truck,
+  Star,
+  Wifi,
+  WifiOff,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { confidenceAdvice, dateDaysBefore, isStale, type Mode, type Source } from "@/lib/data";
 import { RECORDS_AS_OF, useNow, useOnline } from "@/lib/offline";
@@ -10,10 +21,15 @@ export function AppShell({
   title,
   children,
   back,
+  recordId,
+  hideFeedback = false,
 }: {
   title: string;
   children: ReactNode;
   back?: ReactNode;
+  /** The site or operator this screen shows, so feedback sent from it is tied to that record. */
+  recordId?: string;
+  hideFeedback?: boolean;
 }) {
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background shadow-2xl">
@@ -29,9 +45,28 @@ export function AppShell({
         </div>
         <ConnectionStatus />
       </header>
-      <main className="flex-1 px-5 pb-32 pt-5">{children}</main>
+      <main className="flex-1 px-5 pb-32 pt-5">
+        {children}
+        {!hideFeedback && <FeedbackLink recordId={recordId} />}
+      </main>
       <BottomNav />
     </div>
+  );
+}
+
+// "Send feedback" at the end of every screen. It opens the note page and tells
+// it which screen, and which record if any, the note is about.
+function FeedbackLink({ recordId }: { recordId: string | undefined }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <Link
+      to="/feedback"
+      search={{ from: pathname, record: recordId }}
+      className="mt-6 flex min-h-16 w-full items-center justify-center gap-3 rounded-lg border-2 border-primary px-4 text-lg font-bold uppercase text-primary active:bg-secondary"
+    >
+      <MessageSquareWarning className="h-5 w-5" />
+      Send feedback
+    </Link>
   );
 }
 

@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChecklistsRouteImport } from './routes/checklists'
 import { Route as DirectoryRouteImport } from './routes/directory'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as SavedRouteImport } from './routes/saved'
+import { Route as ApiFeedbackRouteImport } from './routes/api/feedback'
 import { Route as OperatorsIdRouteImport } from './routes/operators.$id'
 import { Route as SitesIdRouteImport } from './routes/sites.$id'
 
@@ -31,9 +33,19 @@ const DirectoryRoute = DirectoryRouteImport.update({
   path: '/directory',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SavedRoute = SavedRouteImport.update({
   id: '/saved',
   path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiFeedbackRoute = ApiFeedbackRouteImport.update({
+  id: '/api/feedback',
+  path: '/api/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OperatorsIdRoute = OperatorsIdRouteImport.update({
@@ -51,7 +63,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/checklists': typeof ChecklistsRoute
   '/directory': typeof DirectoryRoute
+  '/feedback': typeof FeedbackRoute
   '/saved': typeof SavedRoute
+  '/api/feedback': typeof ApiFeedbackRoute
   '/operators/$id': typeof OperatorsIdRoute
   '/sites/$id': typeof SitesIdRoute
 }
@@ -59,7 +73,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/checklists': typeof ChecklistsRoute
   '/directory': typeof DirectoryRoute
+  '/feedback': typeof FeedbackRoute
   '/saved': typeof SavedRoute
+  '/api/feedback': typeof ApiFeedbackRoute
   '/operators/$id': typeof OperatorsIdRoute
   '/sites/$id': typeof SitesIdRoute
 }
@@ -68,7 +84,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/checklists': typeof ChecklistsRoute
   '/directory': typeof DirectoryRoute
+  '/feedback': typeof FeedbackRoute
   '/saved': typeof SavedRoute
+  '/api/feedback': typeof ApiFeedbackRoute
   '/operators/$id': typeof OperatorsIdRoute
   '/sites/$id': typeof SitesIdRoute
 }
@@ -78,7 +96,9 @@ export interface FileRouteTypes {
     | '/'
     | '/checklists'
     | '/directory'
+    | '/feedback'
     | '/saved'
+    | '/api/feedback'
     | '/operators/$id'
     | '/sites/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -86,7 +106,9 @@ export interface FileRouteTypes {
     | '/'
     | '/checklists'
     | '/directory'
+    | '/feedback'
     | '/saved'
+    | '/api/feedback'
     | '/operators/$id'
     | '/sites/$id'
   id:
@@ -94,7 +116,9 @@ export interface FileRouteTypes {
     | '/'
     | '/checklists'
     | '/directory'
+    | '/feedback'
     | '/saved'
+    | '/api/feedback'
     | '/operators/$id'
     | '/sites/$id'
   fileRoutesById: FileRoutesById
@@ -103,7 +127,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChecklistsRoute: typeof ChecklistsRoute
   DirectoryRoute: typeof DirectoryRoute
+  FeedbackRoute: typeof FeedbackRoute
   SavedRoute: typeof SavedRoute
+  ApiFeedbackRoute: typeof ApiFeedbackRoute
   OperatorsIdRoute: typeof OperatorsIdRoute
   SitesIdRoute: typeof SitesIdRoute
 }
@@ -131,11 +157,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DirectoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/saved': {
       id: '/saved'
       path: '/saved'
       fullPath: '/saved'
       preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/feedback': {
+      id: '/api/feedback'
+      path: '/api/feedback'
+      fullPath: '/api/feedback'
+      preLoaderRoute: typeof ApiFeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/operators/$id': {
@@ -159,7 +199,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChecklistsRoute: ChecklistsRoute,
   DirectoryRoute: DirectoryRoute,
+  FeedbackRoute: FeedbackRoute,
   SavedRoute: SavedRoute,
+  ApiFeedbackRoute: ApiFeedbackRoute,
   OperatorsIdRoute: OperatorsIdRoute,
   SitesIdRoute: SitesIdRoute,
 }
