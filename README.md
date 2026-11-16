@@ -8,15 +8,15 @@ Everything in it is made up. The sites, contacts and notes are sample data, the 
 
 ## What works today
 
-**Directory.** Search seven sample sites and eight sample operators (air, sea and land), filter by region (Southeast, Southcentral or Interior), and open a detail page. A site page lists access notes, seasonal limits, the credentials to carry, the operator that can get you there, and an "Escort required" tag when one applies. An operator page lists hours, seasonal notes and services, with a call button and, when the entry has them, email and website buttons.
+**Directory.** Search seven sample sites and nine sample operators (air, sea and land), filter by region (Southeast, Southcentral or Interior), and open a detail page. An operator that serves several regions, like the ferry system, shows up under each of them. A site page lists access notes, seasonal limits, the qualifications needed, the operators that can get you there, and an "Escort required" tag when one applies. It also says whether the record is Open (may be shared freely) or Confidential (stays inside the crew), and has an "Open in maps" button. An operator page lists hours, seasonal notes and services, with a call button and, when the entry has them, email and website buttons.
 
-**Source and freshness.** Each site and operator shows a source, a confidence level (high, medium or low) and a last-verified date. Entries older than 60 days get a "stale" tag. The labels and dates are typed into the sample data by hand, and the stale tag is worked out from the current date.
+**Source and freshness.** Each site and operator shows a source, a confidence level (high, medium or low) and a last-verified date. Detail pages say what each level means: act on high, confirm medium by phone before committing travel or money, and treat low as a lead only. Entries verified more than 60 days ago get a "stale" tag. The sample records store how many days ago they were verified, so their dates move with today and the demo always shows a mix of fresh and stale entries.
 
 **Prep checklists.** Four checklists: crew and comms, cold-weather and climb PPE, tower site parts, and paperwork. Your progress is kept in the browser on your phone.
 
 **Saved list.** Star a site or operator to add it to the list under the Saved tab. The app stores only which records you picked, in the browser's local storage.
 
-**Works with no signal.** Every page is built ahead of time, and the first time the app is opened online a service worker caches all of it: the 19 pages, the code, the fonts and the icons, about 940 KB. After that every screen opens with no signal and checklists still tick. The header shows whether the phone is online and the date the records were built ("Records as of"). A new version downloads in the background and takes over the next time the app is opened. A page that isn't cached shows a "No signal" page after 8 seconds at most.
+**Works with no signal.** Every page is built ahead of time, and the first time the app is opened online a service worker caches all of it: the 20 pages, the code, the fonts and the icons, about 970 KB. After that every screen opens with no signal and checklists still tick. The header shows whether the phone is online and the date the records were built ("Records as of"). A new version downloads in the background and takes over the next time the app is opened. A page that isn't cached shows a "No signal" page after 8 seconds at most.
 
 **Install it.** Add it to the home screen from the browser's share or menu button, and it opens full screen like an app. On iPhone, installing also stops Safari from clearing the cached app after a week without use.
 
@@ -26,14 +26,14 @@ The "Report a change" button on site pages is a placeholder that only shows a me
 
 ## Tap targets
 
-Most main controls are at least 56 px tall, and the bottom bar (Home, Find, Prep, Saved) is 80 px. A few secondary controls, the back links and region filter chips, are 48 px. The layout is a single column sized for a phone.
+Every main control is at least 56 px tall and most are 64 px. The bottom bar (Home, Find, Prep, Saved) is 80 px. The layout is a single column sized for a phone.
 
 ## Limits
 
 - No backend, accounts or login. All the content is hard-coded in `src/lib/data.ts`.
 - Saved records and checklist progress live in local storage, so they're per browser and per device and disappear if site data is cleared.
-- A site's "confidentiality" label is only a label. Nothing controls access, and the app stores no gate codes or credentials.
-- Sites show raw latitude and longitude. There's no map.
+- A site's confidentiality says how its record may be shared, and nothing enforces it. The app stores no access secrets (gate codes, keys or lock combinations).
+- There's no map in the app. "Open in maps" hands a site's coordinates, never its name, to the phone's maps app, so a confidential site's name doesn't reach the maps provider.
 
 ## Where it's headed
 

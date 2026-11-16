@@ -46,14 +46,14 @@ Done when a tester can send a feedback note with no signal, and it reaches Cloud
 
 Small, independent of the slices.
 
-- [ ] Raise the region filter chips and the back links to 56px.
-- [ ] Rename "Credentials to carry" to "Qualifications", and say "access secrets" in the disclaimer.
-- [ ] Replace the three confidentiality labels with Open and Confidential.
-- [ ] Explain the three confidence levels in the app by what a technician should do.
-- [ ] Let an operator serve several regions, with the region filter matching any of them. The ferry system is statewide and is hidden outside Southeast today.
-- [ ] Give sample sites more than one operator where their notes call for it. Seasonal detail stays in free text.
-- [ ] Make the sample dates relative to today, so the demo always shows a mix of fresh and stale records. Keep the single 60-day cutoff until real records exist.
-- [ ] Add an "Open in maps" button to the site page that hands the coordinates to the phone's maps app.
+- [x] Raise the region filter chips and the back links to 56px.
+- [x] Rename "Credentials to carry" to "Qualifications", and say "access secrets" in the disclaimer.
+- [x] Replace the three confidentiality labels with Open and Confidential.
+- [x] Explain the three confidence levels in the app by what a technician should do.
+- [x] Let an operator serve several regions, with the region filter matching any of them. The ferry system now shows under Southeast and Southcentral.
+- [x] Give sample sites more than one operator where their notes call for it. Seasonal detail stays in free text. Gravina gained a sample helicopter operator for winter, and Cooper Landing a road hauler.
+- [x] Make the sample dates relative to today, so the demo always shows a mix of fresh and stale records. Keep the single 60-day cutoff until real records exist.
+- [x] Add an "Open in maps" button to the site page that hands the coordinates to the phone's maps app. It sends only the coordinates, never the site's name, so a confidential site's name stays off the maps provider.
 
 ## Slice 3: trips on sample data
 

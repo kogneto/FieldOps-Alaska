@@ -2,7 +2,7 @@
 // Refuses unless every change is committed and pushed, then lints, tests and
 // builds before deploying, so what is live is always a pushed, checked commit.
 import { spawnSync } from "node:child_process";
-import { rmSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { deployBlocker } from "./deploy-guard";
 
 const shell = process.platform === "win32";
@@ -37,6 +37,11 @@ if (blocker) {
 run("bun", ["run", "lint"]);
 run("bun", ["run", "test"]);
 run("bun", ["run", "build"]);
+
+if (!existsSync(".output/public/sw.js")) {
+  console.error("deploy: the build wrote no service worker, so the app wouldn't work offline.");
+  process.exit(1);
+}
 
 // A non-prerender build leaves a pointer here to Nitro's own config, which
 // wrangler would prefer over wrangler.jsonc. Remove it so wrangler.jsonc wins.

@@ -24,7 +24,10 @@ export const Route = createFileRoute("/operators/$id")({
   }),
   notFoundComponent: () => (
     <AppShell title="Not found">
-      <Link to="/directory" className="text-primary">
+      <Link
+        to="/directory"
+        className="flex min-h-14 items-center justify-center rounded-lg border-2 border-primary px-4 font-bold uppercase text-primary"
+      >
         Back to directory
       </Link>
     </AppShell>
@@ -47,7 +50,7 @@ function OpPage() {
         <Link
           to="/directory"
           search={{ tab: "operators" }}
-          className="mb-2 flex min-h-12 items-center gap-2 text-base font-semibold text-muted-foreground"
+          className="mb-2 flex min-h-14 items-center gap-2 text-base font-semibold text-muted-foreground"
         >
           <ArrowLeft className="h-5 w-5" />
           Operators
@@ -57,12 +60,12 @@ function OpPage() {
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="flex min-w-0 items-center gap-2 text-muted-foreground">
           <ModeIcon mode={op.mode} className="h-6 w-6 shrink-0 text-accent" />
-          <span className="uppercase">{op.mode}</span> · {op.community}, {op.region}
+          <span className="uppercase">{op.mode}</span> · {op.community} · {op.regions.join(", ")}
         </div>
         <SaveButton id={op.id} />
       </div>
       <div className="mt-3">
-        <SourceTag source={op.source} />
+        <SourceTag source={op.source} showAdvice />
       </div>
 
       <a

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Home, Search, ListChecks, Plane, Ship, Truck, Star, Wifi, WifiOff } from "lucide-react";
 import type { ReactNode } from "react";
-import { daysSince, type Mode, type Source } from "@/lib/data";
+import { confidenceAdvice, dateDaysBefore, isStale, type Mode, type Source } from "@/lib/data";
 import { RECORDS_AS_OF, useNow, useOnline } from "@/lib/offline";
 import { useSaved } from "@/lib/store";
 import { Button } from "@/components/ui/button";
@@ -88,10 +88,17 @@ export function ModeIcon({ mode, className = "h-5 w-5" }: { mode: Mode; classNam
   return <I className={className} />;
 }
 
-export function SourceTag({ source }: { source: Source }) {
+export function SourceTag({
+  source,
+  showAdvice = false,
+}: {
+  source: Source;
+  showAdvice?: boolean;
+}) {
+  // The verified date depends on today, so it waits for hydration (useNow);
+  // whether a record is stale doesn't, since it's stored as days ago.
   const now = useNow();
-  const d = daysSince(source.verified, now);
-  const stale = d > 60;
+  const stale = isStale(source);
   const tone =
     source.confidence === "high"
       ? "bg-ok text-ok-foreground"
@@ -104,12 +111,20 @@ export function SourceTag({ source }: { source: Source }) {
         {source.confidence}
       </span>
       <span className="text-muted-foreground">
-        {source.label} · verified {source.verified}
+        {source.label} · verified {dateDaysBefore(now, source.verifiedDaysAgo)}
       </span>
       {stale && (
         <span className="rounded-sm border border-destructive px-1.5 py-0.5 font-mono uppercase text-destructive">
           stale
         </span>
+      )}
+      {showAdvice && (
+        <p className="basis-full text-sm text-muted-foreground">
+          <span className="font-semibold text-foreground">
+            {source.confidence.charAt(0).toUpperCase() + source.confidence.slice(1)} confidence:
+          </span>{" "}
+          {confidenceAdvice[source.confidence]}
+        </p>
       )}
     </div>
   );
@@ -139,7 +154,8 @@ export function Disclaimer() {
   return (
     <p className="mt-6 rounded-md border-2 border-border p-4 text-sm leading-relaxed text-muted-foreground">
       Not a substitute for 911 or official notices. Official and operator sources take precedence
-      over crew reports. No gate codes or credentials are stored in this app.
+      over crew reports. No access secrets (gate codes, keys, lock combinations) are stored in this
+      app.
     </p>
   );
 }

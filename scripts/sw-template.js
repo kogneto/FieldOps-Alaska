@@ -63,7 +63,7 @@ function offlinePage() {
 <title>Offline — FieldOps Alaska</title></head>
 <body style="margin:0;background:#0d181d;color:#f9f5eb;font:18px system-ui,sans-serif;padding:24px">
 <h1 style="font-size:24px">No signal</h1>
-<p>This page isn't saved on this phone.</p>
+<p>FieldOps can't open this page without a connection.</p>
 <a href="/" style="display:flex;align-items:center;justify-content:center;min-height:64px;margin-top:24px;border-radius:8px;background:#fe6a00;color:#0d181d;font-weight:700;text-decoration:none">Go to Home</a>
 </body></html>`;
   return new Response(html, {
