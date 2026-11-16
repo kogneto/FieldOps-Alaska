@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && bun scripts/build-sw.ts",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "preview:cf": "wrangler dev",
+    "deploy": "bun scripts/deploy.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
@@ -17,6 +19,9 @@
     "rolldown": "1.2.1"
   },
   "dependencies": {
+    "@fontsource/archivo-black": "^5.3.0",
+    "@fontsource/hind": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -91,6 +96,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "8.1.5",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "wrangler": "^4.162.0"
   }
 }

@@ -9,7 +9,10 @@ export const Route = createFileRoute("/checklists")({
   head: () => ({
     meta: [
       { title: "Prep checklists — FieldOps Alaska" },
-      { name: "description", content: "Crew, PPE, parts and paperwork checklists for remote Alaska telecom runs." },
+      {
+        name: "description",
+        content: "Crew, PPE, parts and paperwork checklists for remote Alaska telecom runs.",
+      },
       { property: "og:title", content: "Prep checklists — FieldOps Alaska" },
       { property: "og:description", content: "Glove-friendly prep checklists that work offline." },
       { property: "og:type", content: "website" },
@@ -34,17 +37,35 @@ function Checklists() {
                 <div className="font-mono text-xs uppercase text-primary">{cl.category}</div>
                 <h2 className="font-display text-xl uppercase">{cl.title}</h2>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => reset(`${cl.id}:`)} aria-label="Reset checklist"><RotateCcw className="h-6 w-6" /></Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => reset(`${cl.id}:`)}
+                aria-label="Reset checklist"
+              >
+                <RotateCcw className="h-6 w-6" />
+              </Button>
             </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} /></div>
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary">
+              <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+            </div>
             <ul className="mt-3 grid gap-2">
               {cl.items.map((item, i) => {
                 const k = `${cl.id}:${i}`;
                 const on = !!checks[k];
                 return (
                   <li key={k}>
-                    <Button variant="ghost" onClick={() => toggle(k)} aria-pressed={on} className={`flex min-h-16 w-full justify-start gap-4 whitespace-normal rounded-lg border-2 px-4 text-left text-lg font-semibold ${on ? "border-border bg-secondary text-muted-foreground line-through" : "border-border bg-card text-card-foreground"}`}>
-                      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded border-2 ${on ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground"}`}>{on && <Check className="h-6 w-6" />}</span>
+                    <Button
+                      variant="ghost"
+                      onClick={() => toggle(k)}
+                      aria-pressed={on}
+                      className={`flex min-h-16 w-full justify-start gap-4 whitespace-normal rounded-lg border-2 px-4 text-left text-lg font-semibold ${on ? "border-border bg-secondary text-muted-foreground line-through" : "border-border bg-card text-card-foreground"}`}
+                    >
+                      <span
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded border-2 ${on ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground"}`}
+                      >
+                        {on && <Check className="h-6 w-6" />}
+                      </span>
                       {item}
                     </Button>
                   </li>

@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // The public demo: sample data, no sign-in.
+  //
+  // This is the full Worker config. Nitro would normally write one to
+  // .output/server/wrangler.json, but it skips that step whenever pages are
+  // built ahead of time (Lovable's build config replaces the Nitro hook that
+  // writes it), so the same settings are spelled out here.
+  "name": "fieldops-alaska",
+  "compatibility_date": "2026-11-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": ".output/server/index.mjs",
+  "no_bundle": true,
+  "rules": [{ "type": "ESModule", "globs": ["**/*.mjs", "**/*.js"] }],
+  "assets": { "binding": "ASSETS", "directory": ".output/public" },
+}

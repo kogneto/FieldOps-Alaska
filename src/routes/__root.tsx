@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { registerServiceWorker } from "../lib/offline";
 
 function NotFoundComponent() {
   return (
@@ -81,6 +82,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "FieldOps Alaska" },
       { name: "description", content: "Mobile field companion for Alaska telecom technicians." },
       { name: "theme-color", content: "#10181C" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "FieldOps" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
@@ -90,11 +95,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Archivo+Black&family=Hind:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", href: "/icon.svg", type: "image/svg+xml" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
+    scripts: analyticsScripts(),
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -116,8 +122,25 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+// Cloudflare Web Analytics: visit and page counts, no cookies, no personal data.
+// Only builds that set VITE_CF_BEACON_TOKEN (the public demo) include it.
+function analyticsScripts() {
+  const token = import.meta.env["VITE_CF_BEACON_TOKEN"];
+  if (!token) return [];
+  return [
+    {
+      src: "https://static.cloudflareinsights.com/beacon.min.js",
+      defer: true,
+      "data-cf-beacon": JSON.stringify({ token }),
+    },
+  ];
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -6,7 +6,9 @@ function useLocal<T>(key: string, initial: T) {
     try {
       const raw = localStorage.getItem(key);
       if (raw) setValue(JSON.parse(raw));
-    } catch {}
+    } catch {
+      // Storage is blocked or holds bad JSON: keep the initial value.
+    }
     const onSync = (e: Event) => {
       const d = (e as CustomEvent).detail;
       if (d?.key === key) setValue(d.value);

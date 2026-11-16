@@ -5,11 +5,42 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { operators, sites } from "./src/lib/data";
+
+// Every page is built ahead of time, so the service worker can cache all of them
+// and the app works with no signal. autoSubfolderIndex: false writes
+// `directory.html` rather than `directory/index.html`, so `/directory` is served
+// without a trailing-slash redirect.
+const pages = [
+  "/",
+  "/directory",
+  "/checklists",
+  "/saved",
+  ...sites.map((site) => `/sites/${site.id}`),
+  ...operators.map((operator) => `/operators/${operator.id}`),
+].map((path) => ({ path }));
+
+function localDate(date: Date) {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
 
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    prerender: {
+      enabled: true,
+      crawlLinks: false,
+      autoSubfolderIndex: false,
+      failOnError: true,
+    },
+    pages,
+  },
+  vite: {
+    define: {
+      __BUILD_DATE__: JSON.stringify(localDate(new Date())),
+    },
   },
 });
