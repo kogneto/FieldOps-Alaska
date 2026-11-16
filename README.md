@@ -37,7 +37,7 @@ Every main control is at least 56 px tall and most are 64 px. The bottom bar (Ho
 
 ## Where it's headed
 
-It's aimed at one working crew of technicians, and until one is lined up, testers try the public demo without signing in. It now works with no signal, and anonymous tester feedback is built. Next comes trip planning on the sample data. The crew's own records behind a sign-in are parked until a crew signs on. Gear tracking and live weather are off the list for now. [roadmap.md](roadmap.md) has the full plan and [CONTEXT.md](CONTEXT.md) the vocabulary.
+It's aimed at one working crew of technicians, and until one is lined up, testers try the public demo without signing in. It now works with no signal, and testers can send anonymous feedback. Next comes trip planning on the sample data. The crew's own records behind a sign-in are parked until a crew signs on. Gear tracking and live weather are off the list for now. [roadmap.md](roadmap.md) has the full plan and [CONTEXT.md](CONTEXT.md) the vocabulary.
 
 ## Stack
 

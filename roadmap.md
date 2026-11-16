@@ -43,13 +43,13 @@ Decided:
 - A note is at most 1,000 characters.
 - Notes are deleted 90 days after they arrive, by a daily cron. Old notes are also cleared whenever a note arrives or the notes are read.
 
-Built and checked locally against a local database, including a note written with the server down that sent itself on reconnect. Not deployed yet, so not done.
+Live since 16 Nov 2026, deployed from `85eb8fa`. Checked live: the endpoint accepts, deduplicates and rejects as designed, a note sent from the Hatcher Pass page in Chrome arrived, and the daily cron is registered. The offline path was checked locally, with a note written while the server was down sending itself on reconnect. Not yet checked on a real phone.
 
-- [ ] A feedback note can be sent from any screen. On a site or operator page it is tied to that record.
-- [ ] Rename "Report a change" to "Send feedback"; it opens the same note. Every screen now ends with one "Send feedback" button.
-- [ ] Notes wait on the phone until there is signal, then send.
-- [ ] Only the note's text, the screen or record, the app version, the time it arrived and a random note id are stored. No name, email or IP address is asked for or kept.
-- [ ] The endpoint is public, so it caps note length and how often notes are accepted.
+- [x] A feedback note can be sent from any screen. On a site or operator page it is tied to that record.
+- [x] Rename "Report a change" to "Send feedback"; it opens the same note. Every screen now ends with one "Send feedback" button.
+- [x] Notes wait on the phone until there is signal, then send.
+- [x] Only the note's text, the screen or record, the app version, the time it arrived and a random note id are stored. No name, email or IP address is asked for or kept.
+- [x] The endpoint is public, so it caps note length and how often notes are accepted.
 - [ ] Watch testers use it outdoors with gloves on, alongside the notes.
 
 ## Tidy-ups
