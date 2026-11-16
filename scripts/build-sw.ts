@@ -13,9 +13,12 @@ function walk(dir: string): string[] {
   });
 }
 
+// Lovable's own build writes to dist/client instead. There the app still
+// works online, just without the service worker, so warn rather than fail its
+// build. `bun run deploy` refuses to ship a build without sw.js.
 if (!existsSync(publicDir)) {
-  console.error(`build-sw: ${publicDir} is missing. Run vite build first.`);
-  process.exit(1);
+  console.warn(`build-sw: ${publicDir} is missing, so no service worker was written.`);
+  process.exit(0);
 }
 
 const cached: (BuiltFile & { url: string })[] = [];
