@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { RadioTower, WifiOff } from "lucide-react";
+import { RadioTower, Star } from "lucide-react";
 import { AppShell, ModeIcon, SaveButton } from "@/components/fo";
 import { operators, sites } from "@/lib/data";
 import { useSaved } from "@/lib/store";
@@ -7,13 +7,10 @@ import { useSaved } from "@/lib/store";
 export const Route = createFileRoute("/saved")({
   head: () => ({
     meta: [
-      { title: "Saved for offline — FieldOps Alaska" },
-      {
-        name: "description",
-        content: "Sites and operators saved to your phone for no-signal use.",
-      },
-      { property: "og:title", content: "Saved for offline — FieldOps Alaska" },
-      { property: "og:description", content: "Your offline site and operator pack." },
+      { title: "Saved — FieldOps Alaska" },
+      { name: "description", content: "The sites and operators you've starred." },
+      { property: "og:title", content: "Saved — FieldOps Alaska" },
+      { property: "og:description", content: "Your starred sites and operators." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -26,12 +23,12 @@ function Saved() {
   const s = sites.filter((x) => saved.includes(x.id));
   const o = operators.filter((x) => saved.includes(x.id));
   return (
-    <AppShell title="Offline pack">
+    <AppShell title="Saved">
       <div className="flex gap-3 rounded-lg border-2 border-border bg-card p-4 text-base">
-        <WifiOff className="h-6 w-6 shrink-0 text-accent" />
+        <Star className="h-6 w-6 shrink-0 text-accent" />
         <p>
-          Star sites and operators to keep them on this phone. In the full app these work with no
-          signal.
+          Star sites and operators to find them fast here. Everything in the app works with no
+          signal, starred or not.
         </p>
       </div>
       {saved.length === 0 && (

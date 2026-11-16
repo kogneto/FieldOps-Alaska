@@ -335,6 +335,6 @@ export const officialLinks = [
 export const getOperator = (id: string) => operators.find((o) => o.id === id);
 export const getSite = (id: string) => sites.find((s) => s.id === id);
 
-export function daysSince(iso: string) {
-  return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+export function daysSince(iso: string, now = Date.now()) {
+  return Math.floor((now - new Date(iso).getTime()) / 86400000);
 }

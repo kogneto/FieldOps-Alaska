@@ -2,6 +2,15 @@
 @source "../src";
 @import "tw-animate-css";
 
+/* Fonts ship with the app so they work with no signal. Latin subset only. */
+@import "@fontsource/archivo-black/latin-400.css";
+@import "@fontsource/hind/latin-400.css";
+@import "@fontsource/hind/latin-500.css";
+@import "@fontsource/hind/latin-600.css";
+@import "@fontsource/hind/latin-700.css";
+@import "@fontsource/jetbrains-mono/latin-500.css";
+@import "@fontsource/jetbrains-mono/latin-600.css";
+
 @custom-variant dark (&:is(.dark *));
 
 /*

@@ -21,13 +21,15 @@ Vocabulary is in [CONTEXT.md](CONTEXT.md). Decisions that need their reasons kep
 
 Done when, with the phone in airplane mode, every screen and record opens and checklists still tick.
 
-- [ ] Set up the PC to build and deploy: install Bun and the dependencies, and add a Cloudflare deploy config.
-- [ ] Add one deploy command. It refuses to run unless the work is committed and pushed, then runs lint, tests and build, then deploys.
-- [ ] Deliver the app as an installable web app: pages built ahead of time, fonts bundled, an install manifest and a service worker.
-- [ ] Everything the phone is allowed to see works offline. The star only builds the Saved list.
-- [ ] Rename the "Offline" tab and the "Offline pack" page to "Saved", and drop the offline wording from the star.
-- [ ] Show a status line on every screen: online or offline, plus "Records as of" the last successful refresh. New versions and records load in the background and apply on the next launch.
-- [ ] Deploy the public demo to Cloudflare, with Cloudflare Web Analytics for visit and page counts. It sets no cookies and collects no personal data.
+- [x] Set up the PC to build and deploy: install Bun and the dependencies, and add a Cloudflare deploy config.
+- [x] Add one deploy command. It refuses to run unless the work is committed and pushed, then runs lint, tests and build, then deploys.
+- [x] Deliver the app as an installable web app: pages built ahead of time, fonts bundled, an install manifest and a service worker.
+- [x] Everything the phone is allowed to see works offline. The star only builds the Saved list.
+- [x] Rename the "Offline" tab and the "Offline pack" page to "Saved", and drop the offline wording from the star.
+- [x] Show a status line on every screen: online or offline, plus "Records as of" the last successful refresh. New versions and records load in the background and apply on the next launch.
+- [x] Deploy the public demo to Cloudflare, with Cloudflare Web Analytics for visit and page counts. It sets no cookies and collects no personal data.
+
+Checked in Chrome against a local Cloudflare server, then with that server stopped. Not yet checked on a real phone in airplane mode.
 
 ## Slice 2: tester feedback
 

@@ -44,7 +44,7 @@ function Index() {
       <div className="mt-4 grid grid-cols-3 gap-3">
         <Stat n={sites.length} label="Sites" />
         <Stat n={operators.length} label="Operators" />
-        <Stat n={saved.length} label="Offline" />
+        <Stat n={saved.length} label="Saved" />
       </div>
 
       <h2 className="mt-8 font-display text-lg uppercase text-foreground">Pilot regions</h2>

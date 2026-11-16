@@ -3,6 +3,7 @@ import { useState } from "react";
 import { RadioTower, ShieldAlert } from "lucide-react";
 import { AppShell, ModeIcon, SaveButton, SourceTag } from "@/components/fo";
 import { operators, regions, sites, type Region } from "@/lib/data";
+import { useHydrated } from "@/lib/offline";
 import { Button } from "@/components/ui/button";
 
 type S = { region?: Region | undefined; tab?: "sites" | "operators" | undefined };
@@ -32,7 +33,12 @@ export const Route = createFileRoute("/directory")({
 });
 
 function Directory() {
-  const { region, tab = "sites" } = Route.useSearch();
+  const search = Route.useSearch();
+  // The page is built ahead of time with no filter, so the URL's region and
+  // tab apply only once React has attached to it.
+  const hydrated = useHydrated();
+  const region = hydrated ? search.region : undefined;
+  const tab = (hydrated ? search.tab : undefined) ?? "sites";
   const nav = Route.useNavigate();
   const [q, setQ] = useState("");
   const match = (t: string) => t.toLowerCase().includes(q.toLowerCase());

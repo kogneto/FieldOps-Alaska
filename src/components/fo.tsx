@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Search, ListChecks, Bookmark, Plane, Ship, Truck, Star } from "lucide-react";
+import { Home, Search, ListChecks, Plane, Ship, Truck, Star, Wifi, WifiOff } from "lucide-react";
 import type { ReactNode } from "react";
 import { daysSince, type Mode, type Source } from "@/lib/data";
+import { RECORDS_AS_OF, useNow, useOnline } from "@/lib/offline";
 import { useSaved } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 
@@ -26,6 +27,7 @@ export function AppShell({
             Sample
           </span>
         </div>
+        <ConnectionStatus />
       </header>
       <main className="flex-1 px-5 pb-32 pt-5">{children}</main>
       <BottomNav />
@@ -33,11 +35,31 @@ export function AppShell({
   );
 }
 
+// The whole app works with no signal, so this shows the state rather than
+// being a place you go to for offline use.
+function ConnectionStatus() {
+  const online = useOnline();
+  return (
+    <p role="status" className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+      {online ? (
+        <Wifi className="h-4 w-4 shrink-0 text-ok" />
+      ) : (
+        <WifiOff className="h-4 w-4 shrink-0 text-caution" />
+      )}
+      <span className="font-semibold text-foreground">{online ? "Online" : "Offline"}</span>
+      <span aria-hidden="true">·</span>
+      <span>
+        Records as of <span className="font-mono">{RECORDS_AS_OF}</span>
+      </span>
+    </p>
+  );
+}
+
 const nav = [
   { to: "/", label: "Home", icon: Home },
   { to: "/directory", label: "Find", icon: Search },
   { to: "/checklists", label: "Prep", icon: ListChecks },
-  { to: "/saved", label: "Offline", icon: Bookmark },
+  { to: "/saved", label: "Saved", icon: Star },
 ] as const;
 
 function BottomNav() {
@@ -67,7 +89,8 @@ export function ModeIcon({ mode, className = "h-5 w-5" }: { mode: Mode; classNam
 }
 
 export function SourceTag({ source }: { source: Source }) {
-  const d = daysSince(source.verified);
+  const now = useNow();
+  const d = daysSince(source.verified, now);
   const stale = d > 60;
   const tone =
     source.confidence === "high"
@@ -104,7 +127,7 @@ export function SaveButton({ id }: { id: string }) {
         toggle(id);
       }}
       aria-pressed={on}
-      aria-label={on ? "Remove from offline" : "Save for offline"}
+      aria-label={on ? "Remove from Saved" : "Add to Saved"}
       className="shrink-0 border-2"
     >
       <Star className={`h-5 w-5 ${on ? "fill-current" : ""}`} />
