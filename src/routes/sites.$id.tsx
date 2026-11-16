@@ -34,7 +34,10 @@ export const Route = createFileRoute("/sites/$id")({
   }),
   notFoundComponent: () => (
     <AppShell title="Not found">
-      <Link to="/directory" className="text-primary">
+      <Link
+        to="/directory"
+        className="flex min-h-14 items-center justify-center rounded-lg border-2 border-primary px-4 font-bold uppercase text-primary"
+      >
         Back to directory
       </Link>
     </AppShell>
