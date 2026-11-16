@@ -4,6 +4,7 @@
 //     nitro (build-only using cloudflare as a default target), VITE_* env injection, @ path alias,
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
+import { execSync } from "node:child_process";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { operators, sites } from "./src/lib/data";
 
@@ -16,6 +17,7 @@ const pages = [
   "/directory",
   "/checklists",
   "/saved",
+  "/feedback",
   ...sites.map((site) => `/sites/${site.id}`),
   ...operators.map((operator) => `/operators/${operator.id}`),
 ].map((path) => ({ path }));
@@ -23,6 +25,16 @@ const pages = [
 function localDate(date: Date) {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+// The commit a build came from, sent with each feedback note. Builds without
+// git (Lovable's, for one) say "unknown".
+function appVersion() {
+  try {
+    return execSync("git rev-parse --short HEAD", { encoding: "utf8" }).trim() || "unknown";
+  } catch {
+    return "unknown";
+  }
 }
 
 export default defineConfig({
@@ -41,6 +53,7 @@ export default defineConfig({
   vite: {
     define: {
       __BUILD_DATE__: JSON.stringify(localDate(new Date())),
+      __APP_VERSION__: JSON.stringify(appVersion()),
     },
   },
 });

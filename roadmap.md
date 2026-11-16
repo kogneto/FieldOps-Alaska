@@ -35,10 +35,20 @@ Checked in Chrome against a local Cloudflare server, then with that server stopp
 
 Done when a tester can send a feedback note with no signal, and it reaches Cloudflare storage once the phone is back online.
 
+Decided:
+
+- Notes are stored in D1, in the `fieldops-feedback` database.
+- Andy reads them with `bun run notes`.
+- Spam limits: Cloudflare's rate limit allows 5 notes a minute per IP address, and a cap of 300 notes a day applies across everyone. The address is counted, never stored or logged, and the app says so.
+- A note is at most 1,000 characters.
+- Notes are deleted 90 days after they arrive, by a daily cron. Old notes are also cleared whenever a note arrives or the notes are read.
+
+Built and checked locally against a local database, including a note written with the server down that sent itself on reconnect. Not deployed yet, so not done.
+
 - [ ] A feedback note can be sent from any screen. On a site or operator page it is tied to that record.
-- [ ] Rename "Report a change" to "Send feedback"; it opens the same note.
+- [ ] Rename "Report a change" to "Send feedback"; it opens the same note. Every screen now ends with one "Send feedback" button.
 - [ ] Notes wait on the phone until there is signal, then send.
-- [ ] Only the note's text, the screen or record, the app version and the time are stored. No name or email is asked for or kept.
+- [ ] Only the note's text, the screen or record, the app version, the time it arrived and a random note id are stored. No name, email or IP address is asked for or kept.
 - [ ] The endpoint is public, so it caps note length and how often notes are accepted.
 - [ ] Watch testers use it outdoors with gloves on, alongside the notes.
 

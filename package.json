@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "preview:cf": "wrangler dev --port 8790",
     "deploy": "bun scripts/deploy.ts",
+    "notes": "bun scripts/notes.ts",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",

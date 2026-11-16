@@ -46,6 +46,7 @@ function OpPage() {
   return (
     <AppShell
       title={op.name}
+      recordId={op.id}
       back={
         <Link
           to="/directory"
