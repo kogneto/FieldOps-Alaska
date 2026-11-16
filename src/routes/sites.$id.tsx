@@ -2,13 +2,15 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Lock,
+  MapPin,
   ShieldAlert,
   Snowflake,
   BadgeCheck,
   MessageSquareWarning,
 } from "lucide-react";
 import { AppShell, Disclaimer, ModeIcon, SaveButton, SourceTag } from "@/components/fo";
-import { getOperator, getSite } from "@/lib/data";
+import { confidentialityRule, getOperator, getSite } from "@/lib/data";
+import { mapsUrl, platformFrom } from "@/lib/maps";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/sites/$id")({
@@ -22,7 +24,7 @@ export const Route = createFileRoute("/sites/$id")({
       { title: `${loaderData?.site.name ?? "Site"} — FieldOps Alaska` },
       {
         name: "description",
-        content: `Access notes, seasonal constraints and credentials for ${loaderData?.site.name ?? "this site"}.`,
+        content: `Access notes, seasonal constraints and qualifications for ${loaderData?.site.name ?? "this site"}.`,
       },
       { property: "og:title", content: `${loaderData?.site.name ?? "Site"} — FieldOps Alaska` },
       { property: "og:description", content: "Site access and prep details." },
@@ -53,7 +55,7 @@ function SitePage() {
       back={
         <Link
           to="/directory"
-          className="mb-2 flex min-h-12 items-center gap-2 text-base font-semibold text-muted-foreground"
+          className="mb-2 flex min-h-14 items-center gap-2 text-base font-semibold text-muted-foreground"
         >
           <ArrowLeft className="h-5 w-5" />
           Directory
@@ -72,13 +74,14 @@ function SitePage() {
         <SaveButton id={site.id} />
       </div>
       <div className="mt-3">
-        <SourceTag source={site.source} />
+        <SourceTag source={site.source} showAdvice />
       </div>
+      <OpenInMaps lat={site.lat} lng={site.lng} />
 
       <div className="mt-4 flex flex-wrap gap-2">
         <span className="flex items-center gap-1 rounded-sm bg-secondary px-2 py-1 text-xs font-semibold uppercase">
           <Lock className="h-3.5 w-3.5" />
-          {site.confidentiality}
+          {site.confidentiality === "open" ? "Open" : "Confidential"}
         </span>
         {site.escort && (
           <span className="flex items-center gap-1 rounded-sm bg-caution px-2 py-1 text-xs font-bold uppercase text-caution-foreground">
@@ -87,6 +90,9 @@ function SitePage() {
           </span>
         )}
       </div>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {confidentialityRule[site.confidentiality]}
+      </p>
 
       <Section title="Access">
         <ul className="grid gap-2">
@@ -111,9 +117,9 @@ function SitePage() {
         </p>
       </Section>
 
-      <Section title="Credentials to carry">
+      <Section title="Qualifications">
         <ul className="grid gap-2">
-          {site.credentials.map((c) => (
+          {site.qualifications.map((c) => (
             <li
               key={c}
               className="flex min-h-16 items-center gap-3 rounded-lg border-2 border-border bg-card p-4"
@@ -161,6 +167,28 @@ function SitePage() {
       </Button>
       <Disclaimer />
     </AppShell>
+  );
+}
+
+// Hands the coordinates to the phone's own maps app. The href is the web
+// fallback; on a phone the click handler swaps in the native maps link.
+function OpenInMaps({ lat, lng }: { lat: number; lng: number }) {
+  return (
+    <a
+      href={mapsUrl("other", lat, lng)}
+      target="_blank"
+      rel="noreferrer"
+      onClick={(e) => {
+        const platform = platformFrom(navigator.userAgent, navigator.maxTouchPoints);
+        if (platform === "other") return;
+        e.preventDefault();
+        window.location.href = mapsUrl(platform, lat, lng);
+      }}
+      className="mt-4 flex min-h-16 items-center justify-center gap-3 rounded-lg border-2 border-accent px-4 text-lg font-bold uppercase text-accent active:bg-secondary"
+    >
+      <MapPin className="h-6 w-6" />
+      Open in maps
+    </a>
   );
 }
 

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { RadioTower, ShieldAlert } from "lucide-react";
 import { AppShell, ModeIcon, SaveButton, SourceTag } from "@/components/fo";
-import { operators, regions, sites, type Region } from "@/lib/data";
+import { filterOperators, filterSites, operators, regions, sites, type Region } from "@/lib/data";
 import { useHydrated } from "@/lib/offline";
 import { Button } from "@/components/ui/button";
 
@@ -41,17 +41,9 @@ function Directory() {
   const tab = (hydrated ? search.tab : undefined) ?? "sites";
   const nav = Route.useNavigate();
   const [q, setQ] = useState("");
-  const match = (t: string) => t.toLowerCase().includes(q.toLowerCase());
 
-  const siteList = sites.filter(
-    (s) =>
-      (!region || s.region === region) && (match(s.name) || match(s.community) || match(s.kind)),
-  );
-  const opList = operators.filter(
-    (o) =>
-      (!region || o.region === region) &&
-      (match(o.name) || match(o.community) || o.services.some(match)),
-  );
+  const siteList = filterSites(sites, region, q);
+  const opList = filterOperators(operators, region, q);
 
   return (
     <AppShell title="Find">
@@ -68,7 +60,7 @@ function Directory() {
             size="sm"
             key={r ?? "all"}
             onClick={() => nav({ search: { region: r, tab } })}
-            className="shrink-0"
+            className="min-h-14 shrink-0"
           >
             {r ?? "All regions"}
           </Button>
