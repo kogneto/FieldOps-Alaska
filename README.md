@@ -2,7 +2,7 @@
 
 A phone-first prototype of a field companion for telecom technicians who work at remote sites in Alaska. It's designed for outdoor use with gloves, so the tap targets are large.
 
-**This is an early prototype.** Today it's a searchable directory of sample sites and operators plus a few prep checklists. It doesn't plan trips, track gear or show live weather yet.
+**This is an early prototype.** Today it's a searchable directory of sample sites and operators plus a few prep checklists. It doesn't plan trips yet, and it doesn't track gear or show live weather.
 
 Everything in it is made up. The sites, contacts and notes are sample data, the phone numbers are 555 numbers, and the email addresses are example.com. Real place names, highways and the Alaska Marine Highway show up, but nothing here has been verified or should be used for real field work. The header on every main screen carries a "Sample" badge.
 
@@ -33,7 +33,7 @@ Most main controls are at least 56 px tall, and the bottom bar (Home, Find, Prep
 
 ## Where it's headed
 
-The goal is for it to help technicians plan trips around Alaska, track shipped gear, and stay aware of weather and travel hazards. None of that is built yet.
+It's aimed at one working crew of technicians, and until one is lined up, testers try the public demo without signing in. The order is: make it work with no signal, add a way for testers to send feedback anonymously, then trip planning on the sample data. The crew's own records behind a sign-in are parked until a crew signs on. Gear tracking and live weather are off the list for now. [roadmap.md](roadmap.md) has the full plan and [CONTEXT.md](CONTEXT.md) the vocabulary.
 
 ## Stack
 
