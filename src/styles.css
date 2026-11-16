@@ -121,11 +121,26 @@
     font-size: 18px;
     line-height: 1.5;
   }
-  button, a, input { touch-action: manipulation; }
-  :focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; }
-  .font-display { font-weight: 400; letter-spacing: 0; }
+  button,
+  a,
+  input {
+    touch-action: manipulation;
+  }
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 3px;
+  }
+  .font-display {
+    font-weight: 400;
+    letter-spacing: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
