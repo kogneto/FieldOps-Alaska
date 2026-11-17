@@ -1,0 +1,35 @@
+name: Checks
+# Runs the checks on every pull request (and on main after a merge), on GitHub's machines, so a
+# broken change shows before it is merged. GitHub's runners cost nothing for a public repository.
+# It gets no secrets and can't deploy: deploys still run from Andy's PC (`bun run deploy`).
+# The same checks run locally with `bun run check`, or in Linux with `bun run check:docker`.
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  # A newer push to the same pull request cancels the older run.
+  group: checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: bun-${{ runner.os }}-
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun run lint
+      - run: bun run format:check
+      - run: bun run test
+      - run: bun run build

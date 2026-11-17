@@ -13,3 +13,4 @@
 - Check [roadmap.md](roadmap.md) for scope and order before starting work, and [docs/adr](docs/adr) for decisions whose reasons matter.
 - Keep all primary mobile controls at least 56px tall, with 64px preferred, because FieldOps is operated outdoors with gloves. A primary control is any control in the main flow; only a text link inside a sentence is exempt.
 - Edit code in this repo rather than in Lovable, and deploy to Cloudflare from Andy's PC rather than from GitHub Actions.
+- Run `bun run check` before opening a pull request. The Checks workflow runs the same steps on every pull request.

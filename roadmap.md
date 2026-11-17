@@ -11,6 +11,7 @@ Vocabulary is in [CONTEXT.md](CONTEXT.md). Decisions that need their reasons kep
 - Real data never enters this repo ([ADR 0001](docs/adr/0001-real-data-stays-out-of-the-repo.md)). The committed records stay an invented sample set.
 - Nothing in the public demo asks a tester who they are.
 - Logic gets automated tests: the record-format check, staleness, the trip roll-up. Screens are checked by hand on a phone.
+- Every pull request runs the checks (typecheck, lint, formatting, tests, build) on GitHub's machines, which cost nothing for a public repository. Deploys still run from the PC.
 
 ## Done
 
@@ -109,7 +110,6 @@ Waits until a crew signs on.
 - Sharing trips with the crew through a backend.
 - Each technician records their own qualifications and expiry dates on their phone, and a trip flags gaps.
 - Choosing a trip's checklists by the kind of site and the season.
-- Checks on GitHub for every push, once a second person contributes.
 
 ## Not now
 

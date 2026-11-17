@@ -13,9 +13,13 @@
     "notes": "bun scripts/notes.ts",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "check": "bun run typecheck && bun run lint && bun run format:check && bun run test && bun run build",
+    "check:docker": "docker build --progress=plain -f ops/checks/Dockerfile --output type=cacheonly ."
   },
   "overrides": {
     "rolldown": "1.2.1"
