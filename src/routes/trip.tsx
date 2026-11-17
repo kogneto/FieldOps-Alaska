@@ -19,6 +19,7 @@ import { useHydrated, useToday } from "@/lib/offline";
 import { deleteTrip, updateTrip, useTrips } from "@/lib/trip-store";
 import {
   addDays,
+  addStop,
   dateRangeLabel,
   MAX_TRIP_DAYS,
   removeStop,
@@ -27,6 +28,7 @@ import {
   setRoute,
   shareText,
   shortDate,
+  sitesNotOnTrip,
   toggleItem,
   toggleQual,
   toggleSkip,
@@ -233,16 +235,7 @@ function TripDetail({ trip }: { trip: Trip }) {
             );
           })}
         </div>
-        <Link
-          to="/directory"
-          className="mt-3 flex min-h-16 items-center justify-center gap-2 rounded-lg border-2 border-accent px-4 text-lg font-bold uppercase text-accent active:bg-secondary"
-        >
-          <Plus className="h-5 w-5" />
-          Add a site
-        </Link>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Open a site and tap "Add to this trip".
-        </p>
+        <AddSites trip={trip} onAdd={(siteId) => change((t) => addStop(t, siteId))} />
       </Section>
 
       <QualificationsSection trip={trip} onToggle={(id) => change((t) => toggleQual(t, id))} />
@@ -322,6 +315,53 @@ function TripDetail({ trip }: { trip: Trip }) {
         {confirmDelete ? "Tap again to delete" : "Delete trip"}
       </button>
     </AppShell>
+  );
+}
+
+// Adds sites to this trip from its own page, so the right trip always gets
+// them (a site page's "Add to this trip" only knows the current trip).
+function AddSites({ trip, onAdd }: { trip: Trip; onAdd: (siteId: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const available = sitesNotOnTrip(trip);
+  if (available.length === 0) return null;
+  return (
+    <div className="mt-3">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+        className="flex min-h-16 w-full items-center justify-center gap-2 rounded-lg border-2 border-accent px-4 text-lg font-bold uppercase text-accent active:bg-secondary"
+      >
+        <Plus className="h-5 w-5" />
+        {open ? "Close site list" : "Add a site"}
+      </button>
+      {open && (
+        <ul className="mt-2 grid gap-2">
+          {available.map((site) => (
+            <li
+              key={site.id}
+              className="flex items-center gap-3 rounded-lg border-2 border-border bg-card p-3"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold">{site.name}</span>
+                <span className="block text-sm text-muted-foreground">
+                  {site.community}, {site.region}
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() => onAdd(site.id)}
+                aria-label={`Add ${site.name} to this trip`}
+                className="flex min-h-14 shrink-0 items-center gap-1 rounded-lg bg-primary px-4 font-bold uppercase text-primary-foreground active:translate-y-0.5"
+              >
+                <Plus className="h-5 w-5" />
+                Add
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

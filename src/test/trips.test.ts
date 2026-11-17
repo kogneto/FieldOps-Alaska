@@ -14,6 +14,7 @@ import {
   setDates,
   setRoute,
   shareText,
+  sitesNotOnTrip,
   toggleItem,
   toggleQual,
   toggleSkip,
@@ -124,6 +125,14 @@ describe("building a trip", () => {
     t = addStop(addStop(t, "site-coldfoot"), "site-coldfoot");
     expect(t.stops.map((s) => s.siteId)).toEqual(["site-thompson-pass", "site-coldfoot"]);
     expect(tripTitle(t)).toBe("Thompson Pass Cell Site + 1 more");
+  });
+
+  it("offers only the sites not already on the trip", () => {
+    const t = addStop(trip("site-thompson-pass", "2026-07-10"), "site-coldfoot");
+    const ids = sitesNotOnTrip(t).map((s) => s.id);
+    expect(ids).toHaveLength(5);
+    expect(ids).not.toContain("site-thompson-pass");
+    expect(ids).not.toContain("site-coldfoot");
   });
 
   it("lists each qualification once across all the trip's sites", () => {

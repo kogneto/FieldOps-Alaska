@@ -6,6 +6,7 @@
 // lands on the previous day in Alaska.
 import {
   checklists as sampleChecklists,
+  sites as sampleSites,
   getOperator,
   getQualification,
   getSite,
@@ -242,6 +243,12 @@ export function toggleQual(trip: Trip, qualId: string): Trip {
 }
 
 // ---- Reading trips ---------------------------------------------------------
+
+/** Sites that could still be added to this trip, in directory order. */
+export function sitesNotOnTrip(trip: Trip): Site[] {
+  const on = new Set(trip.stops.map((s) => s.siteId));
+  return sampleSites.filter((site) => !on.has(site.id));
+}
 
 /** One list of the qualifications every site on the trip needs, without repeats. */
 export function tripQualifications(trip: Trip): string[] {
