@@ -79,7 +79,7 @@ Decided (defaults Claude applied when Andy said to keep going without approvals)
 - Qualification ticks belong to the trip and aren't carried to the next one.
 - A shared plan includes site names, and starts with "Confidential — share inside the crew only" when any site is confidential. Unlike "Open in maps", it doesn't withhold names; revisit if plans get forwarded to operators.
 
-Built and checked locally against a local Cloudflare server, including reloading a trip with the server stopped. Not deployed yet.
+Live since 16 Nov 2026, deployed from the PR #8 branch at `64d56e9` before it was merged. Checked live: every cached file loads, the new version takes over after a close and reopen, and a trip planned from Coldfoot started in two taps and was deleted. Also checked locally with two trips and with the server stopped. Not yet checked on a real phone.
 
 - [x] A trip is one outing: a date range, one or more sites, the operators chosen to reach them, and its own copy of the checklists. The sites are a flat list, not an itinerary with legs.
 - [x] Starting a trip takes two taps: pick a site, confirm the dates.
