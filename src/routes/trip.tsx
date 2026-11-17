@@ -42,7 +42,13 @@ import {
   STATUS_LABEL,
   type Trip,
 } from "@/lib/trips";
-import { needsAttention, qualStatus, statusLabel, useQualRecord } from "@/lib/qual-record";
+import {
+  needsAttention,
+  qualStatus,
+  showRecordFlags,
+  statusLabel,
+  useQualRecord,
+} from "@/lib/qual-record";
 
 type Search = { id?: string | undefined };
 
@@ -397,7 +403,9 @@ function QualificationsSection({ trip, onToggle }: { trip: Trip; onToggle: (id: 
       </p>
       <ul className="grid gap-2">
         {ids.map((id) => {
-          const status = record ? qualStatus(record, id, end, today) : null;
+          const status = showRecordFlags(record, trip, today)
+            ? qualStatus(record, id, end, today)
+            : null;
           return (
             <li key={id}>
               <TickRow

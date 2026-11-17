@@ -8,6 +8,7 @@ import {
   readQualRecord,
   setExpiry,
   setHeld,
+  showRecordFlags,
   statusLabel,
   type QualRecord,
 } from "@/lib/qual-record";
@@ -72,6 +73,26 @@ describe("qualStatus", () => {
       statusLabel(qualStatus(record(e), "q-tower-climb", end, today)),
     );
     expect(labels.join(" ").toLowerCase()).not.toMatch(/clear|ok to go|approved/);
+  });
+});
+
+describe("showRecordFlags", () => {
+  const trip = { start: "2026-11-28", days: 5 };
+
+  it("stays quiet until the technician records something", () => {
+    expect(showRecordFlags(null, trip, "2026-11-17")).toBe(false);
+    expect(showRecordFlags(emptyRecord(), trip, "2026-11-17")).toBe(false);
+    expect(showRecordFlags(record("2027-06"), trip, "2026-11-17")).toBe(true);
+  });
+
+  it("leaves past trips alone, where today's date would give a false 'expired'", () => {
+    // Viewed in Jan 2027, a cert valid to Dec 2026 reads as expired, though it
+    // covered the whole trip. So past trips show no flags.
+    expect(qualStatus(record("2026-12"), "q-tower-climb", "2026-12-02", "2027-01-10").kind).toBe(
+      "expired",
+    );
+    expect(showRecordFlags(record("2026-12"), trip, "2027-01-10")).toBe(false);
+    expect(showRecordFlags(record("2026-12"), trip, "2026-12-02")).toBe(true);
   });
 });
 

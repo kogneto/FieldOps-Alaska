@@ -6,6 +6,7 @@
 // or expires before the trip ends; it never says anyone is cleared to go.
 import { useSyncExternalStore } from "react";
 import { getQualification, monthName } from "./data";
+import { tripStatus, type Trip } from "./trips";
 
 export const QUAL_RECORD_VERSION = 1;
 
@@ -86,6 +87,20 @@ export function statusLabel(status: QualStatus): string {
     case "expired":
       return `Expired ${monthLabel(status.expires)}`;
   }
+}
+
+/**
+ * Whether a trip shows qualifications against the record: only once the
+ * technician has recorded something (the record is optional), and never for a
+ * trip that is over, where "expired" would be measured against today rather
+ * than the trip.
+ */
+export function showRecordFlags(
+  record: QualRecord | null,
+  trip: Pick<Trip, "start" | "days">,
+  today: string,
+): record is QualRecord {
+  return record !== null && record.held.length > 0 && tripStatus(trip, today) !== "past";
 }
 
 /** Statuses a technician should look at before the trip. */

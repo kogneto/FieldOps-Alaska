@@ -18,7 +18,7 @@ Everything in it is made up. The sites, contacts and notes are sample data, the 
 
 **Saved list.** Star a site or operator to add it to the list under the Saved tab. The app stores only which records you picked, in the browser's local storage.
 
-**Works with no signal.** Every page is built ahead of time, and the first time the app is opened online a service worker caches all of it: the 23 pages, the code, the fonts and the icons, about 1 MB. After that every screen opens with no signal and checklists still tick. The header shows whether the phone is online and the date the records were built ("Records as of"). A new version downloads in the background and takes over the next time the app is opened. A page that isn't cached shows a "No signal" page after 8 seconds at most.
+**Works with no signal.** Every page is built ahead of time, and the first time the app is opened online a service worker caches all of it: the 24 pages, the code, the fonts and the icons, about 1 MB. After that every screen opens with no signal and checklists still tick. The header shows whether the phone is online and the date the records were built ("Records as of"). A new version downloads in the background and takes over the next time the app is opened. A page that isn't cached shows a "No signal" page after 8 seconds at most.
 
 **Install it.** Add it to the home screen from the browser's share or menu button, and it opens full screen like an app. On iPhone, installing also stops Safari from clearing the cached app after a week without use.
 
