@@ -78,6 +78,8 @@ bun run check:docker  # the same in Linux, in Docker on this PC (ops/checks/READ
 
 Every pull request runs the same checks on GitHub's machines (`.github/workflows/checks.yml`), and so does `main` after a merge. A newer push to a pull request cancels the older run. GitHub's runners cost nothing for a public repository, and the workflow gets no secrets, so it can't deploy.
 
+`main` requires the Checks status (a repository ruleset), and auto-merge is on: a pull request with auto-merge enabled merges itself as soon as Checks pass. Admins can still push or merge past the rule.
+
 ## Deploying
 
 ```sh
