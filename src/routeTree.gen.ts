@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DirectoryRouteImport } from './routes/directory'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as PlanRouteImport } from './routes/plan'
+import { Route as QualificationsRouteImport } from './routes/qualifications'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as TripRouteImport } from './routes/trip'
 import { Route as TripsRouteImport } from './routes/trips'
@@ -38,6 +39,11 @@ const FeedbackRoute = FeedbackRouteImport.update({
 const PlanRoute = PlanRouteImport.update({
   id: '/plan',
   path: '/plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QualificationsRoute = QualificationsRouteImport.update({
+  id: '/qualifications',
+  path: '/qualifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SavedRoute = SavedRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/directory': typeof DirectoryRoute
   '/feedback': typeof FeedbackRoute
   '/plan': typeof PlanRoute
+  '/qualifications': typeof QualificationsRoute
   '/saved': typeof SavedRoute
   '/trip': typeof TripRoute
   '/trips': typeof TripsRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/directory': typeof DirectoryRoute
   '/feedback': typeof FeedbackRoute
   '/plan': typeof PlanRoute
+  '/qualifications': typeof QualificationsRoute
   '/saved': typeof SavedRoute
   '/trip': typeof TripRoute
   '/trips': typeof TripsRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/directory': typeof DirectoryRoute
   '/feedback': typeof FeedbackRoute
   '/plan': typeof PlanRoute
+  '/qualifications': typeof QualificationsRoute
   '/saved': typeof SavedRoute
   '/trip': typeof TripRoute
   '/trips': typeof TripsRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/directory'
     | '/feedback'
     | '/plan'
+    | '/qualifications'
     | '/saved'
     | '/trip'
     | '/trips'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/directory'
     | '/feedback'
     | '/plan'
+    | '/qualifications'
     | '/saved'
     | '/trip'
     | '/trips'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/directory'
     | '/feedback'
     | '/plan'
+    | '/qualifications'
     | '/saved'
     | '/trip'
     | '/trips'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   DirectoryRoute: typeof DirectoryRoute
   FeedbackRoute: typeof FeedbackRoute
   PlanRoute: typeof PlanRoute
+  QualificationsRoute: typeof QualificationsRoute
   SavedRoute: typeof SavedRoute
   TripRoute: typeof TripRoute
   TripsRoute: typeof TripsRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/plan'
       fullPath: '/plan'
       preLoaderRoute: typeof PlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qualifications': {
+      id: '/qualifications'
+      path: '/qualifications'
+      fullPath: '/qualifications'
+      preLoaderRoute: typeof QualificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/saved': {
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirectoryRoute: DirectoryRoute,
   FeedbackRoute: FeedbackRoute,
   PlanRoute: PlanRoute,
+  QualificationsRoute: QualificationsRoute,
   SavedRoute: SavedRoute,
   TripRoute: TripRoute,
   TripsRoute: TripsRoute,

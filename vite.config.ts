@@ -18,6 +18,7 @@ const pages = [
   "/trips",
   "/trip",
   "/plan",
+  "/qualifications",
   "/saved",
   "/feedback",
   ...sites.map((site) => `/sites/${site.id}`),
