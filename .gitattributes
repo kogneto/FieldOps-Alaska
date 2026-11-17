@@ -1,0 +1,3 @@
+# The route tree is regenerated with LF line endings on every build; keep the
+# checkout LF too, so a build on Windows doesn't show it as changed.
+src/routeTree.gen.ts text eol=lf
