@@ -12,6 +12,7 @@ Vocabulary is in [CONTEXT.md](CONTEXT.md). Decisions that need their reasons kep
 - Nothing in the public demo asks a tester who they are.
 - Logic gets automated tests: the record-format check, staleness, the trip roll-up. Screens are checked by hand on a phone.
 - Every pull request runs the checks (typecheck, lint, formatting, tests, build) on GitHub's machines, which cost nothing for a public repository. Deploys still run from the PC.
+- `main` requires the Checks status, and pull requests use auto-merge: they merge themselves once Checks pass. Andy, as admin, can still push or merge past the rule.
 
 ## Done
 
@@ -80,7 +81,7 @@ Decided (defaults Claude applied when Andy said to keep going without approvals)
 - Qualification ticks belong to the trip and aren't carried to the next one.
 - A shared plan includes site names, and starts with "Confidential — share inside the crew only" when any site is confidential. Unlike "Open in maps", it doesn't withhold names; revisit if plans get forwarded to operators.
 
-Live since 16 Nov 2026, deployed from the PR #8 branch at `64d56e9` before it was merged. Checked live: every cached file loads, the new version takes over after a close and reopen, and a trip planned from Coldfoot started in two taps and was deleted. Also checked locally with two trips and with the server stopped. Not yet checked on a real phone.
+Live since 16 Nov 2026, first from the PR #8 branch at `64d56e9`, and from `main` at `0d2ee25` since 17 Nov. Checked live: every cached file loads, the new version takes over after a close and reopen, and a trip planned from Coldfoot started in two taps and was deleted. Also checked locally with two trips and with the server stopped. Not yet checked on a real phone.
 
 - [x] A trip is one outing: a date range, one or more sites, the operators chosen to reach them, and its own copy of the checklists. The sites are a flat list, not an itinerary with legs.
 - [x] Starting a trip takes two taps: pick a site, confirm the dates.
