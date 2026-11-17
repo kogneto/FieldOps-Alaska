@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Find Alaska telecom sites, operators, access notes and prep checklists — offline-ready.",
+          "Find Alaska telecom sites, operators and access notes, and plan trips with prep checklists — works offline.",
       },
       { property: "og:title", content: "FieldOps Alaska" },
       { property: "og:description", content: "Reach the site, get in, get the job done, get out." },
@@ -68,10 +68,10 @@ function Index() {
       </div>
 
       <Link
-        to="/checklists"
+        to="/trips"
         className="mt-4 flex min-h-16 items-center gap-3 rounded-lg bg-primary px-5 text-lg font-bold uppercase text-primary-foreground active:translate-y-0.5"
       >
-        <ListChecks className="h-7 w-7" strokeWidth={2.5} /> Run prep checklists
+        <ListChecks className="h-7 w-7" strokeWidth={2.5} /> Trips & prep checklists
       </Link>
 
       <h2 className="mt-8 font-display text-lg uppercase text-foreground">Official conditions</h2>

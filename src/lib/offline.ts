@@ -58,3 +58,27 @@ const LAUNCH_TIME = typeof window === "undefined" ? BUILD_TIME : Date.now();
 export function useNow() {
   return useHydrated() ? LAUNCH_TIME : BUILD_TIME;
 }
+
+function localToday() {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// An installed app can stay open for days, so re-check the date every minute
+// and whenever the app comes back to the foreground.
+function subscribeToDay(onChange: () => void) {
+  const timer = setInterval(onChange, 60_000);
+  document.addEventListener("visibilitychange", onChange);
+  window.addEventListener("focus", onChange);
+  return () => {
+    clearInterval(timer);
+    document.removeEventListener("visibilitychange", onChange);
+    window.removeEventListener("focus", onChange);
+  };
+}
+
+/** Today's local date, "YYYY-MM-DD". The build date until hydrated. */
+export function useToday(): string {
+  return useSyncExternalStore(subscribeToDay, localToday, () => RECORDS_AS_OF);
+}

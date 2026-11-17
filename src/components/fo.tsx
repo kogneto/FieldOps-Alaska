@@ -93,7 +93,7 @@ function ConnectionStatus() {
 const nav = [
   { to: "/", label: "Home", icon: Home },
   { to: "/directory", label: "Find", icon: Search },
-  { to: "/checklists", label: "Prep", icon: ListChecks },
+  { to: "/trips", label: "Trips", icon: ListChecks },
   { to: "/saved", label: "Saved", icon: Star },
 ] as const;
 

@@ -15,7 +15,9 @@ import { operators, sites } from "./src/lib/data";
 const pages = [
   "/",
   "/directory",
-  "/checklists",
+  "/trips",
+  "/trip",
+  "/plan",
   "/saved",
   "/feedback",
   ...sites.map((site) => `/sites/${site.id}`),

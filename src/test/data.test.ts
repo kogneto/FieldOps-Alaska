@@ -4,7 +4,10 @@ import {
   filterOperators,
   filterSites,
   getOperator,
+  getQualification,
   isStale,
+  monthsLabel,
+  operatorIdsFor,
   operators,
   sites,
   STALE_AFTER_DAYS,
@@ -74,11 +77,41 @@ describe("filterSites", () => {
 describe("sample data", () => {
   it("links every site only to operators that exist and serve its region", () => {
     for (const site of sites) {
-      for (const id of site.reachBy) {
+      for (const id of operatorIdsFor(site)) {
         const operator = getOperator(id);
         expect(operator, `${site.id} → ${id}`).toBeDefined();
         expect(operator?.regions, `${site.id} → ${id}`).toContain(site.region);
       }
     }
+  });
+
+  it("gives every site at least one way in for every month of the year", () => {
+    for (const site of sites) {
+      const covered = new Set(site.routes.flatMap((r) => r.months));
+      expect(covered.size, site.id).toBe(12);
+      for (const route of site.routes) {
+        expect(route.months.length, site.id).toBeGreaterThan(0);
+        expect(new Set(route.months).size, `${site.id} repeats a month`).toBe(route.months.length);
+        for (const m of route.months) expect(m >= 1 && m <= 12, site.id).toBe(true);
+      }
+    }
+  });
+
+  it("uses only qualifications from the named list", () => {
+    for (const site of sites) {
+      for (const id of site.qualificationIds) {
+        expect(getQualification(id), `${site.id} → ${id}`).toBeDefined();
+      }
+    }
+  });
+});
+
+describe("monthsLabel", () => {
+  it("names a whole year, one run, a run across New Year, and scattered months", () => {
+    expect(monthsLabel([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])).toBe("All year");
+    expect(monthsLabel([4, 5, 6, 7, 8, 9, 10, 11])).toBe("Apr–Nov");
+    expect(monthsLabel([12, 1, 2, 3])).toBe("Dec–Mar");
+    expect(monthsLabel([7])).toBe("Jul");
+    expect(monthsLabel([1, 3, 5])).toBe("Jan, Mar, May");
   });
 });
