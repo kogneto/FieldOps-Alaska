@@ -33,13 +33,3 @@ export function useSaved() {
     setSaved(saved.includes(id) ? saved.filter((s) => s !== id) : [...saved, id]);
   return { saved, isSaved: (id: string) => saved.includes(id), toggle };
 }
-
-export function useChecks() {
-  const [checks, setChecks] = useLocal<Record<string, boolean>>("fo-checks", {});
-  return {
-    checks,
-    toggle: (k: string) => setChecks({ ...checks, [k]: !checks[k] }),
-    reset: (prefix: string) =>
-      setChecks(Object.fromEntries(Object.entries(checks).filter(([k]) => !k.startsWith(prefix)))),
-  };
-}

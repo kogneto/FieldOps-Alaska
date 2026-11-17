@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Phone, Mail, Globe, Clock, Snowflake, RadioTower } from "lucide-react";
 import { AppShell, Disclaimer, ModeIcon, SaveButton, SourceTag } from "@/components/fo";
-import { getOperator, sites } from "@/lib/data";
+import { getOperator, operatorIdsFor, sites } from "@/lib/data";
 
 export const Route = createFileRoute("/operators/$id")({
   loader: ({ params }) => {
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/operators/$id")({
 
 function OpPage() {
   const { op } = Route.useLoaderData();
-  const served = sites.filter((s) => s.reachBy.includes(op.id));
+  const served = sites.filter((s) => operatorIdsFor(s).includes(op.id));
   return (
     <AppShell
       title={op.name}

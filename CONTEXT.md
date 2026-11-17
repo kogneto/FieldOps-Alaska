@@ -46,6 +46,10 @@ _Avoid_: Visit, job, run
 A named list of things to arrange, pack or carry before a trip, written by the maintainer. Each trip carries its own copy of every checklist.
 _Avoid_: Prep list, kit list
 
+**Route**:
+One way of reaching a site: an operator, or driving yourself, with a mode and the months it works. A site has one or more; a trip uses one per site.
+_Avoid_: Way in, access method, reach-by
+
 ### Getting into a site
 
 **Qualification**:

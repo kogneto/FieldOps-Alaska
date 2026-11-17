@@ -69,15 +69,27 @@ Small, independent of the slices.
 
 Built while looking for a crew, so the demo is worth showing. The trip model is a guess until a crew uses it.
 
-- [ ] A trip is one outing: a date range, one or more sites, the operators chosen to reach them, and its own copy of the checklists. The sites are a flat list, not an itinerary with legs.
-- [ ] Starting a trip takes two taps: pick a site, confirm the dates.
-- [ ] Every trip gets its own copy of every checklist, and a whole checklist can be skipped.
-- [ ] The Prep tab becomes the list of your trips. Checklists exist only inside a trip.
-- [ ] Checklists move into the record data, so a crew can have its own. The four invented lists stay in the sample set.
-- [ ] Qualifications become one named list that sites pick from, and a trip shows one de-duplicated list to tick off. The app doesn't know who holds what.
-- [ ] Trips live on the technician's phone only.
-- [ ] A Share button sends the plan as text through the phone's share sheet, so it can be left with a dispatcher.
-- [ ] Structured seasonal routes: each way of reaching a site gets a mode, an operator and the months it works.
+Decided (defaults Claude applied when Andy said to keep going without approvals):
+
+- A trip starts from a site page. "Plan a trip" opens a dates screen that starts at today and one day, with −/+ buttons instead of a calendar, and "Start trip" creates it.
+- Site pages offer "Add to this trip" when a trip is under way or coming up: the one under way, else the soonest.
+- Each trip picks the route that works for its dates and switches when the dates rule it out. Any route can be chosen by hand.
+- The Prep tab is now Trips. Trip pages work offline: one prebuilt page reads the trip from this phone's storage by the id in its URL.
+- Past trips are listed apart. Deleting a trip takes a second tap to confirm.
+- Qualification ticks belong to the trip and aren't carried to the next one.
+- A shared plan includes site names, and starts with "Confidential — share inside the crew only" when any site is confidential. Unlike "Open in maps", it doesn't withhold names; revisit if plans get forwarded to operators.
+
+Built and checked locally against a local Cloudflare server, including reloading a trip with the server stopped. Not deployed yet.
+
+- [x] A trip is one outing: a date range, one or more sites, the operators chosen to reach them, and its own copy of the checklists. The sites are a flat list, not an itinerary with legs.
+- [x] Starting a trip takes two taps: pick a site, confirm the dates.
+- [x] Every trip gets its own copy of every checklist, and a whole checklist can be skipped.
+- [x] The Prep tab becomes the list of your trips. Checklists exist only inside a trip.
+- [x] Checklists move into the record data, so a crew can have its own. The four invented lists stay in the sample set.
+- [x] Qualifications become one named list that sites pick from, and a trip shows one de-duplicated list to tick off. The app doesn't know who holds what.
+- [x] Trips live on the technician's phone only.
+- [x] A Share button sends the plan as text through the phone's share sheet, so it can be left with a dispatcher.
+- [x] Structured seasonal routes: each way of reaching a site gets a mode, an operator and the months it works.
 
 ## Parked: real data behind sign-in
 

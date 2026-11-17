@@ -46,9 +46,28 @@ export interface Site {
   escort: boolean;
   seasonal: string;
   confidentiality: Confidentiality;
-  qualifications: string[];
-  reachBy: string[]; // operator ids
+  /** Ids from `qualifications`. */
+  qualificationIds: string[];
+  /** Every way of reaching the site, in order of preference. */
+  routes: Route[];
   source: Source;
+}
+
+/** A month of the year, 1 = January. */
+export type Month = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+/** One way of reaching a site: an operator (or driving yourself), a mode, and the months it works. */
+export interface Route {
+  /** Null when the crew drives themselves. */
+  operatorId: string | null;
+  mode: Mode;
+  months: Month[];
+  how: string;
+}
+
+export interface Qualification {
+  id: string;
+  name: string;
 }
 
 export interface Checklist {
@@ -205,8 +224,21 @@ export const sites: Site[] = [
     escort: false,
     seasonal: "Snow load on trail Dec–Mar; plan helicopter.",
     confidentiality: "confidential",
-    qualifications: ["Tower climb cert", "First aid / CPR"],
-    reachBy: ["op-tongass-air", "op-revilla-rotor"],
+    qualificationIds: ["q-tower-climb", "q-first-aid"],
+    routes: [
+      {
+        operatorId: "op-tongass-air",
+        mode: "air",
+        months: [4, 5, 6, 7, 8, 9, 10, 11],
+        how: "Float plane to the cove, then a 1.2 mi trail climb",
+      },
+      {
+        operatorId: "op-revilla-rotor",
+        mode: "air",
+        months: [12, 1, 2, 3],
+        how: "Helicopter to the ridge while snow loads the trail",
+      },
+    ],
     source: { label: "Field capture (photo)", verifiedDaysAgo: 21, confidence: "high" },
   },
   {
@@ -221,8 +253,15 @@ export const sites: Site[] = [
     escort: false,
     seasonal: "Avalanche path above road; check DOT closures.",
     confidentiality: "confidential",
-    qualifications: ["Fiber safety training"],
-    reachBy: ["op-amhs"],
+    qualificationIds: ["q-fiber-safety"],
+    routes: [
+      {
+        operatorId: "op-amhs",
+        mode: "sea",
+        months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        how: "Ferry to Juneau, then road to the mile 4 pullout",
+      },
+    ],
     source: { label: "Client dispatcher", verifiedDaysAgo: 5, confidence: "high" },
   },
   {
@@ -237,8 +276,21 @@ export const sites: Site[] = [
     escort: true,
     seasonal: "Extreme snowfall; spur unplowed Nov–Apr.",
     confidentiality: "confidential",
-    qualifications: ["Tower climb cert", "RF awareness", "Site badge"],
-    reachBy: ["op-chugach-heli"],
+    qualificationIds: ["q-tower-climb", "q-rf-awareness", "q-site-badge"],
+    routes: [
+      {
+        operatorId: null,
+        mode: "land",
+        months: [5, 6, 7, 8, 9, 10],
+        how: "Drive the Richardson Hwy to mile 26, then the gated spur",
+      },
+      {
+        operatorId: "op-chugach-heli",
+        mode: "air",
+        months: [11, 12, 1, 2, 3, 4],
+        how: "Helicopter while the spur is unplowed",
+      },
+    ],
     source: { label: "Operator email", verifiedDaysAgo: 40, confidence: "medium" },
   },
   {
@@ -253,8 +305,21 @@ export const sites: Site[] = [
     escort: false,
     seasonal: "Road closed roughly Oct–Jul.",
     confidentiality: "open",
-    qualifications: ["Avalanche awareness (winter)"],
-    reachBy: ["op-matsu-haul"],
+    qualificationIds: ["q-avalanche"],
+    routes: [
+      {
+        operatorId: "op-matsu-haul",
+        mode: "land",
+        months: [7, 8, 9],
+        how: "Road to the summit lot, then a 0.3 mi walk",
+      },
+      {
+        operatorId: "op-matsu-haul",
+        mode: "land",
+        months: [10, 11, 12, 1, 2, 3, 4, 5, 6],
+        how: "Snow machine from the gate, trailered by Mat-Su Hotshot",
+      },
+    ],
     source: { label: "Crew report", verifiedDaysAgo: 93, confidence: "low" },
   },
   {
@@ -269,8 +334,21 @@ export const sites: Site[] = [
     escort: false,
     seasonal: "Spur muddy during breakup.",
     confidentiality: "open",
-    qualifications: ["Site badge"],
-    reachBy: ["op-matsu-haul", "op-kenai-air"],
+    qualificationIds: ["q-site-badge"],
+    routes: [
+      {
+        operatorId: "op-matsu-haul",
+        mode: "land",
+        months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        how: "Hotshot freight down the Sterling Hwy to the pullout",
+      },
+      {
+        operatorId: "op-kenai-air",
+        mode: "air",
+        months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        how: "Charter from Soldotna",
+      },
+    ],
     source: { label: "Operator phone call", verifiedDaysAgo: 26, confidence: "medium" },
   },
   {
@@ -285,8 +363,15 @@ export const sites: Site[] = [
     escort: false,
     seasonal: "−40° operations Dec–Feb; cold-weather kit mandatory.",
     confidentiality: "confidential",
-    qualifications: ["Cold-weather ops", "Tower climb cert", "Medical clearance"],
-    reachBy: ["op-dalton-freight"],
+    qualificationIds: ["q-cold-weather", "q-tower-climb", "q-medical"],
+    routes: [
+      {
+        operatorId: "op-dalton-freight",
+        mode: "land",
+        months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        how: "Dalton Hwy to mile 175 (chain law Oct–Apr)",
+      },
+    ],
     source: { label: "Operator phone call", verifiedDaysAgo: 6, confidence: "high" },
   },
   {
@@ -301,8 +386,15 @@ export const sites: Site[] = [
     escort: true,
     seasonal: "Breakup closes strip intermittently late Apr–May.",
     confidentiality: "confidential",
-    qualifications: ["RF awareness", "Site badge"],
-    reachBy: ["op-yukon-air"],
+    qualificationIds: ["q-rf-awareness", "q-site-badge"],
+    routes: [
+      {
+        operatorId: "op-yukon-air",
+        mode: "air",
+        months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        how: "Fly in, then the village truck from the strip (strip closes at times late Apr–May)",
+      },
+    ],
     source: { label: "Published schedule", verifiedDaysAgo: 13, confidence: "medium" },
   },
 ];
@@ -361,6 +453,65 @@ export const checklists: Checklist[] = [
 ];
 
 export const regions: Region[] = ["Southeast", "Southcentral", "Interior"];
+
+/** The one named list sites pick their qualifications from. */
+export const qualifications: Qualification[] = [
+  { id: "q-tower-climb", name: "Tower climb cert" },
+  { id: "q-first-aid", name: "First aid / CPR" },
+  { id: "q-fiber-safety", name: "Fiber safety training" },
+  { id: "q-rf-awareness", name: "RF awareness" },
+  { id: "q-site-badge", name: "Site badge" },
+  { id: "q-avalanche", name: "Avalanche awareness (winter)" },
+  { id: "q-cold-weather", name: "Cold-weather ops" },
+  { id: "q-medical", name: "Medical clearance" },
+];
+
+export const getQualification = (id: string) => qualifications.find((q) => q.id === id);
+
+/** Every operator that appears in a site's routes, without repeats. */
+export function operatorIdsFor(site: Site): string[] {
+  return [...new Set(site.routes.flatMap((r) => (r.operatorId ? [r.operatorId] : [])))];
+}
+
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
+
+export const monthName = (month: number) => MONTH_NAMES[(month - 1 + 12) % 12] ?? "";
+
+/**
+ * A short label for a set of months: "All year", one run such as "Apr–Nov" or
+ * "Dec–Mar" (wrapping the year end), or a list when the months aren't one run.
+ */
+export function monthsLabel(months: Month[]): string {
+  const set = new Set<number>(months);
+  if (set.size === 0) return "Never";
+  if (set.size === 12) return "All year";
+  const next = (m: number) => (m % 12) + 1;
+  const prev = (m: number) => ((m + 10) % 12) + 1;
+  const starts = [...set].filter((m) => !set.has(prev(m)));
+  if (starts.length === 1) {
+    const start = starts[0] ?? 1;
+    let end = start;
+    while (set.has(next(end))) end = next(end);
+    return start === end ? monthName(start) : `${monthName(start)}–${monthName(end)}`;
+  }
+  return [...set]
+    .sort((a, b) => a - b)
+    .map(monthName)
+    .join(", ");
+}
 
 export const officialLinks = [
   { label: "National Weather Service — Alaska", url: "https://www.weather.gov/afc/" },

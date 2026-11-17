@@ -8,15 +8,15 @@ Everything in it is made up. The sites, contacts and notes are sample data, the 
 
 ## What works today
 
-**Directory.** Search seven sample sites and nine sample operators (air, sea and land), filter by region (Southeast, Southcentral or Interior), and open a detail page. An operator that serves several regions, like the ferry system, shows up under each of them. A site page lists access notes, seasonal limits, the qualifications needed, the operators that can get you there, and an "Escort required" tag when one applies. It also says whether the record is Open (may be shared freely) or Confidential (stays inside the crew), and has an "Open in maps" button. An operator page lists hours, seasonal notes and services, with a call button and, when the entry has them, email and website buttons.
+**Directory.** Search seven sample sites and nine sample operators (air, sea and land), filter by region (Southeast, Southcentral or Interior), and open a detail page. An operator that serves several regions, like the ferry system, shows up under each of them. A site page lists access notes, seasonal limits, the qualifications needed, each route there (an operator or driving yourself, with the months it works), and an "Escort required" tag when one applies. It also says whether the record is Open (may be shared freely) or Confidential (stays inside the crew), and has an "Open in maps" button. An operator page lists hours, seasonal notes and services, with a call button and, when the entry has them, email and website buttons.
 
 **Source and freshness.** Each site and operator shows a source, a confidence level (high, medium or low) and a last-verified date. Detail pages say what each level means: act on high, confirm medium by phone before committing travel or money, and treat low as a lead only. Entries verified more than 60 days ago get a "stale" tag. The sample records store how many days ago they were verified, so their dates move with today and the demo always shows a mix of fresh and stale entries.
 
-**Prep checklists.** Four checklists: crew and comms, cold-weather and climb PPE, tower site parts, and paperwork. Your progress is kept in the browser on your phone.
+**Trips.** On a site page, "Plan a trip" opens a dates screen (today and one day to start, with −/+ buttons), and "Start trip" creates it: two taps. A trip lists its sites, picks the route for each that works on its dates and lets you switch, gathers every qualification its sites need into one list to tick, and carries its own copy of the four prep checklists (crew and comms, cold-weather and climb PPE, tower site parts, paperwork), any of which can be skipped. Other site pages offer "Add to this trip". "Share trip plan" sends the plan as text through the phone's share sheet, starting with a confidential warning when any site is confidential. Trips are kept on the phone only, and past ones are listed apart.
 
 **Saved list.** Star a site or operator to add it to the list under the Saved tab. The app stores only which records you picked, in the browser's local storage.
 
-**Works with no signal.** Every page is built ahead of time, and the first time the app is opened online a service worker caches all of it: the 21 pages, the code, the fonts and the icons, about 1 MB. After that every screen opens with no signal and checklists still tick. The header shows whether the phone is online and the date the records were built ("Records as of"). A new version downloads in the background and takes over the next time the app is opened. A page that isn't cached shows a "No signal" page after 8 seconds at most.
+**Works with no signal.** Every page is built ahead of time, and the first time the app is opened online a service worker caches all of it: the 23 pages, the code, the fonts and the icons, about 1 MB. After that every screen opens with no signal and checklists still tick. The header shows whether the phone is online and the date the records were built ("Records as of"). A new version downloads in the background and takes over the next time the app is opened. A page that isn't cached shows a "No signal" page after 8 seconds at most.
 
 **Install it.** Add it to the home screen from the browser's share or menu button, and it opens full screen like an app. On iPhone, installing also stops Safari from clearing the cached app after a week without use.
 
@@ -26,12 +26,12 @@ Everything in it is made up. The sites, contacts and notes are sample data, the 
 
 ## Tap targets
 
-Every main control is at least 56 px tall and most are 64 px. The bottom bar (Home, Find, Prep, Saved) is 80 px. The layout is a single column sized for a phone.
+Every main control is at least 56 px tall and most are 64 px. The bottom bar (Home, Find, Trips, Saved) is 80 px. The layout is a single column sized for a phone.
 
 ## Limits
 
 - No accounts or login. All the content is hard-coded in `src/lib/data.ts`; the only server code is the feedback endpoint.
-- Saved records and checklist progress live in local storage, so they're per browser and per device and disappear if site data is cleared.
+- Saved records and trips live in local storage, so they're per browser and per device and disappear if site data is cleared.
 - A site's confidentiality says how its record may be shared, and nothing enforces it. The app stores no access secrets (gate codes, keys or lock combinations).
 - There's no map in the app. "Open in maps" hands a site's coordinates, never its name, to the phone's maps app, so a confidential site's name doesn't reach the maps provider.
 
@@ -67,7 +67,7 @@ bun run notes       # print the latest feedback notes (add --local for the local
 
 The service worker only runs in a production build, so test offline behaviour with `bun run build` and then `bun run preview:cf`. Feedback also needs the local database: run `bun run db:migrate:local` once. Under `bun run dev` the feedback endpoint answers 503 and notes stay queued.
 
-The tests cover the route check, which files the service worker caches, the deploy guard, the sample data rules, the maps links, note validation, the feedback endpoint (origin, size, rate limit, daily cap, duplicates, 90-day purge) and the outbox.
+The tests cover the route check, which files the service worker caches, the deploy guard, the sample data rules, the maps links, note validation, the feedback endpoint (origin, size, rate limit, daily cap, duplicates, 90-day purge), the outbox, and trips (local dates in Alaska time, route choice, the qualification roll-up, sharing, and reading damaged storage).
 
 ## Deploying
 

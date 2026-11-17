@@ -10,10 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ChecklistsRouteImport } from './routes/checklists'
 import { Route as DirectoryRouteImport } from './routes/directory'
 import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as PlanRouteImport } from './routes/plan'
 import { Route as SavedRouteImport } from './routes/saved'
+import { Route as TripRouteImport } from './routes/trip'
+import { Route as TripsRouteImport } from './routes/trips'
 import { Route as ApiFeedbackRouteImport } from './routes/api/feedback'
 import { Route as OperatorsIdRouteImport } from './routes/operators.$id'
 import { Route as SitesIdRouteImport } from './routes/sites.$id'
@@ -21,11 +23,6 @@ import { Route as SitesIdRouteImport } from './routes/sites.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChecklistsRoute = ChecklistsRouteImport.update({
-  id: '/checklists',
-  path: '/checklists',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DirectoryRoute = DirectoryRouteImport.update({
@@ -38,9 +35,24 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlanRoute = PlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SavedRoute = SavedRouteImport.update({
   id: '/saved',
   path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TripRoute = TripRouteImport.update({
+  id: '/trip',
+  path: '/trip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TripsRoute = TripsRouteImport.update({
+  id: '/trips',
+  path: '/trips',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiFeedbackRoute = ApiFeedbackRouteImport.update({
@@ -61,20 +73,24 @@ const SitesIdRoute = SitesIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/checklists': typeof ChecklistsRoute
   '/directory': typeof DirectoryRoute
   '/feedback': typeof FeedbackRoute
+  '/plan': typeof PlanRoute
   '/saved': typeof SavedRoute
+  '/trip': typeof TripRoute
+  '/trips': typeof TripsRoute
   '/api/feedback': typeof ApiFeedbackRoute
   '/operators/$id': typeof OperatorsIdRoute
   '/sites/$id': typeof SitesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/checklists': typeof ChecklistsRoute
   '/directory': typeof DirectoryRoute
   '/feedback': typeof FeedbackRoute
+  '/plan': typeof PlanRoute
   '/saved': typeof SavedRoute
+  '/trip': typeof TripRoute
+  '/trips': typeof TripsRoute
   '/api/feedback': typeof ApiFeedbackRoute
   '/operators/$id': typeof OperatorsIdRoute
   '/sites/$id': typeof SitesIdRoute
@@ -82,10 +98,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/checklists': typeof ChecklistsRoute
   '/directory': typeof DirectoryRoute
   '/feedback': typeof FeedbackRoute
+  '/plan': typeof PlanRoute
   '/saved': typeof SavedRoute
+  '/trip': typeof TripRoute
+  '/trips': typeof TripsRoute
   '/api/feedback': typeof ApiFeedbackRoute
   '/operators/$id': typeof OperatorsIdRoute
   '/sites/$id': typeof SitesIdRoute
@@ -94,30 +112,36 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/checklists'
     | '/directory'
     | '/feedback'
+    | '/plan'
     | '/saved'
+    | '/trip'
+    | '/trips'
     | '/api/feedback'
     | '/operators/$id'
     | '/sites/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/checklists'
     | '/directory'
     | '/feedback'
+    | '/plan'
     | '/saved'
+    | '/trip'
+    | '/trips'
     | '/api/feedback'
     | '/operators/$id'
     | '/sites/$id'
   id:
     | '__root__'
     | '/'
-    | '/checklists'
     | '/directory'
     | '/feedback'
+    | '/plan'
     | '/saved'
+    | '/trip'
+    | '/trips'
     | '/api/feedback'
     | '/operators/$id'
     | '/sites/$id'
@@ -125,10 +149,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ChecklistsRoute: typeof ChecklistsRoute
   DirectoryRoute: typeof DirectoryRoute
   FeedbackRoute: typeof FeedbackRoute
+  PlanRoute: typeof PlanRoute
   SavedRoute: typeof SavedRoute
+  TripRoute: typeof TripRoute
+  TripsRoute: typeof TripsRoute
   ApiFeedbackRoute: typeof ApiFeedbackRoute
   OperatorsIdRoute: typeof OperatorsIdRoute
   SitesIdRoute: typeof SitesIdRoute
@@ -141,13 +167,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checklists': {
-      id: '/checklists'
-      path: '/checklists'
-      fullPath: '/checklists'
-      preLoaderRoute: typeof ChecklistsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/directory': {
@@ -164,11 +183,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/plan': {
+      id: '/plan'
+      path: '/plan'
+      fullPath: '/plan'
+      preLoaderRoute: typeof PlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/saved': {
       id: '/saved'
       path: '/saved'
       fullPath: '/saved'
       preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trip': {
+      id: '/trip'
+      path: '/trip'
+      fullPath: '/trip'
+      preLoaderRoute: typeof TripRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trips': {
+      id: '/trips'
+      path: '/trips'
+      fullPath: '/trips'
+      preLoaderRoute: typeof TripsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/feedback': {
@@ -197,10 +237,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ChecklistsRoute: ChecklistsRoute,
   DirectoryRoute: DirectoryRoute,
   FeedbackRoute: FeedbackRoute,
+  PlanRoute: PlanRoute,
   SavedRoute: SavedRoute,
+  TripRoute: TripRoute,
+  TripsRoute: TripsRoute,
   ApiFeedbackRoute: ApiFeedbackRoute,
   OperatorsIdRoute: OperatorsIdRoute,
   SitesIdRoute: SitesIdRoute,
