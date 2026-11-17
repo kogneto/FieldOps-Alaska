@@ -56,6 +56,10 @@ _Avoid_: Way in, access method, reach-by
 Something a technician must hold to work at a site: a certification, a training record, a medical clearance or an issued badge.
 _Avoid_: Credential, cert (as the general term)
 
+**Qualification record**:
+A technician's own list of the qualifications they hold and the month each expires, kept only on their phone.
+_Avoid_: Profile, credentials, cert list
+
 **Access secret**:
 A gate code, key or lock combination that lets someone into a site. It is held by the client and never recorded in FieldOps.
 _Avoid_: Credential, gate code (as the general term)

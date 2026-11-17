@@ -38,9 +38,11 @@ import {
   tripQualifications,
   tripStatus,
   tripTitle,
+  tripEnd,
   STATUS_LABEL,
   type Trip,
 } from "@/lib/trips";
+import { needsAttention, qualStatus, statusLabel, useQualRecord } from "@/lib/qual-record";
 
 type Search = { id?: string | undefined };
 
@@ -379,25 +381,48 @@ function SkipNote({ checklistId, auto }: { checklistId: string; auto: boolean })
   );
 }
 
+// Each qualification the trip's sites need, ticked per trip. With a record of
+// the technician's own qualifications on this phone, each also says whether it
+// is in that record and whether it expires before the trip ends.
 function QualificationsSection({ trip, onToggle }: { trip: Trip; onToggle: (id: string) => void }) {
+  const record = useQualRecord();
+  const today = useToday();
   const ids = tripQualifications(trip);
   if (ids.length === 0) return null;
+  const end = tripEnd(trip);
   return (
     <Section title="Qualifications">
       <p className="mb-2 text-sm text-muted-foreground">
         Everything the trip's sites need, once each. Tick what you hold.
       </p>
       <ul className="grid gap-2">
-        {ids.map((id) => (
-          <li key={id}>
-            <TickRow
-              on={trip.quals.includes(id)}
-              label={getQualification(id)?.name ?? id}
-              onToggle={() => onToggle(id)}
-            />
-          </li>
-        ))}
+        {ids.map((id) => {
+          const status = record ? qualStatus(record, id, end, today) : null;
+          return (
+            <li key={id}>
+              <TickRow
+                on={trip.quals.includes(id)}
+                label={getQualification(id)?.name ?? id}
+                onToggle={() => onToggle(id)}
+              />
+              {status && (
+                <p
+                  className={`mt-1 flex items-center gap-1 px-1 text-sm ${needsAttention(status) ? "font-semibold text-caution" : "text-muted-foreground"}`}
+                >
+                  {needsAttention(status) && <AlertTriangle className="h-4 w-4 shrink-0" />}
+                  {statusLabel(status)}
+                </p>
+              )}
+            </li>
+          );
+        })}
       </ul>
+      <Link
+        to="/qualifications"
+        className="mt-3 flex min-h-14 items-center justify-center rounded-lg border-2 border-border px-4 font-semibold active:bg-secondary"
+      >
+        Your qualifications
+      </Link>
       <p className="mt-2 text-xs text-muted-foreground">
         A prep reminder only — not an authorization decision.
       </p>

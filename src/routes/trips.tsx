@@ -54,6 +54,12 @@ function TripsPage() {
         Plan a new trip
       </Link>
       <p className="mt-1 text-sm text-muted-foreground">Pick a site, then tap Plan a trip.</p>
+      <Link
+        to="/qualifications"
+        className="mt-3 flex min-h-14 items-center justify-center rounded-lg border-2 border-border px-4 font-semibold active:bg-secondary"
+      >
+        Your qualifications
+      </Link>
 
       {trips === null ? (
         <p className="mt-8 text-muted-foreground">Loading…</p>

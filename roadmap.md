@@ -78,7 +78,7 @@ Decided (defaults Claude applied when Andy said to keep going without approvals)
 - Each trip picks the route that works for its dates and switches when the dates rule it out. Any route can be chosen by hand.
 - The Prep tab is now Trips. Trip pages work offline: one prebuilt page reads the trip from this phone's storage by the id in its URL.
 - Past trips are listed apart. Deleting a trip takes a second tap to confirm.
-- Qualification ticks belong to the trip and aren't carried to the next one.
+- Qualification ticks belong to the trip and aren't carried to the next one. Since then a technician can also keep a qualification record on the phone, and the trip shows each qualification against it (see below).
 - A shared plan includes site names, and starts with "Confidential — share inside the crew only" when any site is confidential. Unlike "Open in maps", it doesn't withhold names; revisit if plans get forwarded to operators.
 
 Live since 16 Nov 2026, first from the PR #8 branch at `64d56e9`, and from `main` at `0d2ee25` since 17 Nov. Checked live: every cached file loads, the new version takes over after a close and reopen, and a trip planned from Coldfoot started in two taps and was deleted. Also checked locally with two trips and with the server stopped. Not yet checked on a real phone.
@@ -88,11 +88,12 @@ Live since 16 Nov 2026, first from the PR #8 branch at `64d56e9`, and from `main
 - [x] Every trip gets its own copy of every checklist, and a whole checklist can be skipped.
 - [x] The Prep tab becomes the list of your trips. Checklists exist only inside a trip.
 - [x] Checklists move into the record data, so a crew can have its own. The four invented lists stay in the sample set.
-- [x] Qualifications become one named list that sites pick from, and a trip shows one de-duplicated list to tick off. The app doesn't know who holds what.
+- [x] Qualifications become one named list that sites pick from, and a trip shows one de-duplicated list to tick off. The app only knows what a technician holds if they keep a qualification record on their phone.
 - [x] Trips live on the technician's phone only.
 - [x] A Share button sends the plan as text through the phone's share sheet, so it can be left with a dispatcher.
 - [x] Structured seasonal routes: each way of reaching a site gets a mode, an operator and the months it works.
 - [x] A trip's checklists follow its sites and season (built and checked locally, not deployed yet). A list that no site or month on the trip needs starts skipped, says when it is needed, and can be included. It comes back by itself if a later site or date change needs it; nothing is skipped automatically after the trip is created, and a list skipped or included by hand is left alone. The sample PPE list is needed for a climb or cold-weather site or a trip touching Oct–Apr; the parts kit for radio, microwave and cell sites.
+- [x] A technician can keep a qualification record on the phone (built and checked locally, not deployed yet): which qualifications they hold and the month each expires. Each trip shows every qualification it needs as in the record, valid to a month, expiring before the trip ends, expired, or not recorded; expiring in the trip's last month counts as valid. The record is optional, asks for no name, never leaves the phone (not in feedback or shared plans), and is a prep reminder only. Claude chose to build this from Later, reversing the earlier "the app doesn't know who holds what".
 
 ## Parked: real data behind sign-in
 
@@ -110,7 +111,6 @@ Waits until a crew signs on.
 
 - Crew reports: crew members send changes to records, and the maintainer approves them.
 - Sharing trips with the crew through a backend.
-- Each technician records their own qualifications and expiry dates on their phone, and a trip flags gaps.
 
 ## Not now
 
