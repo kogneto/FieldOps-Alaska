@@ -69,6 +69,15 @@ The service worker only runs in a production build, so test offline behaviour wi
 
 The tests cover the route check, which files the service worker caches, the deploy guard, the sample data rules, the maps links, note validation, the feedback endpoint (origin, size, rate limit, daily cap, duplicates, 90-day purge) and the outbox.
 
+## Checks
+
+```sh
+bun run check         # typecheck, lint, formatting, tests and build, about 15 seconds
+bun run check:docker  # the same in Linux, in Docker on this PC (ops/checks/README.md)
+```
+
+Every pull request runs the same checks on GitHub's machines (`.github/workflows/checks.yml`), and so does `main` after a merge. A newer push to a pull request cancels the older run. GitHub's runners cost nothing for a public repository, and the workflow gets no secrets, so it can't deploy.
+
 ## Deploying
 
 ```sh

@@ -1,0 +1,12 @@
+# Kept out of the `bun run check:docker` build: platform-specific packages, build output and
+# local state. The container installs its own Linux packages from bun.lock.
+node_modules
+.output
+.wrangler
+.nitro
+.tanstack
+.vinxi
+dist
+.git
+.claude
+.env.*.local
