@@ -6,6 +6,14 @@ export type Region = "Southeast" | "Southcentral" | "Interior";
 export type Mode = "air" | "sea" | "land";
 export type Confidence = "high" | "medium" | "low";
 export type Confidentiality = "open" | "confidential";
+export type SiteKind =
+  | "Microwave repeater"
+  | "Fiber regen hut"
+  | "Cell tower"
+  | "Radio repeater"
+  | "Equipment shelter"
+  | "Microwave relay"
+  | "Satellite earth station";
 
 export interface Source {
   label: string;
@@ -37,7 +45,7 @@ export interface Operator {
 export interface Site {
   id: string;
   name: string;
-  kind: string;
+  kind: SiteKind;
   region: Region;
   community: string;
   lat: number;
@@ -75,6 +83,17 @@ export interface Checklist {
   title: string;
   category: "Crew" | "PPE" | "Parts" | "Paperwork";
   items: string[];
+  /**
+   * When the list is needed. Without this it is always needed; with it, the
+   * list is needed when any one condition matches a site on the trip or a
+   * month the trip touches. A trip starts with lists that aren't needed
+   * skipped, and can include them again.
+   */
+  neededWhen?: {
+    qualificationIds?: string[];
+    months?: Month[];
+    siteKinds?: SiteKind[];
+  };
 }
 
 /** What a technician should do with a record, by its confidence. */
@@ -416,6 +435,10 @@ export const checklists: Checklist[] = [
     id: "cl-ppe",
     title: "Cold-weather & climb PPE",
     category: "PPE",
+    neededWhen: {
+      qualificationIds: ["q-tower-climb", "q-cold-weather"],
+      months: [10, 11, 12, 1, 2, 3, 4],
+    },
     items: [
       "Harness inspected, in date",
       "Lanyards & rescue kit",
@@ -429,6 +452,9 @@ export const checklists: Checklist[] = [
     id: "cl-parts",
     title: "Tower site parts kit",
     category: "Parts",
+    neededWhen: {
+      siteKinds: ["Microwave repeater", "Cell tower", "Radio repeater", "Microwave relay"],
+    },
     items: [
       "Spare radio module",
       "Jumpers & connectors",

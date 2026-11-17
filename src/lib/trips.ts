@@ -11,6 +11,7 @@ import {
   getQualification,
   getSite,
   monthName,
+  monthsLabel,
   type Checklist,
   type Month,
   type Route,
@@ -34,6 +35,12 @@ export interface TripChecklist {
   items: string[];
   ticks: boolean[];
   skipped: boolean;
+  /**
+   * True while the list is skipped only because the trip didn't need it when
+   * it was created. Such a list is included again if a later site or date
+   * change makes it needed; skipping or including it by hand clears this.
+   */
+  autoSkipped?: boolean;
 }
 
 export interface Trip {
@@ -171,7 +178,63 @@ export function createTrip(options: {
     checklists: (options.checklists ?? sampleChecklists).map(copyChecklist),
     quals: [],
   };
-  return addStop(trip, siteId);
+  // Decide what's needed once the first site is on the trip. This is the only
+  // time a list is skipped automatically.
+  const withSite = addStop(trip, siteId);
+  const definitions = options.checklists ?? sampleChecklists;
+  return {
+    ...withSite,
+    checklists: withSite.checklists.map((c) => {
+      const definition = definitions.find((d) => d.id === c.id);
+      return definition && !isNeeded(definition, withSite)
+        ? { ...c, skipped: true, autoSkipped: true }
+        : c;
+    }),
+  };
+}
+
+export const checklistDefinition = (id: string) => sampleChecklists.find((c) => c.id === id);
+
+/** Whether a checklist is needed for the trip's sites and the months it touches. */
+export function isNeeded(definition: Checklist, trip: Pick<Trip, "stops" | "start" | "days">) {
+  const when = definition.neededWhen;
+  if (!when) return true;
+  const sites = trip.stops.flatMap((s) => getSite(s.siteId) ?? []);
+  const months = tripMonths(trip);
+  return (
+    (when.qualificationIds ?? []).some((q) => sites.some((s) => s.qualificationIds.includes(q))) ||
+    (when.months ?? []).some((m) => months.includes(m)) ||
+    (when.siteKinds ?? []).some((k) => sites.some((s) => s.kind === k))
+  );
+}
+
+/** "a site needs Tower climb cert or Cold-weather ops, or the trip falls in Oct–Apr" */
+export function neededWhenLabel(definition: Checklist): string {
+  const when = definition.neededWhen;
+  if (!when) return "always";
+  const or = (words: string[]) =>
+    words.length <= 1 ? (words[0] ?? "") : `${words.slice(0, -1).join(", ")} or ${words.at(-1)}`;
+  const parts: string[] = [];
+  const quals = (when.qualificationIds ?? []).map((id) => getQualification(id)?.name ?? id);
+  if (quals.length) parts.push(`a site needs ${or(quals)}`);
+  const kinds = (when.siteKinds ?? []).map((k) => k.toLowerCase());
+  if (kinds.length) parts.push(`a site is a ${or(kinds)}`);
+  if (when.months?.length) parts.push(`the trip falls in ${monthsLabel(when.months)}`);
+  return parts.join(", or ");
+}
+
+// Include again any list that was skipped automatically and is now needed.
+// Lists are never skipped automatically after a trip is created.
+function includeNeeded(trip: Trip): Trip {
+  return {
+    ...trip,
+    checklists: trip.checklists.map((c) => {
+      const definition = checklistDefinition(c.id);
+      return c.skipped && c.autoSkipped && definition && isNeeded(definition, trip)
+        ? { ...c, skipped: false, autoSkipped: false }
+        : c;
+    }),
+  };
 }
 
 const clampDays = (days: number) => Math.min(MAX_TRIP_DAYS, Math.max(1, Math.round(days)));
@@ -179,10 +242,10 @@ const clampDays = (days: number) => Math.min(MAX_TRIP_DAYS, Math.max(1, Math.rou
 export function addStop(trip: Trip, siteId: string): Trip {
   const site = getSite(siteId);
   if (!site || trip.stops.some((s) => s.siteId === siteId)) return trip;
-  return {
+  return includeNeeded({
     ...trip,
     stops: [...trip.stops, { siteId, routeIndex: chooseRoute(site, tripMonths(trip)) }],
-  };
+  });
 }
 
 export const removeStop = (trip: Trip, siteId: string): Trip => ({
@@ -204,7 +267,7 @@ export function setRoute(trip: Trip, siteId: string, routeIndex: number): Trip {
 export function setDates(trip: Trip, start: string, days: number): Trip {
   const next = { ...trip, start, days: clampDays(days) };
   const months = tripMonths(next);
-  return {
+  return includeNeeded({
     ...next,
     stops: next.stops.map((stop) => {
       const site = getSite(stop.siteId);
@@ -212,7 +275,7 @@ export function setDates(trip: Trip, start: string, days: number): Trip {
       if (!site || (route && routeCovers(route, months))) return stop;
       return { ...stop, routeIndex: chooseRoute(site, months) };
     }),
-  };
+  });
 }
 
 export function toggleItem(trip: Trip, checklistId: string, item: number): Trip {
@@ -228,7 +291,7 @@ export function toggleSkip(trip: Trip, checklistId: string): Trip {
   return {
     ...trip,
     checklists: trip.checklists.map((c) =>
-      c.id === checklistId ? { ...c, skipped: !c.skipped } : c,
+      c.id === checklistId ? { ...c, skipped: !c.skipped, autoSkipped: false } : c,
     ),
   };
 }
@@ -338,6 +401,8 @@ function readChecklist(v: unknown): TripChecklist | null {
     items,
     ticks,
     skipped: c["skipped"] === true,
+    // Only trips saved after this field existed have it; older ones read back unchanged.
+    ...(c["autoSkipped"] === true ? { autoSkipped: true } : {}),
   };
 }
 

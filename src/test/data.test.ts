@@ -3,6 +3,7 @@ import {
   dateDaysBefore,
   filterOperators,
   filterSites,
+  checklists,
   getOperator,
   getQualification,
   isStale,
@@ -103,6 +104,21 @@ describe("sample data", () => {
         expect(getQualification(id), `${site.id} → ${id}`).toBeDefined();
       }
     }
+  });
+});
+
+describe("checklist conditions", () => {
+  it("point only at real qualifications and months", () => {
+    for (const c of checklists) {
+      for (const id of c.neededWhen?.qualificationIds ?? []) {
+        expect(getQualification(id), `${c.id} → ${id}`).toBeDefined();
+      }
+      for (const m of c.neededWhen?.months ?? []) expect(m >= 1 && m <= 12, c.id).toBe(true);
+    }
+  });
+
+  it("still number four sample lists", () => {
+    expect(checklists.map((c) => c.id)).toEqual(["cl-crew", "cl-ppe", "cl-parts", "cl-paper"]);
   });
 });
 

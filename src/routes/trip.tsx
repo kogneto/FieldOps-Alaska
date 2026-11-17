@@ -20,8 +20,10 @@ import { deleteTrip, updateTrip, useTrips } from "@/lib/trip-store";
 import {
   addDays,
   addStop,
+  checklistDefinition,
   dateRangeLabel,
   MAX_TRIP_DAYS,
+  neededWhenLabel,
   removeStop,
   routeCovers,
   setDates,
@@ -262,7 +264,7 @@ function TripDetail({ trip }: { trip: Trip }) {
                   </button>
                 </div>
                 {cl.skipped ? (
-                  <p className="mt-2 text-sm text-muted-foreground">Skipped for this trip.</p>
+                  <SkipNote checklistId={cl.id} auto={cl.autoSkipped === true} />
                 ) : (
                   <>
                     <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary">
@@ -362,6 +364,18 @@ function AddSites({ trip, onAdd }: { trip: Trip; onAdd: (siteId: string) => void
         </ul>
       )}
     </div>
+  );
+}
+
+// Why a list is skipped: by hand, or because no site or month on the trip needs it.
+function SkipNote({ checklistId, auto }: { checklistId: string; auto: boolean }) {
+  const definition = auto ? checklistDefinition(checklistId) : undefined;
+  return (
+    <p className="mt-2 text-sm text-muted-foreground">
+      {definition
+        ? `Not needed for these sites and dates, so it starts skipped. Needed when ${neededWhenLabel(definition)}.`
+        : "Skipped for this trip."}
+    </p>
   );
 }
 

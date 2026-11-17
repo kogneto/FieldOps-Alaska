@@ -3,6 +3,10 @@ import { getSite } from "@/lib/data";
 import {
   addDays,
   addStop,
+  neededWhenLabel,
+  checklistDefinition,
+  toggleSkip as skip,
+  removeStop,
   checklistProgress,
   chooseRoute,
   createTrip,
@@ -153,6 +157,76 @@ describe("building a trip", () => {
     expect(checklistProgress(t)).toEqual({ done: 2, total: 22 });
     t = toggleSkip(t, "cl-ppe");
     expect(checklistProgress(t)).toEqual({ done: 1, total: 16 });
+  });
+});
+
+describe("checklists by site and season", () => {
+  const state = (t: Trip) =>
+    Object.fromEntries(
+      t.checklists.map((c) => [c.id, c.skipped ? (c.autoSkipped ? "auto" : "user") : "in"]),
+    );
+
+  it("starts a trip with the lists its sites and months don't need skipped", () => {
+    // A fiber hut in summer: no climb, no cold, no radio site.
+    expect(state(trip("site-douglas-hut", "2026-07-10"))).toEqual({
+      "cl-crew": "in",
+      "cl-ppe": "auto",
+      "cl-parts": "auto",
+      "cl-paper": "in",
+    });
+    // A microwave relay in November needs everything.
+    expect(Object.values(state(trip("site-coldfoot", "2026-11-16")))).toEqual([
+      "in",
+      "in",
+      "in",
+      "in",
+    ]);
+  });
+
+  it("counts any month the trip touches, not just the first", () => {
+    // 28 Sep – 2 Oct reaches October, a cold month.
+    expect(state(trip("site-douglas-hut", "2026-09-28", 5))["cl-ppe"]).toBe("in");
+  });
+
+  it("includes a list again when a new site or new dates need it", () => {
+    const summer = trip("site-douglas-hut", "2026-07-10");
+    expect(state(addStop(summer, "site-coldfoot"))).toMatchObject({
+      "cl-ppe": "in",
+      "cl-parts": "in",
+    });
+    expect(state(setDates(summer, "2026-12-01", 2))).toMatchObject({
+      "cl-ppe": "in",
+      "cl-parts": "auto",
+    });
+  });
+
+  it("never skips a list after the trip is created", () => {
+    let t = trip("site-coldfoot", "2026-11-16");
+    t = setDates(addStop(removeStop(t, "site-coldfoot"), "site-douglas-hut"), "2027-07-10", 1);
+    expect(Object.values(state(t))).toEqual(["in", "in", "in", "in"]);
+  });
+
+  it("leaves a list alone once the user has skipped or included it", () => {
+    let t = trip("site-douglas-hut", "2026-07-10");
+    t = skip(skip(t, "cl-ppe"), "cl-ppe"); // included, then skipped again by hand
+    expect(state(t)["cl-ppe"]).toBe("user");
+    expect(state(addStop(t, "site-coldfoot"))["cl-ppe"]).toBe("user");
+  });
+
+  it("says when a list is needed", () => {
+    expect(neededWhenLabel(checklistDefinition("cl-ppe")!)).toBe(
+      "a site needs Tower climb cert or Cold-weather ops, or the trip falls in Oct–Apr",
+    );
+    expect(neededWhenLabel(checklistDefinition("cl-parts")!)).toBe(
+      "a site is a microwave repeater, cell tower, radio repeater or microwave relay",
+    );
+  });
+
+  it("keeps the flag through storage and reads older trips unchanged", () => {
+    const t = trip("site-douglas-hut", "2026-07-10");
+    expect(readTrips(JSON.stringify([t]))[0]).toEqual(t);
+    const older = { ...t, checklists: t.checklists.map(({ autoSkipped, ...c }) => c) };
+    expect(readTrips(JSON.stringify([older]))[0]).toEqual(older);
   });
 });
 
