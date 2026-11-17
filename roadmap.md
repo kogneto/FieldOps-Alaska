@@ -92,7 +92,7 @@ Live since 16 Nov 2026, first from the PR #8 branch at `64d56e9`, and from `main
 - [x] Trips live on the technician's phone only.
 - [x] A Share button sends the plan as text through the phone's share sheet, so it can be left with a dispatcher.
 - [x] Structured seasonal routes: each way of reaching a site gets a mode, an operator and the months it works.
-- [x] A trip's checklists follow its sites and season. A list that no site or month on the trip needs starts skipped, says when it is needed, and can be included. It comes back by itself if a later site or date change needs it; nothing is skipped automatically after the trip is created, and a list skipped or included by hand is left alone. The sample PPE list is needed for a climb or cold-weather site or a trip touching Oct–Apr; the parts kit for radio, microwave and cell sites.
+- [x] A trip's checklists follow its sites and season (built and checked locally, not deployed yet). A list that no site or month on the trip needs starts skipped, says when it is needed, and can be included. It comes back by itself if a later site or date change needs it; nothing is skipped automatically after the trip is created, and a list skipped or included by hand is left alone. The sample PPE list is needed for a climb or cold-weather site or a trip touching Oct–Apr; the parts kit for radio, microwave and cell sites.
 
 ## Parked: real data behind sign-in
 
