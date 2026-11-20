@@ -2,7 +2,7 @@
 
 A phone-first prototype of a field companion for telecom technicians who work at remote sites in Alaska. It's designed for outdoor use with gloves, so the tap targets are large.
 
-**This is an early prototype.** Today it's a searchable directory of sample sites and operators plus a few prep checklists, and once it has been opened it works with no signal. It doesn't plan trips yet, and it doesn't track gear or show live weather.
+**This is an early prototype.** Today it's a searchable directory of sample sites and operators, with trips you can plan on that sample data, and once it has been opened it works with no signal. It doesn't track gear or show live weather.
 
 Everything in it is made up. The sites, contacts and notes are sample data, the phone numbers are 555 numbers, and the email addresses are example.com. Real place names, highways and the Alaska Marine Highway show up, but nothing here has been verified or should be used for real field work. The header on every main screen carries a "Sample" badge.
 
