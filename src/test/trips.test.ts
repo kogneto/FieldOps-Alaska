@@ -124,7 +124,7 @@ describe("building a trip", () => {
   it("starts with one site, no way there chosen and its own copy of every checklist", () => {
     const t = trip("tower", "2026-11-16", 3);
     expect(t.v).toBe(TRIP_VERSION);
-    expect(t.stops).toEqual([{ siteId: "tower", route: null }]);
+    expect(t.stops).toEqual([{ siteId: "tower", route: null, meet: null, lodging: null }]);
     expect(t.checklists).toHaveLength(4);
     expect(t.checklists.every((c) => c.ticks.every((x) => !x) && !c.skipped)).toBe(true);
     expect(tripTitle(t, sites)).toBe("Bethel cell tower");
@@ -343,6 +343,7 @@ describe("readTrips", () => {
       checklists: [],
       quals: [],
       loadout: { pieces: [], items: [], ticks: {}, waybills: {} },
+      homeMeet: null,
       done: [],
     });
   });
@@ -359,8 +360,8 @@ describe("readTrips", () => {
       },
     ]);
     expect(readTrips(raw)[0]?.stops).toEqual([
-      { siteId: "tower", route: null },
-      { siteId: "hut", route: null },
+      { siteId: "tower", route: null, meet: null, lodging: null },
+      { siteId: "hut", route: null, meet: null, lodging: null },
     ]);
   });
 

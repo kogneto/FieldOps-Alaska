@@ -4,6 +4,7 @@
 // A site has no free-text notes on purpose. FieldOps has no place to write
 // down an access secret, and a notes box would be one.
 import { getQualification, siteKinds, type Confidentiality, type SiteKind } from "./data";
+import { typedPlace } from "./places";
 
 export const MAX_SITE_NAME = 80;
 export const MAX_COMMUNITY = 60;
@@ -18,6 +19,8 @@ export interface Site {
   /** Ids from `qualifications`: what a technician must hold to work there. */
   qualificationIds: string[];
   confidentiality: Confidentiality;
+  /** Where it is: an address or coordinates, for directions. Empty until typed in. */
+  where: string;
 }
 
 /** One line of typed text: trimmed, runs of whitespace collapsed, cut to a length. */
@@ -37,6 +40,7 @@ export function createSite(options: { id: string; name: string; community?: stri
     kind: null,
     qualificationIds: [],
     confidentiality: "confidential",
+    where: "",
   };
 }
 
@@ -99,6 +103,7 @@ function readSite(v: unknown): Site | null {
     ],
     // Anything but a clear "open" reads as confidential.
     confidentiality: s["confidentiality"] === "open" ? "open" : "confidential",
+    where: typeof s["where"] === "string" ? typedPlace("", s["where"]).where : "",
   };
 }
 
@@ -121,3 +126,9 @@ export function readSites(raw: string | null): Site[] {
     return [];
   }
 }
+
+/** Where the site is, as typed: an address or coordinates. */
+export const setSiteWhere = (site: Site, where: string): Site => ({
+  ...site,
+  where: typedPlace("", where).where,
+});

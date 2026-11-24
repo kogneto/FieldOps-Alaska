@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { sweepOrphanDocs } from "@/lib/doc-store";
 import { ChevronRight, Plus } from "lucide-react";
 import { AppShell } from "@/components/fo";
 import { useToday } from "@/lib/offline";
@@ -38,6 +40,12 @@ function TripsPage() {
   const sites = useSites();
   const today = useToday();
   const legacy = useLegacyTripCount();
+
+  // Clear out travel documents whose trip or site has gone, in case a delete
+  // didn't finish (the app closed mid-way, or storage was busy).
+  useEffect(() => {
+    if (trips) void sweepOrphanDocs(trips);
+  }, [trips]);
 
   const active = (trips ?? [])
     .filter((t) => tripStatus(t, today) !== "past")

@@ -18,14 +18,18 @@ import {
 import { AppShell, ModeIcon } from "@/components/fo";
 import { ChecklistBody, LoadoutPanel } from "@/components/loadout";
 import { checkProgress } from "@/lib/loadout";
+import { DirectionsLink, PlaceField } from "@/components/place-field";
 import { NewSiteForm } from "@/components/site-form";
+import { TravelDocs } from "@/components/travel-docs";
+import { deleteDocsForTrip, sweepOrphanDocs } from "@/lib/doc-store";
+import { typedPlace } from "@/lib/places";
 import { Stepper } from "@/components/stepper";
 import { Button } from "@/components/ui/button";
 import { getOperator, getQualification, operators } from "@/lib/data";
 import { useHydrated, useToday } from "@/lib/offline";
 import { currentSites, useSites } from "@/lib/site-store";
 import { siteSummary, type Site } from "@/lib/sites";
-import { deleteTrip, updateTrip, useTrips } from "@/lib/trip-store";
+import { currentTrips, deleteTrip, updateTrip, useTrips } from "@/lib/trip-store";
 import {
   addDays,
   addStop,
@@ -39,6 +43,8 @@ import {
   nextStep,
   removeStop,
   setDates,
+  setLodging,
+  setMeet,
   setRoute,
   setStepDone,
   shareText,
@@ -242,7 +248,10 @@ function TripDetail({ trip, sites }: { trip: Trip; sites: Site[] }) {
               first={index === 0}
               last={index === trip.stops.length - 1}
               onMove={(by) => change((t) => moveStop(t, stop.siteId, by))}
-              onRemove={() => change((t) => removeStop(t, stop.siteId))}
+              onRemove={() => {
+                change((t) => removeStop(t, stop.siteId));
+                void sweepOrphanDocs(currentTrips());
+              }}
             />
           ))}
         </div>
@@ -273,6 +282,7 @@ function TripDetail({ trip, sites }: { trip: Trip; sites: Site[] }) {
             return;
           }
           deleteTrip(trip.id);
+          void deleteDocsForTrip(trip.id);
           void navigate({ to: "/trips" });
         }}
         className={`mt-8 flex min-h-14 w-full items-center justify-center gap-2 rounded-lg border-2 px-4 font-bold uppercase ${confirmDelete ? "border-destructive bg-destructive text-destructive-foreground" : "border-destructive text-destructive"}`}
@@ -411,11 +421,47 @@ function StepBody({
       const stop = trip.stops.find((s) => s.siteId === step.siteId);
       if (!stop || !site)
         return <p className="text-muted-foreground">This site is no longer on this phone.</p>;
+      // In the order they're needed: the operator, where you meet them, the
+      // lodging, then the site.
       return (
-        <TravelTo
-          route={stop.route}
-          onChoose={(route) => change((t) => setRoute(t, stop.siteId, route))}
-        />
+        <>
+          <TravelTo
+            route={stop.route}
+            onChoose={(route) => change((t) => setRoute(t, stop.siteId, route))}
+          />
+          {stop.route?.by !== "self" && (
+            <PlaceField
+              title="Where you meet the operator"
+              namePlaceholder="e.g. Bethel airport, freight counter"
+              place={stop.meet}
+              onChange={(p) => change((t) => setMeet(t, stop.siteId, typedPlace(p.name, p.where)))}
+            />
+          )}
+          <PlaceField
+            title="Lodging"
+            namePlaceholder="e.g. Kuskokwim Inn"
+            place={stop.lodging}
+            onChange={(p) => change((t) => setLodging(t, stop.siteId, typedPlace(p.name, p.where)))}
+          />
+          <div className="grid gap-2 rounded-lg border-2 border-border p-3">
+            <div className="font-bold">The site</div>
+            {site.where ? (
+              <DirectionsLink where={site.where} label="Directions to the site" />
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No location yet. Add one on the site's page, or there with "Use where I am now".
+              </p>
+            )}
+            <Link
+              to="/site"
+              search={{ id: site.id }}
+              className="flex min-h-14 items-center justify-center rounded-lg border-2 border-border px-4 font-semibold active:bg-secondary"
+            >
+              Open the site's page
+            </Link>
+          </div>
+          <TravelDocs tripId={trip.id} stepKey={step.key} />
+        </>
       );
     }
     case "arrival":
@@ -438,7 +484,18 @@ function StepBody({
         <p className="text-muted-foreground">This site is no longer on this phone.</p>
       );
     case "travel-home":
-      return <p className="text-base">Travel back to home base once the loadout has shipped.</p>;
+      return (
+        <>
+          <p className="text-base">Travel back to home base once the loadout has shipped.</p>
+          <PlaceField
+            title="Where you meet the operator"
+            namePlaceholder="e.g. Bethel airport, Alaska Airlines"
+            place={trip.homeMeet}
+            onChange={(p) => change((t) => setMeet(t, null, typedPlace(p.name, p.where)))}
+          />
+          <TravelDocs tripId={trip.id} stepKey={step.key} />
+        </>
+      );
   }
 }
 
@@ -571,6 +628,9 @@ function SiteCard({
   onMove: (by: -1 | 1) => void;
   onRemove: () => void;
 }) {
+  // Taking a site off the trip drops its ticks, step marks and travel
+  // documents, so it takes a second tap.
+  const [confirmRemove, setConfirmRemove] = useState(false);
   return (
     <div className="rounded-lg border-2 border-border bg-card p-4">
       <div className="flex items-start gap-3">
@@ -636,11 +696,17 @@ function SiteCard({
         </button>
         <button
           type="button"
-          onClick={onRemove}
-          className="flex min-h-14 items-center justify-center gap-2 rounded-lg border-2 border-border px-3 font-semibold text-muted-foreground active:bg-secondary"
+          onClick={() => {
+            if (!confirmRemove) {
+              setConfirmRemove(true);
+              return;
+            }
+            onRemove();
+          }}
+          className={`flex min-h-14 items-center justify-center gap-2 rounded-lg border-2 px-3 font-semibold ${confirmRemove ? "border-destructive bg-destructive text-destructive-foreground" : "border-border text-muted-foreground active:bg-secondary"}`}
         >
           <X className="h-5 w-5" />
-          Remove
+          {confirmRemove ? "Tap again" : "Remove"}
         </button>
       </div>
     </div>
