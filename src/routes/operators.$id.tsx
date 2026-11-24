@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Phone, Mail, Globe, Clock, Snowflake, RadioTower } from "lucide-react";
+import { ArrowLeft, Phone, Mail, Globe, Clock, Snowflake } from "lucide-react";
 import { AppShell, Disclaimer, ModeIcon, SaveButton, SourceTag } from "@/components/fo";
-import { getOperator, operatorIdsFor, sites } from "@/lib/data";
+import { getOperator } from "@/lib/data";
 
 export const Route = createFileRoute("/operators/$id")({
   loader: ({ params }) => {
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/operators/$id")({
         to="/directory"
         className="flex min-h-14 items-center justify-center rounded-lg border-2 border-primary px-4 font-bold uppercase text-primary"
       >
-        Back to directory
+        Back to operators
       </Link>
     </AppShell>
   ),
@@ -42,15 +42,14 @@ export const Route = createFileRoute("/operators/$id")({
 
 function OpPage() {
   const { op } = Route.useLoaderData();
-  const served = sites.filter((s) => operatorIdsFor(s).includes(op.id));
   return (
     <AppShell
       title={op.name}
       recordId={op.id}
+      sample
       back={
         <Link
           to="/directory"
-          search={{ tab: "operators" }}
           className="mb-2 flex min-h-14 items-center gap-2 text-base font-semibold text-muted-foreground"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -119,26 +118,6 @@ function OpPage() {
         ))}
       </div>
 
-      {served.length > 0 && (
-        <>
-          <h2 className="mt-6 mb-2 font-display text-lg uppercase tracking-wide text-muted-foreground">
-            Sites served
-          </h2>
-          <div className="grid gap-2">
-            {served.map((s) => (
-              <Link
-                key={s.id}
-                to="/sites/$id"
-                params={{ id: s.id }}
-                className="flex min-h-16 items-center gap-3 rounded-lg border-2 border-border bg-card px-4 font-semibold active:bg-secondary"
-              >
-                <RadioTower className="h-5 w-5 text-primary" />
-                {s.name}
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
       <Disclaimer />
     </AppShell>
   );

@@ -5,7 +5,7 @@ describe("urlForFile", () => {
   it("caches pages under the route a technician opens", () => {
     expect(urlForFile("index.html")).toBe("/");
     expect(urlForFile("directory.html")).toBe("/directory");
-    expect(urlForFile("sites/site-coldfoot.html")).toBe("/sites/site-coldfoot");
+    expect(urlForFile("operators/op-amhs.html")).toBe("/operators/op-amhs");
     expect(urlForFile("sites\\site-coldfoot.html")).toBe("/sites/site-coldfoot");
     expect(urlForFile("sites/index.html")).toBe("/sites");
   });

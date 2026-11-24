@@ -2,15 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   dateDaysBefore,
   filterOperators,
-  filterSites,
   checklists,
-  getOperator,
   getQualification,
   isStale,
   monthsLabel,
-  operatorIdsFor,
   operators,
-  sites,
+  siteKinds,
   STALE_AFTER_DAYS,
 } from "@/lib/data";
 
@@ -27,7 +24,7 @@ describe("isStale", () => {
   });
 
   it("keeps a mix of fresh and stale records in the sample set", () => {
-    const all = [...sites, ...operators].map((r) => isStale(r.source));
+    const all = operators.map((r) => isStale(r.source));
     expect(all).toContain(true);
     expect(all).toContain(false);
   });
@@ -62,58 +59,21 @@ describe("filterOperators", () => {
   });
 });
 
-describe("filterSites", () => {
-  it("filters by region and query together", () => {
-    expect(filterSites(sites, "Interior", "").map((s) => s.id)).toEqual([
-      "site-coldfoot",
-      "site-fort-yukon",
-    ]);
-    expect(filterSites(sites, undefined, "repeater").map((s) => s.id)).toEqual([
-      "site-gravina-rpt",
-      "site-hatcher-rpt",
-    ]);
-  });
-});
-
-describe("sample data", () => {
-  it("links every site only to operators that exist and serve its region", () => {
-    for (const site of sites) {
-      for (const id of operatorIdsFor(site)) {
-        const operator = getOperator(id);
-        expect(operator, `${site.id} → ${id}`).toBeDefined();
-        expect(operator?.regions, `${site.id} → ${id}`).toContain(site.region);
-      }
-    }
-  });
-
-  it("gives every site at least one way in for every month of the year", () => {
-    for (const site of sites) {
-      const covered = new Set(site.routes.flatMap((r) => r.months));
-      expect(covered.size, site.id).toBe(12);
-      for (const route of site.routes) {
-        expect(route.months.length, site.id).toBeGreaterThan(0);
-        expect(new Set(route.months).size, `${site.id} repeats a month`).toBe(route.months.length);
-        for (const m of route.months) expect(m >= 1 && m <= 12, site.id).toBe(true);
-      }
-    }
-  });
-
-  it("uses only qualifications from the named list", () => {
-    for (const site of sites) {
-      for (const id of site.qualificationIds) {
-        expect(getQualification(id), `${site.id} → ${id}`).toBeDefined();
-      }
-    }
+describe("operator records", () => {
+  it("give every operator a unique id", () => {
+    const ids = operators.map((o) => o.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });
 
 describe("checklist conditions", () => {
-  it("point only at real qualifications and months", () => {
+  it("point only at real qualifications, months and site kinds", () => {
     for (const c of checklists) {
       for (const id of c.neededWhen?.qualificationIds ?? []) {
         expect(getQualification(id), `${c.id} → ${id}`).toBeDefined();
       }
       for (const m of c.neededWhen?.months ?? []) expect(m >= 1 && m <= 12, c.id).toBe(true);
+      for (const k of c.neededWhen?.siteKinds ?? []) expect(siteKinds, c.id).toContain(k);
     }
   });
 

@@ -5,6 +5,7 @@ import {
   ListChecks,
   MessageSquareWarning,
   Plane,
+  RadioTower,
   Ship,
   Truck,
   Star,
@@ -23,11 +24,17 @@ export function AppShell({
   back,
   recordId,
   hideFeedback = false,
+  sample = false,
 }: {
   title: string;
   children: ReactNode;
   back?: ReactNode;
-  /** The site or operator this screen shows, so feedback sent from it is tied to that record. */
+  /**
+   * Marks a screen that shows the invented operators. A technician's own
+   * sites, trips and records are real, so their screens never carry it.
+   */
+  sample?: boolean;
+  /** The operator this screen shows, so feedback sent from it is tied to that record. Never a site. */
   recordId?: string;
   hideFeedback?: boolean;
 }) {
@@ -39,9 +46,11 @@ export function AppShell({
           <h1 className="min-w-0 font-display text-2xl uppercase leading-tight text-foreground">
             {title}
           </h1>
-          <span className="shrink-0 rounded-md border border-border bg-secondary px-2 py-1.5 font-mono text-xs uppercase text-muted-foreground">
-            Sample
-          </span>
+          {sample && (
+            <span className="shrink-0 rounded-md border border-border bg-secondary px-2 py-1.5 font-mono text-xs uppercase text-muted-foreground">
+              Sample
+            </span>
+          )}
         </div>
         <ConnectionStatus />
       </header>
@@ -92,15 +101,16 @@ function ConnectionStatus() {
 
 const nav = [
   { to: "/", label: "Home", icon: Home },
-  { to: "/directory", label: "Find", icon: Search },
   { to: "/trips", label: "Trips", icon: ListChecks },
+  { to: "/sites", label: "Sites", icon: RadioTower },
+  { to: "/directory", label: "Find", icon: Search },
   { to: "/saved", label: "Saved", icon: Star },
 ] as const;
 
 function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card">
-      <div className="mx-auto grid max-w-md grid-cols-4 px-1">
+      <div className="mx-auto grid max-w-md grid-cols-5 px-1">
         {nav.map(({ to, label, icon: Icon }) => (
           <Link
             key={to}
@@ -189,8 +199,8 @@ export function Disclaimer() {
   return (
     <p className="mt-6 rounded-md border-2 border-border p-4 text-sm leading-relaxed text-muted-foreground">
       Not a substitute for 911 or official notices. Official and operator sources take precedence
-      over crew reports. No access secrets (gate codes, keys, lock combinations) are stored in this
-      app.
+      over anything in this app. FieldOps has no place for access secrets (gate codes, keys, lock
+      combinations); don't type them in.
     </p>
   );
 }

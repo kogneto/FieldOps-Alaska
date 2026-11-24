@@ -7,9 +7,9 @@ export interface FeedbackNote {
   /** Random id made on the phone, so a retried send isn't stored twice. */
   noteId: string;
   text: string;
-  /** The screen it was sent from, e.g. `/sites/site-coldfoot`. */
+  /** The screen it was sent from, e.g. `/operators/op-amhs`. */
   screen: string;
-  /** The site or operator it is about, when sent from that record's page. */
+  /** The operator it is about, when sent from that operator's page. */
   recordId: string | null;
   appVersion: string;
 }
@@ -20,6 +20,13 @@ const NOTE_ID = /^[A-Za-z0-9-]{8,64}$/;
 const SCREEN = /^\/[A-Za-z0-9\-_/]{0,199}$/;
 const RECORD_ID = /^(site|op)-[a-z0-9-]{1,60}$/;
 const APP_VERSION = /^[A-Za-z0-9.-]{1,40}$/;
+
+/**
+ * Whether the app may tie a note to this record. Only operators qualify: a
+ * note never carries a site. The server still accepts older `site-` ids, which
+ * phones running an earlier version may send.
+ */
+export const isOperatorRecord = (id: string) => /^op-[a-z0-9-]{1,60}$/.test(id);
 
 /** Checks every field of an incoming note. Text is trimmed; nothing else is changed. */
 export function parseNote(input: unknown): ParsedNote {

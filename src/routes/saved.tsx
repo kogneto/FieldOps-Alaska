@@ -1,16 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { RadioTower, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { AppShell, ModeIcon, SaveButton } from "@/components/fo";
-import { operators, sites } from "@/lib/data";
+import { operators } from "@/lib/data";
 import { useSaved } from "@/lib/store";
 
 export const Route = createFileRoute("/saved")({
   head: () => ({
     meta: [
       { title: "Saved — FieldOps Alaska" },
-      { name: "description", content: "The sites and operators you've starred." },
+      { name: "description", content: "The operators you've starred." },
       { property: "og:title", content: "Saved — FieldOps Alaska" },
-      { property: "og:description", content: "Your starred sites and operators." },
+      { property: "og:description", content: "Your starred operators." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -20,51 +20,27 @@ export const Route = createFileRoute("/saved")({
 
 function Saved() {
   const { saved } = useSaved();
-  const s = sites.filter((x) => saved.includes(x.id));
-  const o = operators.filter((x) => saved.includes(x.id));
+  // Older versions could star sample sites too; only operators are shown.
+  const list = operators.filter((x) => saved.includes(x.id));
   return (
-    <AppShell title="Saved">
+    <AppShell title="Saved" sample>
       <div className="flex gap-3 rounded-lg border-2 border-border bg-card p-4 text-base">
         <Star className="h-6 w-6 shrink-0 text-accent" />
         <p>
-          Star sites and operators to find them fast here. Everything in the app works with no
-          signal, starred or not.
+          Star operators to find them fast here. Everything in the app works with no signal, starred
+          or not.
         </p>
       </div>
-      {saved.length === 0 && (
+      {list.length === 0 && (
         <p className="mt-10 text-center text-muted-foreground">
           Nothing saved yet.{" "}
           <Link to="/directory" className="font-semibold text-primary">
-            Browse the directory
+            Browse operators
           </Link>
         </p>
       )}
-      {s.length > 0 && (
-        <h2 className="mt-6 mb-2 font-display text-lg uppercase text-muted-foreground">Sites</h2>
-      )}
-      <div className="grid gap-2">
-        {s.map((x) => (
-          <Link
-            key={x.id}
-            to="/sites/$id"
-            params={{ id: x.id }}
-            className="grid min-h-20 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border-2 border-border bg-card p-3 active:bg-secondary"
-          >
-            <span className="flex items-center gap-2 font-semibold">
-              <RadioTower className="h-5 w-5 text-primary" />
-              {x.name}
-            </span>
-            <SaveButton id={x.id} />
-          </Link>
-        ))}
-      </div>
-      {o.length > 0 && (
-        <h2 className="mt-6 mb-2 font-display text-lg uppercase text-muted-foreground">
-          Operators
-        </h2>
-      )}
-      <div className="grid gap-2">
-        {o.map((x) => (
+      <div className="mt-6 grid gap-2">
+        {list.map((x) => (
           <Link
             key={x.id}
             to="/operators/$id"

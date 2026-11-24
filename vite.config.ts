@@ -6,7 +6,7 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { execSync } from "node:child_process";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-import { operators, sites } from "./src/lib/data";
+import { operators } from "./src/lib/data";
 
 // Every page is built ahead of time, so the service worker can cache all of them
 // and the app works with no signal. autoSubfolderIndex: false writes
@@ -18,10 +18,11 @@ const pages = [
   "/trips",
   "/trip",
   "/plan",
+  "/sites",
+  "/site",
   "/qualifications",
   "/saved",
   "/feedback",
-  ...sites.map((site) => `/sites/${site.id}`),
   ...operators.map((operator) => `/operators/${operator.id}`),
 ].map((path) => ({ path }));
 

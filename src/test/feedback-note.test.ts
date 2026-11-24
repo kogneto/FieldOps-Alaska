@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_NOTE_LENGTH, parseNote } from "@/lib/feedback-note";
+import { isOperatorRecord, MAX_NOTE_LENGTH, parseNote } from "@/lib/feedback-note";
 
 const valid = {
   noteId: "0f8e6c1a-4b2d-4e7a-9a51-3d2c1b0a9f88",
@@ -34,5 +34,13 @@ describe("parseNote", () => {
     expect(parseNote({ ...valid, recordId: undefined }).ok).toBe(false);
     expect(parseNote({ ...valid, appVersion: "" }).ok).toBe(false);
     expect(parseNote({ ...valid, text: 42 }).ok).toBe(false);
+  });
+});
+
+describe("isOperatorRecord", () => {
+  it("lets a note be tied to an operator, never to a site", () => {
+    expect(isOperatorRecord("op-amhs")).toBe(true);
+    expect(isOperatorRecord("site-coldfoot")).toBe(false);
+    expect(isOperatorRecord("3f2c9a7e-0000-4000-8000-000000000000")).toBe(false);
   });
 });
