@@ -16,6 +16,16 @@ import {
   type Checklist,
   type Month,
 } from "./data";
+import {
+  emptyLoadout,
+  forgetChecks,
+  loadoutChecks,
+  loadoutSummary,
+  readLoadout,
+  shipsAt,
+  type Check,
+  type Loadout,
+} from "./loadout";
 import type { Site } from "./sites";
 
 export const TRIP_VERSION = 2;
@@ -59,6 +69,8 @@ export interface Trip {
   checklists: TripChecklist[];
   /** Ids of qualifications ticked off for this trip. */
   quals: string[];
+  /** The tools and parts the trip needs, and the ticks of the checks that run over them. */
+  loadout: Loadout;
 }
 
 export type TripStatus = "upcoming" | "current" | "past";
@@ -167,6 +179,7 @@ export function createTrip(options: {
     stops: [],
     checklists: (options.checklists ?? sampleChecklists).map(copyChecklist),
     quals: [],
+    loadout: emptyLoadout(),
   };
   // Decide what's needed once the first site is on the trip. This is the only
   // time a list is skipped automatically.
@@ -249,10 +262,15 @@ export function addStop(trip: Trip, siteId: string, sites: Site[]): Trip {
   return includeNeeded({ ...trip, stops: [...trip.stops, { siteId, route: null }] }, sites);
 }
 
-export const removeStop = (trip: Trip, siteId: string): Trip => ({
-  ...trip,
-  stops: trip.stops.filter((s) => s.siteId !== siteId),
-});
+/** The loadout checks the trip runs, in order: pre-loadout, arrival and departure at each site, return. */
+export const tripChecks = (trip: Pick<Trip, "stops">): Check[] =>
+  loadoutChecks(trip.stops.map((s) => s.siteId));
+
+/** Takes a site off the trip, with the ticks and waybills of its loadout checks. */
+export function removeStop(trip: Trip, siteId: string): Trip {
+  const stops = trip.stops.filter((s) => s.siteId !== siteId);
+  return { ...trip, stops, loadout: forgetChecks(trip.loadout, tripChecks({ stops })) };
+}
 
 /** Moves a site one place earlier (-1) or later (+1) in the order it is worked. */
 export function moveStop(trip: Trip, siteId: string, by: -1 | 1): Trip {
@@ -389,6 +407,19 @@ export function shareText(trip: Trip, sites: Site[]): string {
   lines.push(
     `Checklists: ${done} of ${total} items ticked${skipped.length ? `; skipped ${skipped.join(", ")}` : ""}.`,
   );
+  if (trip.loadout.items.length > 0) {
+    const checks = tripChecks(trip);
+    const dangerous = trip.loadout.items.filter((i) => i.dangerous).length;
+    lines.push(
+      `Loadout: ${loadoutSummary(trip.loadout)}${dangerous ? `; ${dangerous} to declare as dangerous goods` : ""}.`,
+    );
+    for (const check of checks.filter(shipsAt)) {
+      const waybill = trip.loadout.waybills[check.key];
+      if (!waybill) continue;
+      const site = check.siteId ? sites.find((s) => s.id === check.siteId) : undefined;
+      lines.push(`Shipped from ${site?.name ?? "home base"}: waybill ${waybill.trim()}.`);
+    }
+  }
   // The operators are still an invented sample set. Say so only when the plan
   // names one; the technician's own sites and dates are real.
   if (namesOperator) {
@@ -463,6 +494,7 @@ function readTrip(v: unknown): Trip | null {
     stops,
     checklists: checklists.flatMap((c) => readChecklist(c) ?? []),
     quals: isStringArray(t["quals"]) ? t["quals"] : [],
+    loadout: readLoadout(t["loadout"]),
   };
 }
 

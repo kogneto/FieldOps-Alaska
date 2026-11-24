@@ -101,6 +101,14 @@ Done when a technician can take a trip to a site they typed in, such as one in B
 
 Built in four pieces: typed-in sites, then the loadout and its checklists, then a trip page that follows the steps, then travel. Typed-in sites are live since 24 Nov 2026, deployed from the PR #17 branch at `6d311f8`. Checked with `bun run check`, in a phone-sized browser, and live (every new page loads and is in the offline cache). Not yet checked on a real phone.
 
+The loadout and its four checklists are live since 24 Nov 2026, deployed from the PR #18 branch at `b034e81`. Checked with `bun run check`, in a phone-sized browser, and as the built app on a local Cloudflare server with the server stopped. Not yet checked on a real phone. Defaults Claude chose, not yet confirmed by Andy:
+
+- Each checklist lists what was ticked at the checklist before it, plus anything added at it, which starts ticked. This extends the confirmed return-checklist rule to every checklist. If nothing was ticked at the one before, it lists what that one listed, and says so.
+- One waybill number per shipment: at the pre-loadout and at each departure. It shows on the next arrival or return checklist.
+- A new trip's loadout can start as a copy of the last trip's (no ticks or waybills), or from the tower site parts kit. The parts kit is still also a prep checklist; slice 5 decides what it becomes.
+- Unticked items are counted as "not ticked yet", never called missing or lost.
+- Dangerous goods are flagged per item. The app says to check with the operator, and doesn't state any operator's rules.
+
 This is how the work is really done, as Andy described it on 24 Nov 2026. It is built to be used, not tried out on testers first, and it replaces slice 3's guess at the trip model.
 
 The trip, in order:
@@ -146,8 +154,8 @@ To build:
 - [x] Trips already on a phone aren't silently lost when the invented sites go. The Trips screen says how many can no longer be opened, and offers to clear them.
 - [x] Wording that speaks of a crew or of sample data is reworded. A technician's own plan is never stamped "Sample data", and the "Sample" badge shows only on screens with the invented operators. The checklists' own wording waits on slice 5.
 - [x] A feedback note never carries a site.
-- [ ] A trip holds a loadout, built on a pallet or in a tub.
-- [ ] The pre-loadout, arrival checklist, departure pre-loadout and return checklist each run over the loadout.
+- [x] A trip holds a loadout, built on pallets or in tubs.
+- [x] The pre-loadout, arrival checklist, departure pre-loadout and return checklist each run over the loadout.
 - [ ] The trip page follows the trip in order and shows the step the technician is on. The sites can already be put in order.
 - [ ] Travel out, between sites and home gives directions and holds travel documents.
 - [ ] Each site on a trip has its lodging, with directions.

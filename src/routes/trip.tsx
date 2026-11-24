@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { AppShell, ModeIcon } from "@/components/fo";
+import { LoadoutSection } from "@/components/loadout";
 import { NewSiteForm } from "@/components/site-form";
 import { Stepper } from "@/components/stepper";
 import { Button } from "@/components/ui/button";
@@ -266,6 +267,8 @@ function TripDetail({ trip, sites }: { trip: Trip; sites: Site[] }) {
           onAdd={(siteId) => change((t) => addStop(t, siteId, currentSites()))}
         />
       </Section>
+
+      <LoadoutSection trip={trip} sites={sites} />
 
       <QualificationsSection
         trip={trip}
