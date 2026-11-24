@@ -1,9 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ExternalLink, ListChecks, MapPin, RadioTower, Search } from "lucide-react";
+import { ChevronRight, ExternalLink, ListChecks, MapPin, RadioTower, Search } from "lucide-react";
 import { AppShell, Disclaimer } from "@/components/fo";
 import { officialLinks, operators, regions } from "@/lib/data";
 import { useSites } from "@/lib/site-store";
 import { useSaved } from "@/lib/store";
+import { useToday } from "@/lib/offline";
+import { useTrips } from "@/lib/trip-store";
+import {
+  currentTrip,
+  dateRangeLabel,
+  nextStep,
+  STATUS_LABEL,
+  stepLabel,
+  tripStatus,
+  tripTitle,
+} from "@/lib/trips";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,6 +54,7 @@ function Index() {
         </span>
         <span>Trips & checklists</span>
       </Link>
+      <TripNow />
 
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Link
@@ -106,6 +118,38 @@ function Index() {
       </div>
       <Disclaimer />
     </AppShell>
+  );
+}
+
+// The trip under way or coming up next, and its next step, one tap away.
+function TripNow() {
+  const trips = useTrips();
+  const sites = useSites();
+  const today = useToday();
+  if (trips === null || sites === null) return null;
+  const trip = currentTrip(trips, today);
+  if (!trip) return null;
+  const next = nextStep(trip);
+  const label = next ? stepLabel(trip, next, sites) : undefined;
+  return (
+    <Link
+      to="/trip"
+      search={{ id: trip.id }}
+      className="mt-3 grid min-h-20 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg border-2 border-primary bg-card p-4 active:bg-secondary"
+    >
+      <span className="min-w-0">
+        <span className="block text-xs font-bold uppercase text-muted-foreground">
+          {STATUS_LABEL[tripStatus(trip, today)]} · {dateRangeLabel(trip)}
+        </span>
+        <span className="block break-words font-bold">{tripTitle(trip, sites)}</span>
+        {label && (
+          <span className="block break-words text-sm font-semibold text-primary">
+            Next: {label.title} · {label.where}
+          </span>
+        )}
+      </span>
+      <ChevronRight className="h-6 w-6 text-muted-foreground" />
+    </Link>
   );
 }
 

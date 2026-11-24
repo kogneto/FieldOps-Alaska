@@ -34,20 +34,15 @@ import { checklistDefinition, tripChecks, type Trip } from "@/lib/trips";
 
 const newId = newTripId;
 
-// The trip's loadout: what is shipped, built on pallets or in tubs, and the
-// four checks that run over it in order. Each check starts collapsed.
-export function LoadoutSection({ trip, sites }: { trip: Trip; sites: Site[] }) {
-  const loadout = trip.loadout;
-  const checks = tripChecks(trip);
-  const change = (fn: (l: Loadout) => Loadout) =>
-    updateTrip(trip.id, (t) => ({ ...t, loadout: fn(t.loadout) }));
-  const dangerous = loadout.items.filter((i) => i.dangerous).length;
+const changeLoadout = (tripId: string) => (fn: (l: Loadout) => Loadout) =>
+  updateTrip(tripId, (t) => ({ ...t, loadout: fn(t.loadout) }));
 
+// What the trip ships, built on pallets or in tubs: a summary and the builder.
+export function LoadoutPanel({ trip }: { trip: Trip }) {
+  const loadout = trip.loadout;
+  const dangerous = loadout.items.filter((i) => i.dangerous).length;
   return (
-    <section className="mt-8">
-      <h2 className="mb-1 font-display text-lg uppercase tracking-wide text-muted-foreground">
-        Loadout
-      </h2>
+    <div>
       <p className="text-base font-semibold">{loadoutSummary(loadout)}</p>
       {dangerous > 0 && (
         <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-caution">
@@ -55,25 +50,8 @@ export function LoadoutSection({ trip, sites }: { trip: Trip; sites: Site[] }) {
           {dangerous} to declare as dangerous goods
         </p>
       )}
-
-      <LoadoutBuilder trip={trip} change={change} />
-
-      <h3 className="mt-6 mb-2 text-xs font-bold uppercase text-muted-foreground">
-        Checklists, in order
-      </h3>
-      <div className="grid gap-2">
-        {checks.map((check) => (
-          <CheckCard
-            key={`${trip.id}:${check.key}`}
-            check={check}
-            checks={checks}
-            loadout={loadout}
-            sites={sites}
-            change={change}
-          />
-        ))}
-      </div>
-    </section>
+      <LoadoutBuilder trip={trip} change={changeLoadout(trip.id)} />
+    </div>
   );
 }
 
@@ -409,26 +387,16 @@ const ALL_LABEL: Record<Check["kind"], string> = {
   return: "All back",
 };
 
-function CheckCard({
-  check,
-  checks,
-  loadout,
-  sites,
-  change,
-}: {
-  check: Check;
-  checks: Check[];
-  loadout: Loadout;
-  sites: Site[];
-  change: (fn: (l: Loadout) => Loadout) => void;
-}) {
-  const [open, setOpen] = useState(false);
+// One loadout checklist, shown inside its step on the trip page.
+export function ChecklistBody({ trip, checkKey }: { trip: Trip; checkKey: string }) {
+  const loadout = trip.loadout;
+  const checks = tripChecks(trip);
+  const check = checks.find((c) => c.key === checkKey);
+  const change = changeLoadout(trip.id);
+  if (!check) return null;
   const { ids, fellThrough } = coverage(loadout, checks, check.key);
   const { done, total } = checkProgress(loadout, checks, check.key);
   const ticked = new Set(loadout.ticks[check.key] ?? []);
-  const where = check.siteId
-    ? (sites.find((s) => s.id === check.siteId)?.name ?? "A site no longer on this phone")
-    : "Home base";
   const from = shippedFrom(checks, check.key);
   const incoming = from ? loadout.waybills[from.key] : undefined;
   const before = checks[checks.findIndex((c) => c.key === check.key) - 1];
@@ -437,33 +405,11 @@ function CheckCard({
   const groups = [...loadout.pieces.map((p) => p.id), null].filter((pieceId) =>
     loadout.items.some((i) => listed.has(i.id) && i.pieceId === pieceId),
   );
-  const complete = total > 0 && done === total;
 
   return (
-    <div className="rounded-lg border-2 border-border bg-card">
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={() => setOpen(!open)}
-        className="flex min-h-16 w-full items-center gap-3 px-4 py-2 text-left"
-      >
-        <span
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 ${complete ? "border-ok bg-ok text-ok-foreground" : "border-muted-foreground"}`}
-        >
-          {complete && <CheckIcon className="h-5 w-5" strokeWidth={3} />}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-bold">{CHECK_LABEL[check.kind]}</span>
-          <span className="block break-words text-sm text-muted-foreground">{where}</span>
-        </span>
-        <span className="shrink-0 font-mono text-sm">
-          {done}/{total}
-        </span>
-        <ChevronDown className={`h-5 w-5 shrink-0 ${open ? "rotate-180" : ""}`} />
-      </button>
-
-      {open && (
-        <div className="grid gap-3 border-t-2 border-border p-3">
+    <div>
+      {
+        <div className="grid gap-3">
           {incoming && (
             <p className="text-sm">
               Shipped with waybill{" "}
@@ -489,8 +435,8 @@ function CheckCard({
           {ids.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               {check.kind === "pre-loadout"
-                ? "Nothing to check yet. Build the loadout above."
-                : "Nothing to check here yet."}
+                ? "Nothing to tick yet. Build the loadout above."
+                : "Nothing to tick here yet."}
             </p>
           ) : (
             groups.map((pieceId) => {
@@ -554,7 +500,7 @@ function CheckCard({
 
           {check.kind !== "pre-loadout" && <AddHere checkKey={check.key} change={change} />}
         </div>
-      )}
+      }
     </div>
   );
 }

@@ -69,8 +69,24 @@ export interface Trip {
   checklists: TripChecklist[];
   /** Ids of qualifications ticked off for this trip. */
   quals: string[];
-  /** The tools and parts the trip needs, and the ticks of the checks that run over them. */
+  /** The tools and parts the trip needs, and the ticks of the checklists that run over them. */
   loadout: Loadout;
+  /** Keys of the steps the technician has marked done. */
+  done: string[];
+}
+
+export type StepKind =
+  "ready" | "loadout" | "travel" | "arrival" | "work" | "departure" | "travel-home" | "return";
+
+/**
+ * One step of a trip, in order. The four loadout checklist steps share their
+ * checklist's key (`pre`, `arrive:…`, `depart:…`, `return`).
+ */
+export interface Step {
+  key: string;
+  kind: StepKind;
+  /** The site it happens at or on the way to, or null at home base. */
+  siteId: string | null;
 }
 
 export type TripStatus = "upcoming" | "current" | "past";
@@ -143,7 +159,21 @@ export function tripMonths(trip: Pick<Trip, "start" | "days">): Month[] {
   return months;
 }
 
-export function tripStatus(trip: Pick<Trip, "start" | "days">, today: string): TripStatus {
+/**
+ * Where a trip stands. Once a step is marked it follows the steps, not the
+ * calendar: Done once the return checklist is marked done, Under way until
+ * then, so a weather hold never ends a trip. A trip with nothing marked goes
+ * by its dates.
+ */
+export function tripStatus(
+  trip: Pick<Trip, "start" | "days"> & Partial<Pick<Trip, "stops" | "done">>,
+  today: string,
+): TripStatus {
+  if (trip.stops && trip.done) {
+    const marked = { stops: trip.stops, done: trip.done };
+    if (isFinished(marked)) return "past";
+    if (isStarted(marked)) return "current";
+  }
   if (today < trip.start) return "upcoming";
   if (today > tripEnd(trip)) return "past";
   return "current";
@@ -180,6 +210,7 @@ export function createTrip(options: {
     checklists: (options.checklists ?? sampleChecklists).map(copyChecklist),
     quals: [],
     loadout: emptyLoadout(),
+    done: [],
   };
   // Decide what's needed once the first site is on the trip. This is the only
   // time a list is skipped automatically.
@@ -266,10 +297,103 @@ export function addStop(trip: Trip, siteId: string, sites: Site[]): Trip {
 export const tripChecks = (trip: Pick<Trip, "stops">): Check[] =>
   loadoutChecks(trip.stops.map((s) => s.siteId));
 
-/** Takes a site off the trip, with the ticks and waybills of its loadout checks. */
+/** Takes a site off the trip, with its checklist ticks, waybills and step marks. */
 export function removeStop(trip: Trip, siteId: string): Trip {
   const stops = trip.stops.filter((s) => s.siteId !== siteId);
-  return { ...trip, stops, loadout: forgetChecks(trip.loadout, tripChecks({ stops })) };
+  const keys = new Set(tripSteps({ stops }).map((s) => s.key));
+  return {
+    ...trip,
+    stops,
+    loadout: forgetChecks(trip.loadout, tripChecks({ stops })),
+    done: trip.done.filter((k) => keys.has(k)),
+  };
+}
+
+// ---- Steps ---------------------------------------------------------------------
+
+/**
+ * The trip's steps in order: get ready, build and ship the loadout, then at
+ * each site in turn travel there, the arrival checklist, the job and the
+ * departure pre-loadout, then travel home and the return checklist.
+ */
+export function tripSteps(trip: Pick<Trip, "stops">): Step[] {
+  return [
+    { key: "ready", kind: "ready", siteId: null },
+    { key: "pre", kind: "loadout", siteId: null },
+    ...trip.stops.flatMap(({ siteId }): Step[] => [
+      { key: `travel:${siteId}`, kind: "travel", siteId },
+      { key: `arrive:${siteId}`, kind: "arrival", siteId },
+      { key: `work:${siteId}`, kind: "work", siteId },
+      { key: `depart:${siteId}`, kind: "departure", siteId },
+    ]),
+    { key: "travel-home", kind: "travel-home", siteId: null },
+    { key: "return", kind: "return", siteId: null },
+  ];
+}
+
+/** The marks that still belong to a step of the trip. */
+function marked(trip: Pick<Trip, "stops" | "done">): Set<string> {
+  const keys = new Set(tripSteps(trip).map((s) => s.key));
+  return new Set(trip.done.filter((k) => keys.has(k)));
+}
+
+export const isStarted = (trip: Pick<Trip, "stops" | "done">) => marked(trip).size > 0;
+
+/** Done once the return checklist step is marked, whatever else was skipped. */
+export const isFinished = (trip: Pick<Trip, "stops" | "done">) => marked(trip).has("return");
+
+export const isStepDone = (trip: Pick<Trip, "done">, key: string) => trip.done.includes(key);
+
+/**
+ * The step the technician is on: the first unmarked step after the furthest
+ * one marked, so a step they forgot to mark doesn't hold the trip back.
+ * Undefined once the trip is finished.
+ */
+export function nextStep(trip: Pick<Trip, "stops" | "done">): Step | undefined {
+  const steps = tripSteps(trip);
+  const done = marked(trip);
+  if (done.has("return")) return undefined;
+  let furthest = -1;
+  steps.forEach((s, i) => {
+    if (done.has(s.key)) furthest = i;
+  });
+  return steps.slice(furthest + 1).find((s) => !done.has(s.key));
+}
+
+/** A step's title and where it happens, as the trip page and lists show it. */
+export function stepLabel(
+  trip: Pick<Trip, "stops">,
+  step: Step,
+  sites: Site[],
+): { title: string; where: string } {
+  const site = step.siteId ? sites.find((s) => s.id === step.siteId) : undefined;
+  const name = site?.name ?? "a site no longer on this phone";
+  switch (step.kind) {
+    case "ready":
+      return { title: "Get ready", where: "Prep checklists and qualifications" };
+    case "loadout":
+      return { title: "Build and ship the loadout", where: "Pre-loadout at home base" };
+    case "travel": {
+      const route = trip.stops.find((s) => s.siteId === step.siteId)?.route ?? null;
+      return { title: `Travel to ${name}`, where: routeLabel(route) || "Choose how to get there" };
+    }
+    case "arrival":
+      return { title: "Arrival checklist", where: site?.name ?? name };
+    case "work":
+      return { title: "Do the job", where: site?.name ?? name };
+    case "departure":
+      return { title: "Departure pre-loadout", where: site?.name ?? name };
+    case "travel-home":
+      return { title: "Travel home", where: "Back to home base" };
+    case "return":
+      return { title: "Return checklist", where: "Home base" };
+  }
+}
+
+/** Marks a step done, or takes the mark back. Ticks are never changed. */
+export function setStepDone(trip: Trip, key: string, done: boolean): Trip {
+  const others = trip.done.filter((k) => k !== key);
+  return { ...trip, done: done ? [...others, key] : others };
 }
 
 /** Moves a site one place earlier (-1) or later (+1) in the order it is worked. */
@@ -357,9 +481,14 @@ export function tripTitle(trip: Trip, sites: Site[]): string {
   return more > 0 ? `${first} + ${more} more` : first;
 }
 
-/** The trip under way today, else the next one coming up. */
+/**
+ * The trip under way, else the next one coming up. When several are under
+ * way, such as one left unfinished, the one with the latest first day.
+ */
 export function currentTrip(trips: Trip[], today: string): Trip | undefined {
-  const current = trips.find((t) => tripStatus(t, today) === "current");
+  const current = trips
+    .filter((t) => tripStatus(t, today) === "current")
+    .sort((a, b) => b.start.localeCompare(a.start))[0];
   if (current) return current;
   return trips
     .filter((t) => tripStatus(t, today) === "upcoming")
@@ -495,6 +624,9 @@ function readTrip(v: unknown): Trip | null {
     checklists: checklists.flatMap((c) => readChecklist(c) ?? []),
     quals: isStringArray(t["quals"]) ? t["quals"] : [],
     loadout: readLoadout(t["loadout"]),
+    done: Array.isArray(t["done"])
+      ? [...new Set(t["done"].filter((k): k is string => typeof k === "string"))]
+      : [],
   };
 }
 
