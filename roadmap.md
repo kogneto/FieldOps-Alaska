@@ -109,6 +109,13 @@ The loadout and its four checklists are live since 24 Nov 2026, deployed from th
 - Unticked items are counted as "not ticked yet", never called missing or lost.
 - Dangerous goods are flagged per item. The app says to check with the operator, and doesn't state any operator's rules.
 
+The trip page that follows the steps was built on 24 Nov 2026. Checked with `bun run check`, in a phone-sized browser (a two-site trip marked through to Done, a reload halfway, first day moved into the past, sites reordered after marks), and as the built app on a local Cloudflare server with the server stopped. Not yet checked on a real phone. Defaults Claude chose, not yet confirmed by Andy:
+
+- The first step is called "Get ready": the prep checklists and qualifications. Then "Build and ship the loadout", and for each site "Travel to …", the arrival checklist, "Do the job" and the departure pre-loadout, then "Travel home" and the return checklist.
+- The step the technician is on is the first unmarked step after the furthest one marked, so a forgotten mark doesn't hold the trip back.
+- Marking a step done never changes any ticks, and unticked items don't block it.
+- When more than one trip is under way, the one with the latest first day is the one site pages and Home offer.
+
 This is how the work is really done, as Andy described it on 24 Nov 2026. It is built to be used, not tried out on testers first, and it replaces slice 3's guess at the trip model.
 
 The trip, in order:
@@ -156,7 +163,7 @@ To build:
 - [x] A feedback note never carries a site.
 - [x] A trip holds a loadout, built on pallets or in tubs.
 - [x] The pre-loadout, arrival checklist, departure pre-loadout and return checklist each run over the loadout.
-- [ ] The trip page follows the trip in order and shows the step the technician is on. The sites can already be put in order.
+- [x] The trip page follows the trip in order and shows the step the technician is on.
 - [ ] Travel out, between sites and home gives directions and holds travel documents.
 - [ ] Each site on a trip has its lodging, with directions.
 
