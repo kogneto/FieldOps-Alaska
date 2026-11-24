@@ -1,32 +1,42 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { getSite } from "@/lib/data";
+import {
+  createSite,
+  setConfidentiality,
+  setKind,
+  toggleSiteQualification,
+  type Site,
+} from "@/lib/sites";
 import {
   addDays,
   addStop,
-  neededWhenLabel,
   checklistDefinition,
-  toggleSkip as skip,
-  removeStop,
   checklistProgress,
-  chooseRoute,
   createTrip,
   currentTrip,
   dateRangeLabel,
   formatLocalDate,
+  includeNeeded,
+  legacyTripCount,
+  moveStop,
+  neededWhenLabel,
   parseLocalDate,
   readTrips,
+  removeStop,
+  routeLabel,
   setDates,
   setRoute,
   shareText,
   sitesNotOnTrip,
+  todayString,
   toggleItem,
   toggleQual,
   toggleSkip,
-  todayString,
   tripMonths,
   tripQualifications,
+  tripsUsingSite,
   tripStatus,
   tripTitle,
+  TRIP_VERSION,
   type Trip,
 } from "@/lib/trips";
 
@@ -40,8 +50,23 @@ afterAll(() => {
   process.env["TZ"] = originalTz;
 });
 
+function site(id: string, name: string, kind: Site["kind"], quals: string[] = []): Site {
+  let s = setKind(createSite({ id, name, community: "Bethel" })!, kind);
+  for (const q of quals) s = toggleSiteQualification(s, q);
+  return s;
+}
+
+const tower = site("tower", "Bethel cell tower", "Cell tower", ["q-tower-climb", "q-rf-awareness"]);
+const hut = setConfidentiality(
+  site("hut", "Fiber hut", "Fiber regen hut", ["q-fiber-safety"]),
+  "open",
+);
+const relay = site("relay", "Ridge relay", "Microwave relay", ["q-cold-weather", "q-medical"]);
+const bare = createSite({ id: "bare", name: "Somewhere new" })!;
+const sites = [tower, hut, relay, bare];
+
 const trip = (siteId: string, start: string, days = 1): Trip =>
-  createTrip({ id: `t-${siteId}-${start}`, siteId, start, days });
+  createTrip({ id: `t-${siteId}-${start}`, siteId, start, days, sites });
 
 describe("local dates", () => {
   it("round-trips a date and never slips a day in Alaska", () => {
@@ -67,6 +92,10 @@ describe("local dates", () => {
     expect(dateRangeLabel({ start: "2026-11-30", days: 3 })).toBe("30 Nov – 2 Dec 2026");
     expect(dateRangeLabel({ start: "2026-12-31", days: 2 })).toBe("31 Dec 2026 – 1 Jan 2027");
   });
+
+  it("lists every month a trip touches", () => {
+    expect(tripMonths({ start: "2026-11-29", days: 4 })).toEqual([11, 12]);
+  });
 });
 
 describe("trip status", () => {
@@ -79,72 +108,59 @@ describe("trip status", () => {
   });
 
   it("finds the trip under way, else the soonest upcoming one", () => {
-    const past = trip("site-coldfoot", "2026-10-01");
-    const later = trip("site-coldfoot", "2026-12-20");
-    const sooner = trip("site-fort-yukon", "2026-12-01");
-    const now = trip("site-hatcher-rpt", "2026-11-16", 2);
+    const past = trip("tower", "2026-10-01");
+    const later = trip("tower", "2026-12-20");
+    const sooner = trip("hut", "2026-12-01");
+    const now = trip("relay", "2026-11-16", 2);
     expect(currentTrip([past, later, sooner], "2026-11-16")?.id).toBe(sooner.id);
     expect(currentTrip([past, later, sooner, now], "2026-11-17")?.id).toBe(now.id);
     expect(currentTrip([past], "2026-11-16")).toBeUndefined();
   });
 });
 
-describe("routes", () => {
-  const gravina = getSite("site-gravina-rpt")!;
-  const thompson = getSite("site-thompson-pass")!;
-
-  it("picks the route that works in the trip's months", () => {
-    expect(chooseRoute(gravina, [7])).toBe(0); // float plane in summer
-    expect(chooseRoute(gravina, [1])).toBe(1); // helicopter in winter
-    expect(chooseRoute(thompson, [5])).toBe(0); // drive yourself
-    expect(chooseRoute(thompson, [12])).toBe(1); // helicopter
-  });
-
-  it("falls back to the first month's route when none covers the whole trip", () => {
-    expect(tripMonths({ start: "2026-11-29", days: 4 })).toEqual([11, 12]);
-    expect(chooseRoute(gravina, [11, 12])).toBe(0);
-  });
-
-  it("reroutes a stop when new dates rule its route out, and keeps a choice that still works", () => {
-    const summer = trip("site-gravina-rpt", "2026-07-10");
-    expect(summer.stops[0]?.routeIndex).toBe(0);
-    expect(setDates(summer, "2027-01-10", 2).stops[0]?.routeIndex).toBe(1);
-
-    const cooper = setRoute(trip("site-cooper-landing", "2026-07-10"), "site-cooper-landing", 1);
-    expect(setDates(cooper, "2027-01-10", 2).stops[0]?.routeIndex).toBe(1);
-  });
-});
-
 describe("building a trip", () => {
-  it("starts with one site and its own copy of every checklist", () => {
-    const t = trip("site-coldfoot", "2026-11-16", 3);
-    expect(t.stops).toEqual([{ siteId: "site-coldfoot", routeIndex: 0 }]);
+  it("starts with one site, no way there chosen and its own copy of every checklist", () => {
+    const t = trip("tower", "2026-11-16", 3);
+    expect(t.v).toBe(TRIP_VERSION);
+    expect(t.stops).toEqual([{ siteId: "tower", route: null }]);
     expect(t.checklists).toHaveLength(4);
     expect(t.checklists.every((c) => c.ticks.every((x) => !x) && !c.skipped)).toBe(true);
-    expect(tripTitle(t)).toBe("Coldfoot Microwave Site");
+    expect(tripTitle(t, sites)).toBe("Bethel cell tower");
   });
 
-  it("adds a site once and names the trip after the first", () => {
-    let t = trip("site-thompson-pass", "2026-07-10");
-    t = addStop(addStop(t, "site-coldfoot"), "site-coldfoot");
-    expect(t.stops.map((s) => s.siteId)).toEqual(["site-thompson-pass", "site-coldfoot"]);
-    expect(tripTitle(t)).toBe("Thompson Pass Cell Site + 1 more");
+  it("adds each of the technician's sites once, in order, and only theirs", () => {
+    let t = trip("hut", "2026-07-10");
+    t = addStop(addStop(addStop(t, "tower", sites), "tower", sites), "not-a-site", sites);
+    expect(t.stops.map((s) => s.siteId)).toEqual(["hut", "tower"]);
+    expect(tripTitle(t, sites)).toBe("Fiber hut + 1 more");
+    expect(sitesNotOnTrip(t, sites).map((s) => s.id)).toEqual(["relay", "bare"]);
   });
 
-  it("offers only the sites not already on the trip", () => {
-    const t = addStop(trip("site-thompson-pass", "2026-07-10"), "site-coldfoot");
-    const ids = sitesNotOnTrip(t).map((s) => s.id);
-    expect(ids).toHaveLength(5);
-    expect(ids).not.toContain("site-thompson-pass");
-    expect(ids).not.toContain("site-coldfoot");
+  it("moves a site earlier or later and ignores a move off either end", () => {
+    let t = addStop(addStop(trip("hut", "2026-07-10"), "tower", sites), "relay", sites);
+    t = moveStop(t, "relay", -1);
+    expect(t.stops.map((s) => s.siteId)).toEqual(["hut", "relay", "tower"]);
+    expect(moveStop(t, "hut", -1)).toBe(t);
+    expect(moveStop(t, "tower", 1)).toBe(t);
+  });
+
+  it("names a trip whose sites were all deleted", () => {
+    expect(tripTitle(trip("tower", "2026-07-10"), [])).toBe("Trip with no sites");
+  });
+
+  it("finds the trips a site is on", () => {
+    const a = trip("tower", "2026-07-10");
+    const b = addStop(trip("hut", "2026-08-10"), "tower", sites);
+    const c = trip("relay", "2026-09-10");
+    expect(tripsUsingSite([a, b, c], "tower").map((t) => t.id)).toEqual([a.id, b.id]);
+    expect(tripsUsingSite([a, b, c], "bare")).toEqual([]);
   });
 
   it("lists each qualification once across all the trip's sites", () => {
-    const t = addStop(trip("site-thompson-pass", "2026-07-10"), "site-coldfoot");
-    expect(tripQualifications(t)).toEqual([
+    const t = addStop(addStop(trip("tower", "2026-07-10"), "relay", sites), "bare", sites);
+    expect(tripQualifications(t, sites)).toEqual([
       "q-tower-climb",
       "q-rf-awareness",
-      "q-site-badge",
       "q-cold-weather",
       "q-medical",
     ]);
@@ -152,11 +168,27 @@ describe("building a trip", () => {
   });
 
   it("counts ticks only in checklists that aren't skipped", () => {
-    let t = trip("site-coldfoot", "2026-11-16");
+    let t = trip("tower", "2026-11-16");
     t = toggleItem(toggleItem(t, "cl-crew", 0), "cl-ppe", 1);
     expect(checklistProgress(t)).toEqual({ done: 2, total: 22 });
     t = toggleSkip(t, "cl-ppe");
     expect(checklistProgress(t)).toEqual({ done: 1, total: 16 });
+  });
+});
+
+describe("getting there", () => {
+  it("is chosen by hand: an operator, driving yourself, or nothing yet", () => {
+    let t = trip("tower", "2026-07-10");
+    expect(routeLabel(t.stops[0]!.route)).toBe("");
+    t = setRoute(t, "tower", { by: "operator", operatorId: "op-yukon-air" });
+    expect(routeLabel(t.stops[0]!.route)).toBe("Yukon Flats Air");
+    t = setRoute(t, "tower", { by: "self" });
+    expect(routeLabel(t.stops[0]!.route)).toBe("Drive yourself");
+  });
+
+  it("is kept when the dates change", () => {
+    const t = setRoute(trip("tower", "2026-07-10"), "tower", { by: "self" });
+    expect(setDates(t, "2027-01-10", 2, sites).stops[0]?.route).toEqual({ by: "self" });
   });
 });
 
@@ -168,49 +200,51 @@ describe("checklists by site and season", () => {
 
   it("starts a trip with the lists its sites and months don't need skipped", () => {
     // A fiber hut in summer: no climb, no cold, no radio site.
-    expect(state(trip("site-douglas-hut", "2026-07-10"))).toEqual({
+    expect(state(trip("hut", "2026-07-10"))).toEqual({
       "cl-crew": "in",
       "cl-ppe": "auto",
       "cl-parts": "auto",
       "cl-paper": "in",
     });
-    // A microwave relay in November needs everything.
-    expect(Object.values(state(trip("site-coldfoot", "2026-11-16")))).toEqual([
-      "in",
-      "in",
-      "in",
-      "in",
-    ]);
+    // A cell tower that needs a climb, in November, needs everything.
+    expect(Object.values(state(trip("tower", "2026-11-16")))).toEqual(["in", "in", "in", "in"]);
   });
 
   it("counts any month the trip touches, not just the first", () => {
     // 28 Sep – 2 Oct reaches October, a cold month.
-    expect(state(trip("site-douglas-hut", "2026-09-28", 5))["cl-ppe"]).toBe("in");
+    expect(state(trip("hut", "2026-09-28", 5))["cl-ppe"]).toBe("in");
   });
 
   it("includes a list again when a new site or new dates need it", () => {
-    const summer = trip("site-douglas-hut", "2026-07-10");
-    expect(state(addStop(summer, "site-coldfoot"))).toMatchObject({
+    const summer = trip("hut", "2026-07-10");
+    expect(state(addStop(summer, "tower", sites))).toMatchObject({
       "cl-ppe": "in",
       "cl-parts": "in",
     });
-    expect(state(setDates(summer, "2026-12-01", 2))).toMatchObject({
+    expect(state(setDates(summer, "2026-12-01", 2, sites))).toMatchObject({
       "cl-ppe": "in",
       "cl-parts": "auto",
     });
   });
 
+  it("includes a list again when a site on the trip is given a kind that needs it", () => {
+    const t = trip("bare", "2026-07-10");
+    expect(state(t)["cl-parts"]).toBe("auto");
+    const nowATower = sites.map((s) => (s.id === "bare" ? setKind(s, "Cell tower") : s));
+    expect(state(includeNeeded(t, nowATower))["cl-parts"]).toBe("in");
+  });
+
   it("never skips a list after the trip is created", () => {
-    let t = trip("site-coldfoot", "2026-11-16");
-    t = setDates(addStop(removeStop(t, "site-coldfoot"), "site-douglas-hut"), "2027-07-10", 1);
+    let t = trip("tower", "2026-11-16");
+    t = setDates(addStop(removeStop(t, "tower"), "hut", sites), "2027-07-10", 1, sites);
     expect(Object.values(state(t))).toEqual(["in", "in", "in", "in"]);
   });
 
   it("leaves a list alone once the user has skipped or included it", () => {
-    let t = trip("site-douglas-hut", "2026-07-10");
-    t = skip(skip(t, "cl-ppe"), "cl-ppe"); // included, then skipped again by hand
+    let t = trip("hut", "2026-07-10");
+    t = toggleSkip(toggleSkip(t, "cl-ppe"), "cl-ppe"); // included, then skipped again by hand
     expect(state(t)["cl-ppe"]).toBe("user");
-    expect(state(addStop(t, "site-coldfoot"))["cl-ppe"]).toBe("user");
+    expect(state(addStop(t, "tower", sites))["cl-ppe"]).toBe("user");
   });
 
   it("says when a list is needed", () => {
@@ -221,45 +255,75 @@ describe("checklists by site and season", () => {
       "a site is a microwave repeater, cell tower, radio repeater or microwave relay",
     );
   });
-
-  it("keeps the flag through storage and reads older trips unchanged", () => {
-    const t = trip("site-douglas-hut", "2026-07-10");
-    expect(readTrips(JSON.stringify([t]))[0]).toEqual(t);
-    const older = { ...t, checklists: t.checklists.map(({ autoSkipped, ...c }) => c) };
-    expect(readTrips(JSON.stringify([older]))[0]).toEqual(older);
-  });
 });
 
 describe("shareText", () => {
   it("warns when any site is confidential and says how to get there", () => {
-    const t = addStop(trip("site-hatcher-rpt", "2026-07-10"), "site-thompson-pass");
-    const text = shareText(t);
-    expect(text.startsWith("CONFIDENTIAL — share inside the crew only.")).toBe(true);
-    expect(text).toContain("Thompson Pass Cell Site — Valdez, Southcentral");
-    expect(text).toContain("Getting there: Drive yourself.");
-    expect(text).toContain("Escort required.");
+    let t = addStop(trip("tower", "2026-07-10"), "hut", sites);
+    t = setRoute(setRoute(t, "tower", { by: "operator", operatorId: "op-yukon-air" }), "hut", {
+      by: "self",
+    });
+    const text = shareText(t, sites);
+    expect(text.startsWith("CONFIDENTIAL — keep this plan with the technicians")).toBe(true);
+    expect(text).toContain("1. Bethel cell tower — Bethel");
+    expect(text).toContain("Getting there: Yukon Flats Air, 907-555-0166");
+    expect(text).toContain("Getting there: drive yourself.");
+    expect(text).toContain("Operator details are sample data for now.");
   });
 
-  it("has no warning when every site is open", () => {
-    const text = shareText(addStop(trip("site-hatcher-rpt", "2026-07-10"), "site-cooper-landing"));
+  it("has no warning for open sites, and no sample line without an operator", () => {
+    const text = shareText(setRoute(trip("hut", "2026-07-10"), "hut", { by: "self" }), sites);
     expect(text).not.toContain("CONFIDENTIAL");
-    expect(text).toContain("Mat-Su Hotshot Hauling, 907-555-0189");
+    expect(text).not.toContain("sample");
+    expect(text).not.toContain("crew");
   });
 });
 
 describe("readTrips", () => {
+  it("round-trips a trip through storage", () => {
+    const t = setRoute(trip("tower", "2026-07-10"), "tower", { by: "self" });
+    expect(readTrips(JSON.stringify([t]))).toEqual([t]);
+  });
+
   it("keeps every trip it understands and drops the rest", () => {
-    const good = trip("site-coldfoot", "2026-11-16");
+    const good = trip("tower", "2026-11-16");
     const raw = JSON.stringify([
       good,
-      { ...good, id: "old", v: 0 },
+      { ...good, id: "old", v: 1 },
       { ...good, id: "bad-date", start: "2026-02-30" },
-      { ...good, id: "gone-site", stops: [{ siteId: "site-nowhere", routeIndex: 0 }] },
       "nonsense",
     ]);
-    const trips = readTrips(raw);
-    expect(trips.map((t) => t.id)).toEqual([good.id, "gone-site"]);
-    expect(trips[1]?.stops).toEqual([]);
+    expect(readTrips(raw).map((t) => t.id)).toEqual([good.id]);
+  });
+
+  it("fills in anything missing, so a field added later never drops a trip", () => {
+    const [t] = readTrips(JSON.stringify([{ v: TRIP_VERSION, id: "x", start: "2026-11-16" }]));
+    expect(t).toEqual({
+      v: TRIP_VERSION,
+      id: "x",
+      start: "2026-11-16",
+      days: 1,
+      stops: [],
+      checklists: [],
+      quals: [],
+    });
+  });
+
+  it("reads an operator that has left the records as not chosen, and keeps each site once", () => {
+    const raw = JSON.stringify([
+      {
+        ...trip("tower", "2026-11-16"),
+        stops: [
+          { siteId: "tower", route: { by: "operator", operatorId: "op-gone" } },
+          { siteId: "tower", route: { by: "self" } },
+          { siteId: "hut", route: { by: "teleport" } },
+        ],
+      },
+    ]);
+    expect(readTrips(raw)[0]?.stops).toEqual([
+      { siteId: "tower", route: null },
+      { siteId: "hut", route: null },
+    ]);
   });
 
   it("survives empty or broken storage", () => {
@@ -268,9 +332,9 @@ describe("readTrips", () => {
     expect(readTrips('{"a":1}')).toEqual([]);
   });
 
-  it("repairs a stop whose route no longer exists", () => {
-    const good = trip("site-coldfoot", "2026-11-16");
-    const raw = JSON.stringify([{ ...good, stops: [{ siteId: "site-coldfoot", routeIndex: 9 }] }]);
-    expect(readTrips(raw)[0]?.stops).toEqual([{ siteId: "site-coldfoot", routeIndex: 0 }]);
+  it("counts the old trips planned on the sample sites", () => {
+    expect(legacyTripCount(null)).toBe(0);
+    expect(legacyTripCount("{broken")).toBe(0);
+    expect(legacyTripCount(JSON.stringify([{ v: 1 }, { v: 1 }]))).toBe(2);
   });
 });

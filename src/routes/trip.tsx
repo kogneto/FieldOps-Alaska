@@ -2,20 +2,25 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   AlertTriangle,
+  ArrowDown,
   ArrowLeft,
+  ArrowUp,
+  Car,
   Check,
   Lock,
   Plus,
   Share2,
-  ShieldAlert,
   Trash2,
   X,
 } from "lucide-react";
 import { AppShell, ModeIcon } from "@/components/fo";
+import { NewSiteForm } from "@/components/site-form";
 import { Stepper } from "@/components/stepper";
 import { Button } from "@/components/ui/button";
-import { getOperator, getQualification, getSite, monthsLabel } from "@/lib/data";
+import { getOperator, getQualification, operators } from "@/lib/data";
 import { useHydrated, useToday } from "@/lib/offline";
+import { currentSites, useSites } from "@/lib/site-store";
+import { siteSummary, type Site } from "@/lib/sites";
 import { deleteTrip, updateTrip, useTrips } from "@/lib/trip-store";
 import {
   addDays,
@@ -23,9 +28,9 @@ import {
   checklistDefinition,
   dateRangeLabel,
   MAX_TRIP_DAYS,
+  moveStop,
   neededWhenLabel,
   removeStop,
-  routeCovers,
   setDates,
   setRoute,
   shareText,
@@ -34,13 +39,13 @@ import {
   toggleItem,
   toggleQual,
   toggleSkip,
-  tripMonths,
   tripQualifications,
   tripStatus,
   tripTitle,
   tripEnd,
   STATUS_LABEL,
   type Trip,
+  type TripRoute,
 } from "@/lib/trips";
 import {
   needsAttention,
@@ -59,7 +64,10 @@ export const Route = createFileRoute("/trip")({
   head: () => ({
     meta: [
       { title: "Trip — FieldOps Alaska" },
-      { name: "description", content: "A trip's sites, routes, qualifications and checklists." },
+      {
+        name: "description",
+        content: "A trip's sites, how to get there, qualifications and checklists.",
+      },
       { property: "og:title", content: "Trip — FieldOps Alaska" },
       { property: "og:type", content: "website" },
     ],
@@ -83,8 +91,9 @@ function TripPage() {
   const search = Route.useSearch();
   const hydrated = useHydrated();
   const trips = useTrips();
+  const sites = useSites();
 
-  if (!hydrated || trips === null) {
+  if (!hydrated || trips === null || sites === null) {
     return (
       <AppShell title="Trip" back={backToTrips}>
         <p className="text-muted-foreground">Loading…</p>
@@ -101,20 +110,19 @@ function TripPage() {
       </AppShell>
     );
   }
-  return <TripDetail trip={trip} />;
+  return <TripDetail trip={trip} sites={sites} />;
 }
 
-function TripDetail({ trip }: { trip: Trip }) {
+function TripDetail({ trip, sites }: { trip: Trip; sites: Site[] }) {
   const today = useToday();
   const navigate = useNavigate();
   const [shareStatus, setShareStatus] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const status = tripStatus(trip, today);
-  const months = tripMonths(trip);
   const change = (fn: (t: Trip) => Trip) => updateTrip(trip.id, fn);
 
   async function share() {
-    const text = shareText(trip);
+    const text = shareText(trip, sites);
     try {
       if (navigator.share) {
         await navigator.share({ title: "FieldOps trip", text });
@@ -136,7 +144,9 @@ function TripDetail({ trip }: { trip: Trip }) {
   return (
     <AppShell title="Trip" back={backToTrips}>
       <div className="flex items-start justify-between gap-3">
-        <h2 className="min-w-0 text-xl font-bold leading-tight">{tripTitle(trip)}</h2>
+        <h2 className="min-w-0 break-words text-xl font-bold leading-tight">
+          {tripTitle(trip, sites)}
+        </h2>
         <span className="shrink-0 rounded-sm bg-secondary px-2 py-1 font-mono text-xs uppercase">
           {STATUS_LABEL[status]}
         </span>
@@ -147,108 +157,121 @@ function TripDetail({ trip }: { trip: Trip }) {
         <Stepper
           label="First day"
           value={trip.start === today ? `Today, ${shortDate(trip.start)}` : shortDate(trip.start)}
-          onMinus={() => change((t) => setDates(t, addDays(t.start, -1), t.days))}
-          onPlus={() => change((t) => setDates(t, addDays(t.start, 1), t.days))}
+          onMinus={() => change((t) => setDates(t, addDays(t.start, -1), t.days, currentSites()))}
+          onPlus={() => change((t) => setDates(t, addDays(t.start, 1), t.days, currentSites()))}
         />
         <Stepper
           label="Length"
           value={`${trip.days} day${trip.days === 1 ? "" : "s"}`}
-          onMinus={() => change((t) => setDates(t, t.start, t.days - 1))}
-          onPlus={() => change((t) => setDates(t, t.start, t.days + 1))}
+          onMinus={() => change((t) => setDates(t, t.start, t.days - 1, currentSites()))}
+          onPlus={() => change((t) => setDates(t, t.start, t.days + 1, currentSites()))}
           minusDisabled={trip.days <= 1}
           plusDisabled={trip.days >= MAX_TRIP_DAYS}
         />
       </div>
 
-      <Section title="Sites">
+      <Section title="Sites, in order">
         <div className="grid gap-3">
-          {trip.stops.map((stop) => {
-            const site = getSite(stop.siteId);
-            if (!site) return null;
-            const chosen = site.routes[stop.routeIndex];
+          {trip.stops.map((stop, index) => {
+            const site = sites.find((s) => s.id === stop.siteId);
+            const first = index === 0;
+            const last = index === trip.stops.length - 1;
             return (
               <div key={stop.siteId} className="rounded-lg border-2 border-border bg-card p-4">
-                <Link
-                  to="/sites/$id"
-                  params={{ id: site.id }}
-                  className="flex min-h-14 items-center text-lg font-bold text-card-foreground"
-                >
-                  {site.name}
-                </Link>
-                <div className="text-sm text-muted-foreground">
-                  {site.community}, {site.region}
-                </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {site.confidentiality === "confidential" && (
-                    <span className="flex items-center gap-1 rounded-sm bg-secondary px-2 py-1 text-xs font-semibold uppercase">
-                      <Lock className="h-3.5 w-3.5" />
-                      Confidential
-                    </span>
-                  )}
-                  {site.escort && (
-                    <span className="flex items-center gap-1 rounded-sm bg-caution px-2 py-1 text-xs font-bold uppercase text-caution-foreground">
-                      <ShieldAlert className="h-3.5 w-3.5" />
-                      Escort required
-                    </span>
-                  )}
+                <div className="flex items-start gap-3">
+                  <span className="mt-3 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary font-mono font-bold">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    {site ? (
+                      <>
+                        <Link
+                          to="/site"
+                          search={{ id: site.id }}
+                          className="flex min-h-14 items-center break-words text-lg font-bold text-card-foreground"
+                        >
+                          {site.name}
+                        </Link>
+                        {siteSummary(site) && (
+                          <div className="text-sm text-muted-foreground">{siteSummary(site)}</div>
+                        )}
+                        {site.kind === null && (
+                          <Link
+                            to="/site"
+                            search={{ id: site.id }}
+                            className="mt-2 flex min-h-14 items-center gap-2 rounded-lg border-2 border-caution px-3 text-sm font-semibold active:bg-secondary"
+                          >
+                            <AlertTriangle className="h-5 w-5 shrink-0 text-caution" />
+                            Say what kind of site this is and what it needs, so the right checklists
+                            are included
+                          </Link>
+                        )}
+                        {site.confidentiality === "confidential" && (
+                          <span className="mt-2 inline-flex items-center gap-1 rounded-sm bg-secondary px-2 py-1 text-xs font-semibold uppercase">
+                            <Lock className="h-3.5 w-3.5" />
+                            Confidential
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <p className="flex min-h-14 items-center text-muted-foreground">
+                        This site is no longer on this phone.
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="mt-3 text-xs font-bold uppercase text-muted-foreground">
-                  Getting there
-                </div>
-                <div className="mt-1 grid gap-2">
-                  {site.routes.map((route, i) => {
-                    const operator = route.operatorId ? getOperator(route.operatorId) : undefined;
-                    const selected = i === stop.routeIndex;
-                    return (
-                      <button
-                        key={i}
-                        type="button"
-                        aria-pressed={selected}
-                        onClick={() => change((t) => setRoute(t, site.id, i))}
-                        className={`flex min-h-16 w-full items-center gap-3 rounded-lg border-2 px-3 py-2 text-left ${selected ? "border-primary bg-primary/10" : "border-border bg-background"}`}
-                      >
-                        <span
-                          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 ${selected ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground"}`}
-                        >
-                          {selected && <Check className="h-4 w-4" strokeWidth={3} />}
-                        </span>
-                        <ModeIcon mode={route.mode} className="h-5 w-5 shrink-0 text-accent" />
-                        <span className="min-w-0 flex-1">
-                          <span className="block font-semibold">
-                            {operator?.name ?? "Drive yourself"}
-                          </span>
-                          <span className="block text-sm text-muted-foreground">{route.how}</span>
-                        </span>
-                        <span className="shrink-0 font-mono text-xs uppercase">
-                          {monthsLabel(route.months)}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                {chosen && !routeCovers(chosen, months) && (
-                  <p className="mt-2 flex gap-2 text-sm font-semibold text-caution">
-                    <AlertTriangle className="h-5 w-5 shrink-0" />
-                    This route doesn't work for every day of the trip.
-                  </p>
+                {site && (
+                  <RoutePicker
+                    route={stop.route}
+                    onChoose={(route) => change((t) => setRoute(t, stop.siteId, route))}
+                  />
                 )}
-                <button
-                  type="button"
-                  onClick={() => change((t) => removeStop(t, site.id))}
-                  className="mt-3 flex min-h-14 items-center gap-2 rounded-lg border-2 border-border px-4 font-semibold text-muted-foreground active:bg-secondary"
-                >
-                  <X className="h-5 w-5" />
-                  Remove from trip
-                </button>
+
+                <div className="mt-3 grid grid-cols-[auto_auto_minmax(0,1fr)] gap-2">
+                  <button
+                    type="button"
+                    aria-label="Move earlier"
+                    disabled={first}
+                    onClick={() => change((t) => moveStop(t, stop.siteId, -1))}
+                    className="flex h-14 w-14 items-center justify-center rounded-lg border-2 border-border active:bg-secondary disabled:opacity-40"
+                  >
+                    <ArrowUp className="h-6 w-6" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Move later"
+                    disabled={last}
+                    onClick={() => change((t) => moveStop(t, stop.siteId, 1))}
+                    className="flex h-14 w-14 items-center justify-center rounded-lg border-2 border-border active:bg-secondary disabled:opacity-40"
+                  >
+                    <ArrowDown className="h-6 w-6" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => change((t) => removeStop(t, stop.siteId))}
+                    className="flex min-h-14 items-center justify-center gap-2 rounded-lg border-2 border-border px-3 font-semibold text-muted-foreground active:bg-secondary"
+                  >
+                    <X className="h-5 w-5" />
+                    Remove
+                  </button>
+                </div>
               </div>
             );
           })}
         </div>
-        <AddSites trip={trip} onAdd={(siteId) => change((t) => addStop(t, siteId))} />
+        <AddSites
+          trip={trip}
+          sites={sites}
+          onAdd={(siteId) => change((t) => addStop(t, siteId, currentSites()))}
+        />
       </Section>
 
-      <QualificationsSection trip={trip} onToggle={(id) => change((t) => toggleQual(t, id))} />
+      <QualificationsSection
+        trip={trip}
+        sites={sites}
+        onToggle={(id) => change((t) => toggleQual(t, id))}
+      />
 
       <Section title="Checklists">
         <div className="grid gap-6">
@@ -305,8 +328,8 @@ function TripDetail({ trip }: { trip: Trip }) {
         {shareStatus}
       </p>
       <p className="text-sm text-muted-foreground">
-        Sends the plan as text, with site names. A plan with a confidential site starts with
-        "Confidential — share inside the crew only".
+        Sends the plan as text, with site names. A plan with a confidential site starts with a
+        warning to keep it with the technicians working these sites.
       </p>
 
       <button
@@ -328,12 +351,98 @@ function TripDetail({ trip }: { trip: Trip }) {
   );
 }
 
-// Adds sites to this trip from its own page, so the right trip always gets
-// them (a site page's "Add to this trip" only knows the current trip).
-function AddSites({ trip, onAdd }: { trip: Trip; onAdd: (siteId: string) => void }) {
+// How the technician gets to one site: an operator from the records, or
+// driving themselves. The list stays open until something is chosen.
+function RoutePicker({
+  route,
+  onChoose,
+}: {
+  route: TripRoute;
+  onChoose: (route: TripRoute) => void;
+}) {
   const [open, setOpen] = useState(false);
-  const available = sitesNotOnTrip(trip);
-  if (available.length === 0) return null;
+  const operator = route?.by === "operator" ? getOperator(route.operatorId) : undefined;
+  const showList = open || route === null;
+
+  const option = (selected: boolean) =>
+    `flex min-h-14 w-full items-center gap-3 rounded-lg border-2 px-3 py-2 text-left ${selected ? "border-primary bg-primary/10" : "border-border bg-background"}`;
+
+  return (
+    <div className="mt-3">
+      <div className="text-xs font-bold uppercase text-muted-foreground">Getting there</div>
+      {!showList && (
+        <div className="mt-1 flex items-center gap-2">
+          <div className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-lg border-2 border-primary bg-primary/10 px-3 font-semibold">
+            {operator ? (
+              <ModeIcon mode={operator.mode} className="h-5 w-5 shrink-0 text-accent" />
+            ) : (
+              <Car className="h-5 w-5 shrink-0 text-accent" />
+            )}
+            <span className="min-w-0">{operator?.name ?? "Drive yourself"}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="flex min-h-14 shrink-0 items-center rounded-lg border-2 border-border px-4 text-sm font-bold uppercase active:bg-secondary"
+          >
+            Change
+          </button>
+        </div>
+      )}
+      {showList && (
+        <div className="mt-1 grid gap-2">
+          <button
+            type="button"
+            aria-pressed={route?.by === "self"}
+            onClick={() => {
+              onChoose({ by: "self" });
+              setOpen(false);
+            }}
+            className={option(route?.by === "self")}
+          >
+            <Car className="h-5 w-5 shrink-0 text-accent" />
+            <span className="font-semibold">Drive yourself</span>
+          </button>
+          {operators.map((o) => {
+            const selected = route?.by === "operator" && route.operatorId === o.id;
+            return (
+              <button
+                key={o.id}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => {
+                  onChoose({ by: "operator", operatorId: o.id });
+                  setOpen(false);
+                }}
+                className={option(selected)}
+              >
+                <ModeIcon mode={o.mode} className="h-5 w-5 shrink-0 text-accent" />
+                <span className="min-w-0 flex-1">
+                  <span className="block font-semibold">{o.name}</span>
+                  <span className="block text-sm text-muted-foreground">{o.community}</span>
+                </span>
+                {selected && <Check className="h-5 w-5 shrink-0 text-primary" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Adds one of your sites to this trip, or a site typed in here.
+function AddSites({
+  trip,
+  sites,
+  onAdd,
+}: {
+  trip: Trip;
+  sites: Site[];
+  onAdd: (siteId: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const available = sitesNotOnTrip(trip, sites);
   return (
     <div className="mt-3">
       <button
@@ -343,33 +452,40 @@ function AddSites({ trip, onAdd }: { trip: Trip; onAdd: (siteId: string) => void
         className="flex min-h-16 w-full items-center justify-center gap-2 rounded-lg border-2 border-accent px-4 text-lg font-bold uppercase text-accent active:bg-secondary"
       >
         <Plus className="h-5 w-5" />
-        {open ? "Close site list" : "Add a site"}
+        {open ? "Close" : "Add a site"}
       </button>
       {open && (
-        <ul className="mt-2 grid gap-2">
-          {available.map((site) => (
-            <li
-              key={site.id}
-              className="flex items-center gap-3 rounded-lg border-2 border-border bg-card p-3"
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block font-semibold">{site.name}</span>
-                <span className="block text-sm text-muted-foreground">
-                  {site.community}, {site.region}
-                </span>
-              </span>
-              <button
-                type="button"
-                onClick={() => onAdd(site.id)}
-                aria-label={`Add ${site.name} to this trip`}
-                className="flex min-h-14 shrink-0 items-center gap-1 rounded-lg bg-primary px-4 font-bold uppercase text-primary-foreground active:translate-y-0.5"
-              >
-                <Plus className="h-5 w-5" />
-                Add
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-3 grid gap-3">
+          {available.length > 0 && (
+            <ul className="grid gap-2">
+              {available.map((site) => (
+                <li key={site.id}>
+                  <button
+                    type="button"
+                    onClick={() => onAdd(site.id)}
+                    className="flex min-h-16 w-full items-center gap-3 rounded-lg border-2 border-border bg-card px-4 py-2 text-left active:bg-secondary"
+                  >
+                    <Plus className="h-5 w-5 shrink-0 text-primary" />
+                    <span className="min-w-0">
+                      <span className="block font-semibold break-words">{site.name}</span>
+                      {siteSummary(site) && (
+                        <span className="block text-sm text-muted-foreground">
+                          {siteSummary(site)}
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="rounded-lg border-2 border-border p-3">
+            <div className="mb-2 text-sm font-bold uppercase text-muted-foreground">
+              Type in a new site
+            </div>
+            <NewSiteForm submitLabel="Add to this trip" onAdded={(site) => onAdd(site.id)} />
+          </div>
+        </div>
       )}
     </div>
   );
@@ -390,10 +506,18 @@ function SkipNote({ checklistId, auto }: { checklistId: string; auto: boolean })
 // Each qualification the trip's sites need, ticked per trip. With a record of
 // the technician's own qualifications on this phone, each also says whether it
 // is in that record and whether it expires before the trip ends.
-function QualificationsSection({ trip, onToggle }: { trip: Trip; onToggle: (id: string) => void }) {
+function QualificationsSection({
+  trip,
+  sites,
+  onToggle,
+}: {
+  trip: Trip;
+  sites: Site[];
+  onToggle: (id: string) => void;
+}) {
   const record = useQualRecord();
   const today = useToday();
-  const ids = tripQualifications(trip);
+  const ids = tripQualifications(trip, sites);
   if (ids.length === 0) return null;
   const end = tripEnd(trip);
   return (

@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 /**
  * The URL the service worker should cache a built file under, or null to leave
  * it out. Pages built ahead of time are cached under their route
- * (`sites/x.html` → `/sites/x`), since that is the URL a technician opens.
+ * (`operators/x.html` → `/operators/x`), since that is the URL a technician opens.
  */
 export function urlForFile(relativePath: string): string | null {
   const path = relativePath.replaceAll("\\", "/");

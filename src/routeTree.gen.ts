@@ -15,11 +15,12 @@ import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as PlanRouteImport } from './routes/plan'
 import { Route as QualificationsRouteImport } from './routes/qualifications'
 import { Route as SavedRouteImport } from './routes/saved'
+import { Route as SiteRouteImport } from './routes/site'
+import { Route as SitesRouteImport } from './routes/sites'
 import { Route as TripRouteImport } from './routes/trip'
 import { Route as TripsRouteImport } from './routes/trips'
 import { Route as ApiFeedbackRouteImport } from './routes/api/feedback'
 import { Route as OperatorsIdRouteImport } from './routes/operators.$id'
-import { Route as SitesIdRouteImport } from './routes/sites.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +52,16 @@ const SavedRoute = SavedRouteImport.update({
   path: '/saved',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SiteRoute = SiteRouteImport.update({
+  id: '/site',
+  path: '/site',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitesRoute = SitesRouteImport.update({
+  id: '/sites',
+  path: '/sites',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TripRoute = TripRouteImport.update({
   id: '/trip',
   path: '/trip',
@@ -71,11 +82,6 @@ const OperatorsIdRoute = OperatorsIdRouteImport.update({
   path: '/operators/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitesIdRoute = SitesIdRouteImport.update({
-  id: '/sites/$id',
-  path: '/sites/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -84,11 +90,12 @@ export interface FileRoutesByFullPath {
   '/plan': typeof PlanRoute
   '/qualifications': typeof QualificationsRoute
   '/saved': typeof SavedRoute
+  '/site': typeof SiteRoute
+  '/sites': typeof SitesRoute
   '/trip': typeof TripRoute
   '/trips': typeof TripsRoute
   '/api/feedback': typeof ApiFeedbackRoute
   '/operators/$id': typeof OperatorsIdRoute
-  '/sites/$id': typeof SitesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -97,11 +104,12 @@ export interface FileRoutesByTo {
   '/plan': typeof PlanRoute
   '/qualifications': typeof QualificationsRoute
   '/saved': typeof SavedRoute
+  '/site': typeof SiteRoute
+  '/sites': typeof SitesRoute
   '/trip': typeof TripRoute
   '/trips': typeof TripsRoute
   '/api/feedback': typeof ApiFeedbackRoute
   '/operators/$id': typeof OperatorsIdRoute
-  '/sites/$id': typeof SitesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,11 +119,12 @@ export interface FileRoutesById {
   '/plan': typeof PlanRoute
   '/qualifications': typeof QualificationsRoute
   '/saved': typeof SavedRoute
+  '/site': typeof SiteRoute
+  '/sites': typeof SitesRoute
   '/trip': typeof TripRoute
   '/trips': typeof TripsRoute
   '/api/feedback': typeof ApiFeedbackRoute
   '/operators/$id': typeof OperatorsIdRoute
-  '/sites/$id': typeof SitesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -126,11 +135,12 @@ export interface FileRouteTypes {
     | '/plan'
     | '/qualifications'
     | '/saved'
+    | '/site'
+    | '/sites'
     | '/trip'
     | '/trips'
     | '/api/feedback'
     | '/operators/$id'
-    | '/sites/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,11 +149,12 @@ export interface FileRouteTypes {
     | '/plan'
     | '/qualifications'
     | '/saved'
+    | '/site'
+    | '/sites'
     | '/trip'
     | '/trips'
     | '/api/feedback'
     | '/operators/$id'
-    | '/sites/$id'
   id:
     | '__root__'
     | '/'
@@ -152,11 +163,12 @@ export interface FileRouteTypes {
     | '/plan'
     | '/qualifications'
     | '/saved'
+    | '/site'
+    | '/sites'
     | '/trip'
     | '/trips'
     | '/api/feedback'
     | '/operators/$id'
-    | '/sites/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -166,11 +178,12 @@ export interface RootRouteChildren {
   PlanRoute: typeof PlanRoute
   QualificationsRoute: typeof QualificationsRoute
   SavedRoute: typeof SavedRoute
+  SiteRoute: typeof SiteRoute
+  SitesRoute: typeof SitesRoute
   TripRoute: typeof TripRoute
   TripsRoute: typeof TripsRoute
   ApiFeedbackRoute: typeof ApiFeedbackRoute
   OperatorsIdRoute: typeof OperatorsIdRoute
-  SitesIdRoute: typeof SitesIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -217,6 +230,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SavedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/site': {
+      id: '/site'
+      path: '/site'
+      fullPath: '/site'
+      preLoaderRoute: typeof SiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sites': {
+      id: '/sites'
+      path: '/sites'
+      fullPath: '/sites'
+      preLoaderRoute: typeof SitesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trip': {
       id: '/trip'
       path: '/trip'
@@ -245,13 +272,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OperatorsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sites/$id': {
-      id: '/sites/$id'
-      path: '/sites/$id'
-      fullPath: '/sites/$id'
-      preLoaderRoute: typeof SitesIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -262,11 +282,12 @@ const rootRouteChildren: RootRouteChildren = {
   PlanRoute: PlanRoute,
   QualificationsRoute: QualificationsRoute,
   SavedRoute: SavedRoute,
+  SiteRoute: SiteRoute,
+  SitesRoute: SitesRoute,
   TripRoute: TripRoute,
   TripsRoute: TripsRoute,
   ApiFeedbackRoute: ApiFeedbackRoute,
   OperatorsIdRoute: OperatorsIdRoute,
-  SitesIdRoute: SitesIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,30 +1,35 @@
 // Trips: one outing by a technician. They live only on the phone, in local
 // storage, so everything here is pure and works on plain values.
 //
+// A trip names its sites by id. The sites are the technician's own (sites.ts),
+// so anything here that needs to know about a site is handed the list of them.
+//
 // Dates are local calendar dates as "YYYY-MM-DD" strings. They are never
 // parsed with `new Date("YYYY-MM-DD")`, which reads them as UTC midnight and
 // lands on the previous day in Alaska.
 import {
   checklists as sampleChecklists,
-  sites as sampleSites,
   getOperator,
   getQualification,
-  getSite,
   monthName,
   monthsLabel,
   type Checklist,
   type Month,
-  type Route,
-  type Site,
 } from "./data";
+import type { Site } from "./sites";
 
-export const TRIP_VERSION = 1;
+export const TRIP_VERSION = 2;
 export const MAX_TRIP_DAYS = 60;
+
+/**
+ * How the technician reaches a site: with an operator from the records, or
+ * driving themselves. Null until they choose.
+ */
+export type TripRoute = { by: "operator"; operatorId: string } | { by: "self" } | null;
 
 export interface TripStop {
   siteId: string;
-  /** Index into the site's routes. */
-  routeIndex: number;
+  route: TripRoute;
 }
 
 /** A trip's own copy of a checklist, taken when the trip is created. */
@@ -49,6 +54,7 @@ export interface Trip {
   /** First day, local date "YYYY-MM-DD". */
   start: string;
   days: number;
+  /** The sites in the order they are worked. */
   stops: TripStop[];
   checklists: TripChecklist[];
   /** Ids of qualifications ticked off for this trip. */
@@ -131,24 +137,6 @@ export function tripStatus(trip: Pick<Trip, "start" | "days">, today: string): T
   return "current";
 }
 
-// ---- Routes ----------------------------------------------------------------
-
-export const routeCovers = (route: Route, months: Month[]) =>
-  months.every((m) => route.months.includes(m));
-
-/**
- * The route to use for a site on a trip: the first that works for every month
- * of the trip, else the first that works in its first month, else the first
- * route the site has.
- */
-export function chooseRoute(site: Site, months: Month[]): number {
-  const all = site.routes.findIndex((r) => routeCovers(r, months));
-  if (all >= 0) return all;
-  const first = months[0];
-  const start = site.routes.findIndex((r) => first !== undefined && r.months.includes(first));
-  return start >= 0 ? start : 0;
-}
-
 // ---- Building and changing trips -------------------------------------------
 
 const copyChecklist = (c: Checklist): TripChecklist => ({
@@ -165,9 +153,11 @@ export function createTrip(options: {
   siteId: string;
   start: string;
   days: number;
+  /** The technician's sites, which must include `siteId`. */
+  sites: Site[];
   checklists?: Checklist[];
 }): Trip {
-  const { id, siteId, start } = options;
+  const { id, siteId, start, sites } = options;
   const days = clampDays(options.days);
   const trip: Trip = {
     v: TRIP_VERSION,
@@ -180,13 +170,13 @@ export function createTrip(options: {
   };
   // Decide what's needed once the first site is on the trip. This is the only
   // time a list is skipped automatically.
-  const withSite = addStop(trip, siteId);
+  const withSite = addStop(trip, siteId, sites);
   const definitions = options.checklists ?? sampleChecklists;
   return {
     ...withSite,
     checklists: withSite.checklists.map((c) => {
       const definition = definitions.find((d) => d.id === c.id);
-      return definition && !isNeeded(definition, withSite)
+      return definition && !isNeeded(definition, withSite, sites)
         ? { ...c, skipped: true, autoSkipped: true }
         : c;
     }),
@@ -195,16 +185,25 @@ export function createTrip(options: {
 
 export const checklistDefinition = (id: string) => sampleChecklists.find((c) => c.id === id);
 
+/** The trip's sites in order, leaving out any that are no longer on this phone. */
+export function tripSites(trip: Pick<Trip, "stops">, sites: Site[]): Site[] {
+  return trip.stops.flatMap((stop) => sites.find((s) => s.id === stop.siteId) ?? []);
+}
+
 /** Whether a checklist is needed for the trip's sites and the months it touches. */
-export function isNeeded(definition: Checklist, trip: Pick<Trip, "stops" | "start" | "days">) {
+export function isNeeded(
+  definition: Checklist,
+  trip: Pick<Trip, "stops" | "start" | "days">,
+  sites: Site[],
+) {
   const when = definition.neededWhen;
   if (!when) return true;
-  const sites = trip.stops.flatMap((s) => getSite(s.siteId) ?? []);
+  const onTrip = tripSites(trip, sites);
   const months = tripMonths(trip);
   return (
-    (when.qualificationIds ?? []).some((q) => sites.some((s) => s.qualificationIds.includes(q))) ||
+    (when.qualificationIds ?? []).some((q) => onTrip.some((s) => s.qualificationIds.includes(q))) ||
     (when.months ?? []).some((m) => months.includes(m)) ||
-    (when.siteKinds ?? []).some((k) => sites.some((s) => s.kind === k))
+    (when.siteKinds ?? []).some((k) => onTrip.some((s) => s.kind === k))
   );
 }
 
@@ -223,14 +222,17 @@ export function neededWhenLabel(definition: Checklist): string {
   return parts.join(", or ");
 }
 
-// Include again any list that was skipped automatically and is now needed.
-// Lists are never skipped automatically after a trip is created.
-function includeNeeded(trip: Trip): Trip {
+/**
+ * Includes again any list that was skipped automatically and is now needed.
+ * Lists are never skipped automatically after a trip is created. Call it after
+ * a site on the trip changes its kind or qualifications, too.
+ */
+export function includeNeeded(trip: Trip, sites: Site[]): Trip {
   return {
     ...trip,
     checklists: trip.checklists.map((c) => {
       const definition = checklistDefinition(c.id);
-      return c.skipped && c.autoSkipped && definition && isNeeded(definition, trip)
+      return c.skipped && c.autoSkipped && definition && isNeeded(definition, trip, sites)
         ? { ...c, skipped: false, autoSkipped: false }
         : c;
     }),
@@ -239,13 +241,12 @@ function includeNeeded(trip: Trip): Trip {
 
 const clampDays = (days: number) => Math.min(MAX_TRIP_DAYS, Math.max(1, Math.round(days)));
 
-export function addStop(trip: Trip, siteId: string): Trip {
-  const site = getSite(siteId);
-  if (!site || trip.stops.some((s) => s.siteId === siteId)) return trip;
-  return includeNeeded({
-    ...trip,
-    stops: [...trip.stops, { siteId, routeIndex: chooseRoute(site, tripMonths(trip)) }],
-  });
+/** Adds one of the technician's sites to the end of the trip, once. How to get there is chosen afterwards. */
+export function addStop(trip: Trip, siteId: string, sites: Site[]): Trip {
+  if (!sites.some((s) => s.id === siteId) || trip.stops.some((s) => s.siteId === siteId)) {
+    return trip;
+  }
+  return includeNeeded({ ...trip, stops: [...trip.stops, { siteId, route: null }] }, sites);
 }
 
 export const removeStop = (trip: Trip, siteId: string): Trip => ({
@@ -253,29 +254,27 @@ export const removeStop = (trip: Trip, siteId: string): Trip => ({
   stops: trip.stops.filter((s) => s.siteId !== siteId),
 });
 
-export function setRoute(trip: Trip, siteId: string, routeIndex: number): Trip {
+/** Moves a site one place earlier (-1) or later (+1) in the order it is worked. */
+export function moveStop(trip: Trip, siteId: string, by: -1 | 1): Trip {
+  const from = trip.stops.findIndex((s) => s.siteId === siteId);
+  const to = from + by;
+  if (from < 0 || to < 0 || to >= trip.stops.length) return trip;
+  const stops = [...trip.stops];
+  const [stop] = stops.splice(from, 1);
+  if (stop) stops.splice(to, 0, stop);
+  return { ...trip, stops };
+}
+
+export function setRoute(trip: Trip, siteId: string, route: TripRoute): Trip {
   return {
     ...trip,
-    stops: trip.stops.map((s) => (s.siteId === siteId ? { ...s, routeIndex } : s)),
+    stops: trip.stops.map((s) => (s.siteId === siteId ? { ...s, route } : s)),
   };
 }
 
-/**
- * New dates. A stop keeps its chosen route while that route still works for
- * every month of the trip; otherwise it switches to the best one.
- */
-export function setDates(trip: Trip, start: string, days: number): Trip {
-  const next = { ...trip, start, days: clampDays(days) };
-  const months = tripMonths(next);
-  return includeNeeded({
-    ...next,
-    stops: next.stops.map((stop) => {
-      const site = getSite(stop.siteId);
-      const route = site?.routes[stop.routeIndex];
-      if (!site || (route && routeCovers(route, months))) return stop;
-      return { ...stop, routeIndex: chooseRoute(site, months) };
-    }),
-  });
+/** New dates. Lists the new months need are included again. */
+export function setDates(trip: Trip, start: string, days: number, sites: Site[]): Trip {
+  return includeNeeded({ ...trip, start, days: clampDays(days) }, sites);
 }
 
 export function toggleItem(trip: Trip, checklistId: string, item: number): Trip {
@@ -307,16 +306,19 @@ export function toggleQual(trip: Trip, qualId: string): Trip {
 
 // ---- Reading trips ---------------------------------------------------------
 
-/** Sites that could still be added to this trip, in directory order. */
-export function sitesNotOnTrip(trip: Trip): Site[] {
+/** The technician's sites that could still be added to this trip. */
+export function sitesNotOnTrip(trip: Trip, sites: Site[]): Site[] {
   const on = new Set(trip.stops.map((s) => s.siteId));
-  return sampleSites.filter((site) => !on.has(site.id));
+  return sites.filter((site) => !on.has(site.id));
 }
 
+/** The trips a site is on. A site can't be deleted while this isn't empty. */
+export const tripsUsingSite = (trips: Trip[], siteId: string): Trip[] =>
+  trips.filter((t) => t.stops.some((s) => s.siteId === siteId));
+
 /** One list of the qualifications every site on the trip needs, without repeats. */
-export function tripQualifications(trip: Trip): string[] {
-  const ids = trip.stops.flatMap((s) => getSite(s.siteId)?.qualificationIds ?? []);
-  return [...new Set(ids)];
+export function tripQualifications(trip: Trip, sites: Site[]): string[] {
+  return [...new Set(tripSites(trip, sites).flatMap((s) => s.qualificationIds))];
 }
 
 /** Ticked and total items across the checklists that aren't skipped. */
@@ -328,11 +330,12 @@ export function checklistProgress(trip: Trip): { done: number; total: number } {
   };
 }
 
-/** "Coldfoot Microwave Site", or "Coldfoot Microwave Site + 2 more". */
-export function tripTitle(trip: Trip): string {
-  const first = trip.stops[0] ? getSite(trip.stops[0].siteId)?.name : undefined;
+/** "Bethel cell tower", or "Bethel cell tower + 2 more". */
+export function tripTitle(trip: Trip, sites: Site[]): string {
+  const onTrip = tripSites(trip, sites);
+  const first = onTrip[0]?.name;
   if (!first) return "Trip with no sites";
-  const more = trip.stops.length - 1;
+  const more = onTrip.length - 1;
   return more > 0 ? `${first} + ${more} more` : first;
 }
 
@@ -345,36 +348,55 @@ export function currentTrip(trips: Trip[], today: string): Trip | undefined {
     .sort((a, b) => a.start.localeCompare(b.start))[0];
 }
 
-/** Plain text for the phone's share sheet. */
-export function shareText(trip: Trip): string {
-  const sites = trip.stops.flatMap((s) => {
-    const site = getSite(s.siteId);
-    return site ? [{ site, route: site.routes[s.routeIndex] }] : [];
+/** "Yukon Flats Air" or "Drive yourself"; empty until chosen. */
+export function routeLabel(route: TripRoute): string {
+  if (route?.by === "self") return "Drive yourself";
+  if (route?.by === "operator") return getOperator(route.operatorId)?.name ?? "";
+  return "";
+}
+
+/**
+ * Plain text for the phone's share sheet. It names the trip's sites, which is
+ * the technician's own choice to share; the app sends it nowhere itself.
+ */
+export function shareText(trip: Trip, sites: Site[]): string {
+  const stops = trip.stops.flatMap((stop) => {
+    const site = sites.find((s) => s.id === stop.siteId);
+    return site ? [{ site, route: stop.route }] : [];
   });
   const lines: string[] = [];
-  if (sites.some(({ site }) => site.confidentiality === "confidential")) {
-    lines.push("CONFIDENTIAL — share inside the crew only.", "");
+  if (stops.some(({ site }) => site.confidentiality === "confidential")) {
+    lines.push("CONFIDENTIAL — keep this plan with the technicians working these sites.", "");
   }
   lines.push(
     `FieldOps trip: ${dateRangeLabel(trip)} (${trip.days} day${trip.days === 1 ? "" : "s"})`,
   );
-  sites.forEach(({ site, route }, i) => {
-    lines.push("", `${i + 1}. ${site.name} — ${site.community}, ${site.region}`);
-    if (route) {
-      const operator = route.operatorId ? getOperator(route.operatorId) : undefined;
-      const who = operator ? `${operator.name}, ${operator.phone}` : "Drive yourself";
-      lines.push(`   Getting there: ${who}. ${route.how}.`);
+  let namesOperator = false;
+  stops.forEach(({ site, route }, i) => {
+    lines.push("", `${i + 1}. ${site.name}${site.community ? ` — ${site.community}` : ""}`);
+    const operator = route?.by === "operator" ? getOperator(route.operatorId) : undefined;
+    if (operator) {
+      namesOperator = true;
+      lines.push(`   Getting there: ${operator.name}, ${operator.phone}.`);
+    } else if (route?.by === "self") {
+      lines.push("   Getting there: drive yourself.");
     }
-    if (site.escort) lines.push("   Escort required.");
   });
-  const quals = tripQualifications(trip).map((id) => getQualification(id)?.name ?? id);
+  const quals = tripQualifications(trip, sites).map((id) => getQualification(id)?.name ?? id);
   if (quals.length > 0) lines.push("", `Qualifications: ${quals.join(", ")}.`);
   const { done, total } = checklistProgress(trip);
   const skipped = trip.checklists.filter((c) => c.skipped).map((c) => c.title);
   lines.push(
     `Checklists: ${done} of ${total} items ticked${skipped.length ? `; skipped ${skipped.join(", ")}` : ""}.`,
   );
-  lines.push("", "Sample data — not for field use.");
+  // The operators are still an invented sample set. Say so only when the plan
+  // names one; the technician's own sites and dates are real.
+  if (namesOperator) {
+    lines.push(
+      "",
+      "Operator details are sample data for now. Confirm them before relying on them.",
+    );
+  }
   return lines.join("\n");
 }
 
@@ -401,34 +423,45 @@ function readChecklist(v: unknown): TripChecklist | null {
     items,
     ticks,
     skipped: c["skipped"] === true,
-    // Only trips saved after this field existed have it; older ones read back unchanged.
     ...(c["autoSkipped"] === true ? { autoSkipped: true } : {}),
   };
 }
 
+function readRoute(v: unknown): TripRoute {
+  if (typeof v !== "object" || v === null) return null;
+  const r = v as Record<string, unknown>;
+  if (r["by"] === "self") return { by: "self" };
+  const operatorId = r["operatorId"];
+  // An operator that has left the records reads as not chosen yet.
+  if (r["by"] === "operator" && typeof operatorId === "string" && getOperator(operatorId)) {
+    return { by: "operator", operatorId };
+  }
+  return null;
+}
+
+// A trip needs only an id and a first day to be kept. Everything else is
+// filled in when missing, so a field added later never drops stored trips.
 function readTrip(v: unknown): Trip | null {
   if (typeof v !== "object" || v === null) return null;
   const t = v as Record<string, unknown>;
   if (t["v"] !== TRIP_VERSION || typeof t["id"] !== "string") return null;
   if (typeof t["start"] !== "string" || !isValidDate(t["start"])) return null;
-  if (typeof t["days"] !== "number" || !Number.isFinite(t["days"])) return null;
-  if (!Array.isArray(t["stops"]) || !Array.isArray(t["checklists"])) return null;
-  const stops = t["stops"].flatMap((s): TripStop[] => {
-    if (typeof s !== "object" || s === null) return [];
-    const { siteId, routeIndex } = s as Record<string, unknown>;
-    const site = typeof siteId === "string" ? getSite(siteId) : undefined;
-    if (!site) return [];
-    const index =
-      typeof routeIndex === "number" && site.routes[routeIndex] !== undefined ? routeIndex : 0;
-    return [{ siteId: site.id, routeIndex: index }];
-  });
+  const stops: TripStop[] = [];
+  for (const s of Array.isArray(t["stops"]) ? t["stops"] : []) {
+    if (typeof s !== "object" || s === null) continue;
+    const { siteId, route } = s as Record<string, unknown>;
+    if (typeof siteId !== "string" || stops.some((x) => x.siteId === siteId)) continue;
+    stops.push({ siteId, route: readRoute(route) });
+  }
+  const days = t["days"];
+  const checklists = Array.isArray(t["checklists"]) ? t["checklists"] : [];
   return {
     v: TRIP_VERSION,
     id: t["id"],
     start: t["start"],
-    days: clampDays(t["days"]),
+    days: clampDays(typeof days === "number" && Number.isFinite(days) ? days : 1),
     stops,
-    checklists: t["checklists"].flatMap((c) => readChecklist(c) ?? []),
+    checklists: checklists.flatMap((c) => readChecklist(c) ?? []),
     quals: isStringArray(t["quals"]) ? t["quals"] : [],
   };
 }
@@ -444,5 +477,20 @@ export function readTrips(raw: string | null): Trip[] {
     return Array.isArray(parsed) ? parsed.flatMap((t) => readTrip(t) ?? []) : [];
   } catch {
     return [];
+  }
+}
+
+/**
+ * How many trips are left over from before sites were typed in. They were
+ * planned on the invented sample sites, which are gone, so they can't be
+ * opened; the Trips screen says so and offers to clear them.
+ */
+export function legacyTripCount(raw: string | null): number {
+  if (!raw) return 0;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.length : 0;
+  } catch {
+    return 0;
   }
 }

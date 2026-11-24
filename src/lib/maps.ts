@@ -11,8 +11,8 @@ export function platformFrom(userAgent: string, maxTouchPoints = 0): Platform {
 
 /**
  * A link that opens the phone's own maps app at the coordinates. It carries
- * only the coordinates, never the site's name: the maps provider is outside
- * the crew, and a confidential site's name must not reach it.
+ * only the coordinates, never the site's name: the maps provider isn't one of
+ * the technicians working the site, and a confidential site's name must not reach it.
  */
 export function mapsUrl(platform: Platform, lat: number, lng: number): string {
   const point = `${lat},${lng}`;

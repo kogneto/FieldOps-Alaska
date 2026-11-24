@@ -3,15 +3,14 @@ import { useState } from "react";
 import { ArrowLeft, Send, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/components/fo";
 import { Button } from "@/components/ui/button";
-import { getOperator, getSite } from "@/lib/data";
-import { MAX_NOTE_LENGTH, type FeedbackNote } from "@/lib/feedback-note";
+import { getOperator } from "@/lib/data";
+import { isOperatorRecord, MAX_NOTE_LENGTH, type FeedbackNote } from "@/lib/feedback-note";
 import { useHydrated } from "@/lib/offline";
 import { flushOutbox, newNoteId, queueNote, useOutboxCount } from "@/lib/outbox";
 
 type Search = { from?: string | undefined; record?: string | undefined };
 
 const SCREEN = /^\/[A-Za-z0-9\-_/]{0,199}$/;
-const RECORD = /^(site|op)-[a-z0-9-]{1,60}$/;
 
 export const Route = createFileRoute("/feedback")({
   validateSearch: (s: Record<string, unknown>): Search => {
@@ -20,7 +19,7 @@ export const Route = createFileRoute("/feedback")({
     return {
       from:
         typeof from === "string" && SCREEN.test(from) && from !== "/feedback" ? from : undefined,
-      record: typeof record === "string" && RECORD.test(record) ? record : undefined,
+      record: typeof record === "string" && isOperatorRecord(record) ? record : undefined,
     };
   },
   head: () => ({
@@ -28,7 +27,7 @@ export const Route = createFileRoute("/feedback")({
       { title: "Send feedback — FieldOps Alaska" },
       { name: "description", content: "Tell us what's wrong, missing or hard to use." },
       { property: "og:title", content: "Send feedback — FieldOps Alaska" },
-      { property: "og:description", content: "Anonymous feedback on the FieldOps demo." },
+      { property: "og:description", content: "Anonymous feedback on FieldOps." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -51,7 +50,7 @@ function FeedbackPage() {
   const hydrated = useHydrated();
   const from = hydrated ? search.from : undefined;
   const record = hydrated ? search.record : undefined;
-  const subject = record ? (getSite(record)?.name ?? getOperator(record)?.name) : undefined;
+  const subject = record ? getOperator(record)?.name : undefined;
 
   const [text, setText] = useState("");
   const [status, setStatus] = useState<Status>("idle");

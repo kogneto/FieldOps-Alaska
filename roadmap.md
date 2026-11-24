@@ -1,6 +1,6 @@
 # Roadmap
 
-FieldOps Alaska is aimed at one real crew of telecom technicians. No crew is lined up yet, so for now testers try the public demo: no sign-in, and nothing asked of them. Until a crew exists, the design assumes fewer than ten technicians on a mix of iPhone and Android, working the three pilot regions.
+FieldOps Alaska is for any telecom technician who travels to remote sites in Alaska. It was aimed at one crew until 24 Nov 2026, when Andy made it an app for anyone. There is no sign-in and nothing is asked of a technician, and their trips, typed-in sites and travel documents stay on their phone. It runs on iPhone and Android. Slices 4 and 5 make the records real, public operators that Andy keeps current, with every site typed in by its technician. Until then the records are an invented sample set.
 
 Vocabulary is in [CONTEXT.md](CONTEXT.md). Decisions that need their reasons kept are in [docs/adr](docs/adr).
 
@@ -8,8 +8,8 @@ Vocabulary is in [CONTEXT.md](CONTEXT.md). Decisions that need their reasons kep
 
 - The code is edited here, not in Lovable. Commits still sync to Lovable, so pushed history is never rewritten.
 - Cloudflare hosts it. Deployments run from Andy's PC with a command, not from GitHub Actions.
-- Real data never enters this repo ([ADR 0001](docs/adr/0001-real-data-stays-out-of-the-repo.md)). The committed records stay an invented sample set.
-- Nothing in the public demo asks a tester who they are.
+- No site ever enters this repo ([ADR 0001](docs/adr/0001-real-data-stays-out-of-the-repo.md)). The records it holds are real, public operators ([ADR 0003](docs/adr/0003-real-operators-are-public-and-sites-stay-on-the-phone.md)). Until slice 5 lands they are still the invented sample set.
+- Nothing in the app asks a technician who they are. They may keep their own travel documents with a trip, such as a boarding pass with their name on it; those stay on their phone.
 - Logic gets automated tests: the record-format check, staleness, the trip roll-up. Screens are checked by hand on a phone.
 - Every pull request runs the checks (typecheck, lint, formatting, tests, build) on GitHub's machines, which cost nothing for a public repository. Deploys still run from the PC.
 - `main` requires the Checks status, and pull requests use auto-merge: they merge themselves once Checks pass. Andy, as admin, can still push or merge past the rule.
@@ -95,9 +95,86 @@ Live since 16 Nov 2026, first from the PR #8 branch at `64d56e9`, and from `main
 - [x] A trip's checklists follow its sites and season (live since 17 Nov 2026, from `main` at `95ba13f`). A list that no site or month on the trip needs starts skipped, says when it is needed, and can be included. It comes back by itself if a later site or date change needs it; nothing is skipped automatically after the trip is created, and a list skipped or included by hand is left alone. The sample PPE list is needed for a climb or cold-weather site or a trip touching Oct–Apr; the parts kit for radio, microwave and cell sites.
 - [x] A technician can keep a qualification record on the phone (live since 17 Nov 2026, from `main` at `95ba13f`): which qualifications they hold and the month each expires. Each trip shows every qualification it needs as in the record, valid to a month, expiring before the trip ends, expired, or not recorded; expiring in the trip's last month counts as valid. The record is optional, asks for no name, never leaves the phone (not in feedback or shared plans), and is a prep reminder only. Claude chose to build this from Later, reversing the earlier "the app doesn't know who holds what".
 
-## Parked: real data behind sign-in
+## Slice 4: the whole trip, home base to home base
 
-Waits until a crew signs on.
+Done when a technician can take a trip to a site they typed in, such as one in Bethel, from start to finish with no signal after the first open: type in the site, build and ship the loadout, travel out, make sure it arrived, pack up and ship it home, travel home, and make sure it all came back.
+
+Built in four pieces: typed-in sites, then the loadout and its checklists, then a trip page that follows the steps, then travel. Typed-in sites are live since 24 Nov 2026, deployed from the PR #17 branch at `6d311f8`. Checked with `bun run check`, in a phone-sized browser, and live (every new page loads and is in the offline cache). Not yet checked on a real phone.
+
+This is how the work is really done, as Andy described it on 24 Nov 2026. It is built to be used, not tried out on testers first, and it replaces slice 3's guess at the trip model.
+
+The trip, in order:
+
+1. Build the loadout on a pallet or in a tub, and ship it.
+2. Travel to the site.
+3. Make sure everything arrived.
+4. Do the job.
+5. Pack up the loadout and ship it, on to the next site or home.
+6. Travel home.
+7. Make sure everything made it back.
+
+Steps 2 to 5 repeat for each site on the trip.
+
+Decided (Andy):
+
+- A trip is one outing from home base to one or more sites and back. The sites are worked one after another, which reverses slice 3's flat list.
+- The loadout is the tools and parts for the trip. It usually ships apart from the technician, both ways, with an operator such as GoldStreak or NAC. This was "Shipped-gear tracking" under Not now.
+- The loadout gets four kinds of checklist: the pre-loadout at home base, an arrival checklist and a departure pre-loadout at each site, and one return checklist back at home base.
+- Travel is part of the trip. It gives directions to where the operator is met (an airport, a port, a dog sled team), then to the lodging (a hotel or cabin), then to the site.
+- A technician can keep travel documents with a trip, such as a boarding pass image. The glossary and the ground rules were changed to allow it.
+- A technician types in each site, and its lodging and the directions to its operator the same way. What they type stays on their phone. An operator's record fills in the directions where it has them.
+- The records hold real, public operators and no sites ([ADR 0003](docs/adr/0003-real-operators-are-public-and-sites-stay-on-the-phone.md)).
+
+Decided (Claude's defaults, confirmed by Andy on 24 Nov 2026):
+
+- The invented sites go in this slice, and the invented operators are replaced in slice 5.
+- A typed-in site can carry a kind and the qualifications it needs, picked from the maintainer's lists. Without them the parts list would start skipped on every trip, and the qualification flags would have nothing to check. Choosing a route by the month goes, since no site has recorded routes.
+- With no crew, a Confidential site is one that stays with the technicians working it, and the technician sets that when typing the site in. A shared plan still warns when it names one.
+- The saved list holds operators only.
+- An operator's record never says which sites or clients the operator serves.
+- A trip moves to its next step when the technician finishes one, not when the date changes. A weather hold no longer marks a trip done.
+- The return checklist covers whatever was ticked at the last departure pre-loadout. Items aren't marked used, left or lost.
+- A shipment's waybill number is typed in by hand. The app never talks to the operator's tracking.
+- Travel holds directions and travel documents, not flight numbers or times. The boarding pass carries those.
+- Travel documents are deleted with the trip, and are never put in a shared plan or a feedback note.
+- An item that must be declared as dangerous goods, such as fuel or bear spray, is flagged at the pre-loadout.
+
+To build:
+
+- [x] A technician can type in a site, and set its kind, qualifications and confidentiality.
+- [x] The invented sites go. A typed-in site carries its own kind and qualifications, so the checklists and qualification flags still have something to read.
+- [x] Trips already on a phone aren't silently lost when the invented sites go. The Trips screen says how many can no longer be opened, and offers to clear them.
+- [x] Wording that speaks of a crew or of sample data is reworded. A technician's own plan is never stamped "Sample data", and the "Sample" badge shows only on screens with the invented operators. The checklists' own wording waits on slice 5.
+- [x] A feedback note never carries a site.
+- [ ] A trip holds a loadout, built on a pallet or in a tub.
+- [ ] The pre-loadout, arrival checklist, departure pre-loadout and return checklist each run over the loadout.
+- [ ] The trip page follows the trip in order and shows the step the technician is on. The sites can already be put in order.
+- [ ] Travel out, between sites and home gives directions and holds travel documents.
+- [ ] Each site on a trip has its lodging, with directions.
+
+## Slice 5: real operators
+
+Done when no invented record is left: every operator in the app is a real business with a source, a verified date and a confidence, and nothing is labelled "Sample".
+
+Decided (Andy):
+
+- The records are real, public operators, and Andy keeps them current as the maintainer ([ADR 0003](docs/adr/0003-real-operators-are-public-and-sites-stay-on-the-phone.md)).
+
+To decide:
+
+- Who gathers the first operators, and which come first.
+- The region list. The three pilot regions don't cover Bethel.
+- What the invented checklists and qualification list become. They are the maintainer's but aren't records, and once "Sample" comes off they read as real. They still speak of a crew ("Second crew member confirmed", a Crew category).
+
+To build:
+
+- [ ] Replace the invented operators with real ones.
+- [ ] An operator's record says where the operator is met, so a trip can give directions there.
+- [ ] Take "Sample" off the header, the shared plan and the README.
+
+## Shelved: one crew's real data behind sign-in
+
+Shelved on 24 Nov 2026, when FieldOps became an app for anyone. Kept in case a crew asks for a private copy of its own.
 
 - [ ] Choose how the crew signs in. [ADR 0002](docs/adr/0002-sign-in-is-cloudflare-access.md) proposes Cloudflare Access with an email allow-list; the alternative is per-phone invite codes.
 - [ ] A second deployment for the crew, behind that sign-in.
@@ -109,12 +186,13 @@ Waits until a crew signs on.
 
 ## Later
 
+Both are shelved with the crew work above.
+
 - Crew reports: crew members send changes to records, and the maintainer approves them.
 - Sharing trips with the crew through a backend.
 
 ## Not now
 
-- Shipped-gear tracking.
 - Live weather and hazards inside the app.
 - An in-app map or offline map tiles.
 - An editing screen for a dispatcher.
