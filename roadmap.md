@@ -99,7 +99,7 @@ Live since 16 Nov 2026, first from the PR #8 branch at `64d56e9`, and from `main
 
 Done when a technician can take a trip to a site they typed in, such as one in Bethel, from start to finish with no signal after the first open: type in the site, build and ship the loadout, travel out, make sure it arrived, pack up and ship it home, travel home, and make sure it all came back.
 
-Built in four pieces: typed-in sites, then the loadout and its checklists, then a trip page that follows the steps, then travel. Typed-in sites are live since 24 Nov 2026, deployed from the PR #17 branch at `6d311f8`. Checked with `bun run check`, in a phone-sized browser, and live (every new page loads and is in the offline cache). Not yet checked on a real phone.
+All four pieces are live since 24 Nov 2026: typed-in sites, the loadout and its checklists, a trip page that follows the steps, and travel. The full trip has been walked offline as the built app; it still needs the phone test. Typed-in sites are live since 24 Nov 2026, deployed from the PR #17 branch at `6d311f8`. Checked with `bun run check`, in a phone-sized browser, and live (every new page loads and is in the offline cache). Not yet checked on a real phone.
 
 The loadout and its four checklists are live since 24 Nov 2026, deployed from the PR #18 branch at `b034e81`. Checked with `bun run check`, in a phone-sized browser, and as the built app on a local Cloudflare server with the server stopped. Not yet checked on a real phone. Defaults Claude chose, not yet confirmed by Andy:
 
@@ -116,7 +116,7 @@ The trip page that follows the steps is live since 24 Nov 2026, deployed from th
 - Marking a step done never changes any ticks, and unticked items don't block it.
 - When more than one trip is under way, the one with the latest first day is the one site pages and Home offer.
 
-Travel was built on 24 Nov 2026. Checked with `bun run check`, in a phone-sized browser (a meeting place and lodging typed in with directions, a boarding pass image added, opened full screen, and deleted with its trip), and as the built app on a local Cloudflare server with the server stopped. Not yet checked on a real phone, including picking a photo from the library and the iPhone maps link for an address, which couldn't be confirmed from Apple's docs. Defaults Claude chose, not yet confirmed by Andy:
+Travel is live since 24 Nov 2026, deployed from the PR #20 branch at `396302a`. Checked with `bun run check`, in a phone-sized browser (a meeting place and lodging typed in with directions, a boarding pass image added, opened full screen, and deleted with its trip), and as the built app on a local Cloudflare server with the server stopped. Not yet checked on a real phone, including picking a photo from the library and the iPhone maps link for an address, which couldn't be confirmed from Apple's docs. Defaults Claude chose, not yet confirmed by Andy:
 
 - A place is a name and one line of where it is: an address, or coordinates. "Use where I am now" fills in the phone's position, for sites with no address. Directions send only that line to the maps app, never a site's name.
 - Each travel step to a site holds, in Andy's order: the operator with a Call button, where you meet the operator (not when driving yourself), the lodging, and directions to the site. Travel home holds where you meet the operator.
