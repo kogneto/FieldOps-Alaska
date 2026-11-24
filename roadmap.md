@@ -116,6 +116,14 @@ The trip page that follows the steps is live since 24 Nov 2026, deployed from th
 - Marking a step done never changes any ticks, and unticked items don't block it.
 - When more than one trip is under way, the one with the latest first day is the one site pages and Home offer.
 
+Travel was built on 24 Nov 2026. Checked with `bun run check`, in a phone-sized browser (a meeting place and lodging typed in with directions, a boarding pass image added, opened full screen, and deleted with its trip), and as the built app on a local Cloudflare server with the server stopped. Not yet checked on a real phone, including picking a photo from the library and the iPhone maps link for an address, which couldn't be confirmed from Apple's docs. Defaults Claude chose, not yet confirmed by Andy:
+
+- A place is a name and one line of where it is: an address, or coordinates. "Use where I am now" fills in the phone's position, for sites with no address. Directions send only that line to the maps app, never a site's name.
+- Each travel step to a site holds, in Andy's order: the operator with a Call button, where you meet the operator (not when driving yourself), the lodging, and directions to the site. Travel home holds where you meet the operator.
+- Where a site is lives on the site, so every trip there has it. Meeting places and lodging live on the trip.
+- Travel documents are images only, each one a boarding pass, shipping paper, permit or other. They are kept unscaled, so a barcode still scans, in the phone's file storage rather than with the trip, and a document shows as saved only once it reads back. They are deleted with their trip or site, and any left over are cleared when Trips opens.
+- Removing a site from a trip now takes a second tap, since it takes the site's travel documents with it.
+
 This is how the work is really done, as Andy described it on 24 Nov 2026. It is built to be used, not tried out on testers first, and it replaces slice 3's guess at the trip model.
 
 The trip, in order:
@@ -164,8 +172,8 @@ To build:
 - [x] A trip holds a loadout, built on pallets or in tubs.
 - [x] The pre-loadout, arrival checklist, departure pre-loadout and return checklist each run over the loadout.
 - [x] The trip page follows the trip in order and shows the step the technician is on.
-- [ ] Travel out, between sites and home gives directions and holds travel documents.
-- [ ] Each site on a trip has its lodging, with directions.
+- [x] Travel out, between sites and home gives directions and holds travel documents.
+- [x] Each site on a trip has its lodging, with directions.
 
 ## Slice 5: real operators
 
