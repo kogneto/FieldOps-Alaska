@@ -65,7 +65,7 @@ Stay offline, on the same trip.
 
 1. Under Loadout, tap **Add a tub**, then **Start from the tower site parts kit**. Check six items appear under "Not on a pallet or in a tub".
 2. In "Add a tool or part", choose **Tub 1**, type "Bear spray", tick **Dangerous goods**, and tap **Add to the loadout**. Check the form stays open and the summary says "7 items on 1 tub" with "1 to declare as dangerous goods".
-3. Under "Checks, in order", open **Pre-loadout**. Check it warns to declare Bear spray. Tap **All packed** beside Tub 1, and type "027 1234" as the waybill number.
+3. Under "Checklists, in order", open **Pre-loadout**. Check it warns to declare Bear spray. Tap **All packed** beside Tub 1, and type "027 1234" as the waybill number.
 4. Open the first **Arrival checklist**. Check it lists only Bear spray, and says "Shipped with waybill 027 1234".
 5. In that arrival checklist, add "Spare fuse" under "Picked something up?". Check it appears ticked.
 6. Close the app fully and reopen it, still offline. Check the loadout, the ticks and the waybill are all still there.

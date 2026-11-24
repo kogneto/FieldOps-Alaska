@@ -17,7 +17,6 @@ import {
   type Month,
 } from "./data";
 import {
-  dangerousAt,
   emptyLoadout,
   forgetChecks,
   loadoutChecks,
@@ -410,7 +409,7 @@ export function shareText(trip: Trip, sites: Site[]): string {
   );
   if (trip.loadout.items.length > 0) {
     const checks = tripChecks(trip);
-    const dangerous = dangerousAt(trip.loadout, checks, "pre").length;
+    const dangerous = trip.loadout.items.filter((i) => i.dangerous).length;
     lines.push(
       `Loadout: ${loadoutSummary(trip.loadout)}${dangerous ? `; ${dangerous} to declare as dangerous goods` : ""}.`,
     );

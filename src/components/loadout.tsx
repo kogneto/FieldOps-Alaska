@@ -41,7 +41,7 @@ export function LoadoutSection({ trip, sites }: { trip: Trip; sites: Site[] }) {
   const checks = tripChecks(trip);
   const change = (fn: (l: Loadout) => Loadout) =>
     updateTrip(trip.id, (t) => ({ ...t, loadout: fn(t.loadout) }));
-  const dangerous = dangerousAt(loadout, checks, "pre").length;
+  const dangerous = loadout.items.filter((i) => i.dangerous).length;
 
   return (
     <section className="mt-8">
@@ -59,7 +59,7 @@ export function LoadoutSection({ trip, sites }: { trip: Trip; sites: Site[] }) {
       <LoadoutBuilder trip={trip} change={change} />
 
       <h3 className="mt-6 mb-2 text-xs font-bold uppercase text-muted-foreground">
-        Checks, in order
+        Checklists, in order
       </h3>
       <div className="grid gap-2">
         {checks.map((check) => (
@@ -212,6 +212,13 @@ function LoadoutBuilder({
             );
           })}
 
+          {(loadout.ticks["pre"] ?? []).length > 0 && (
+            <p className="text-sm text-muted-foreground">
+              The pre-loadout has started. Something added here goes on the pre-loadout, and on to
+              later checklists only once it is ticked there. Picked it up at a site? Add it under
+              "Picked something up?" on that site's checklist instead.
+            </p>
+          )}
           <AddItemForm loadout={loadout} change={change} />
         </div>
       )}
@@ -466,7 +473,7 @@ function CheckCard({
           {fellThrough && before && (
             <p className="text-sm text-muted-foreground">
               Nothing was ticked at the {CHECK_LABEL[before.kind].toLowerCase()} before this, so it
-              lists everything that check listed.
+              lists everything that checklist listed.
             </p>
           )}
           {dangerous.length > 0 && (

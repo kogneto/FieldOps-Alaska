@@ -284,6 +284,13 @@ describe("the loadout on a trip", () => {
     expect(text).toContain("Loadout: 2 items; 1 to declare as dangerous goods.");
     expect(text).toContain("Shipped from home base: waybill 027 1234.");
   });
+
+  it("counts dangerous goods picked up at a site in a shared plan", () => {
+    let t = trip("hut", "2026-07-10");
+    const l = addItem(t.loadout, { id: "a", name: "Fuel", dangerous: true }, "arrive:hut");
+    t = { ...t, loadout: l };
+    expect(shareText(t, sites)).toContain("1 to declare as dangerous goods");
+  });
 });
 
 describe("shareText", () => {

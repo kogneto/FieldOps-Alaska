@@ -101,9 +101,9 @@ Done when a technician can take a trip to a site they typed in, such as one in B
 
 Built in four pieces: typed-in sites, then the loadout and its checklists, then a trip page that follows the steps, then travel. Typed-in sites are live since 24 Nov 2026, deployed from the PR #17 branch at `6d311f8`. Checked with `bun run check`, in a phone-sized browser, and live (every new page loads and is in the offline cache). Not yet checked on a real phone.
 
-The loadout and its four checks are live since 24 Nov 2026, deployed from the PR #18 branch at `60a60e9`. Checked with `bun run check`, in a phone-sized browser, and as the built app on a local Cloudflare server with the server stopped. Not yet checked on a real phone. Defaults Claude chose, not yet confirmed by Andy:
+The loadout and its four checklists are live since 24 Nov 2026, deployed from the PR #18 branch at `60a60e9`. Checked with `bun run check`, in a phone-sized browser, and as the built app on a local Cloudflare server with the server stopped. Not yet checked on a real phone. Defaults Claude chose, not yet confirmed by Andy:
 
-- A check lists what was ticked at the check before it, plus anything added at the check itself, which starts ticked. This extends the confirmed return-checklist rule to every check. If nothing was ticked at the check before, it lists what that check listed, and says so.
+- Each checklist lists what was ticked at the checklist before it, plus anything added at it, which starts ticked. This extends the confirmed return-checklist rule to every checklist. If nothing was ticked at the one before, it lists what that one listed, and says so.
 - One waybill number per shipment: at the pre-loadout and at each departure. It shows on the next arrival or return checklist.
 - A new trip's loadout can start as a copy of the last trip's (no ticks or waybills), or from the tower site parts kit. The parts kit is still also a prep checklist; slice 5 decides what it becomes.
 - Unticked items are counted as "not ticked yet", never called missing or lost.
