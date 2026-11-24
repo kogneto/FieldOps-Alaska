@@ -109,7 +109,7 @@ The loadout and its four checklists are live since 24 Nov 2026, deployed from th
 - Unticked items are counted as "not ticked yet", never called missing or lost.
 - Dangerous goods are flagged per item. The app says to check with the operator, and doesn't state any operator's rules.
 
-The trip page that follows the steps was built on 24 Nov 2026. Checked with `bun run check`, in a phone-sized browser (a two-site trip marked through to Done, a reload halfway, first day moved into the past, sites reordered after marks), and as the built app on a local Cloudflare server with the server stopped. Not yet checked on a real phone. Defaults Claude chose, not yet confirmed by Andy:
+The trip page that follows the steps is live since 24 Nov 2026, deployed from the PR #19 branch at `08395db`. Checked with `bun run check`, in a phone-sized browser (a two-site trip marked through to Done, a reload halfway, first day moved into the past, sites reordered after marks), and as the built app on a local Cloudflare server with the server stopped. Not yet checked on a real phone. Defaults Claude chose, not yet confirmed by Andy:
 
 - The first step is called "Get ready": the prep checklists and qualifications. Then "Build and ship the loadout", and for each site "Travel to …", the arrival checklist, "Do the job" and the departure pre-loadout, then "Travel home" and the return checklist.
 - The step the technician is on is the first unmarked step after the furthest one marked, so a forgotten mark doesn't hold the trip back.
