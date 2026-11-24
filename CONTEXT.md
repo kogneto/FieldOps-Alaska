@@ -54,6 +54,10 @@ _Avoid_: Shop, depot, headquarters
 The tools and parts a trip needs at its sites, built on a pallet or in a tub. It usually ships with an operator, apart from the technician, both out and back.
 _Avoid_: Kit, gear list
 
+**Waybill**:
+The number an operator gives a shipment of the loadout. The technician types it in at the check the loadout ships at.
+_Avoid_: Tracking number, airbill, AWB
+
 **Pre-loadout**:
 The checklist run at home base while the loadout is built, before it ships.
 _Avoid_: Packing list, load plan
