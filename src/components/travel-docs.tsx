@@ -5,6 +5,13 @@ import { addDoc, deleteDocs, useDocs, type TravelDoc } from "@/lib/doc-store";
 import { DOC_KINDS, DOC_LABEL, isDocType, MAX_DOC_BYTES, type DocKind } from "@/lib/travel-docs";
 import { newTripId } from "@/lib/trip-store";
 
+const ADD_LABEL: Record<DocKind, string> = {
+  "boarding-pass": "Add a boarding pass",
+  shipping: "Add a shipping paper",
+  permit: "Add a permit",
+  other: "Add another document",
+};
+
 // The travel documents kept with one travel step: images such as a boarding
 // pass, kept only on this phone and deleted with the trip.
 export function TravelDocs({ tripId, stepKey }: { tripId: string; stepKey: string }) {
@@ -65,7 +72,7 @@ export function TravelDocs({ tripId, stepKey }: { tripId: string; stepKey: strin
         className={`flex min-h-16 cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-accent px-4 text-lg font-bold uppercase text-accent active:bg-secondary ${busy ? "opacity-50" : ""}`}
       >
         <Plus className="h-5 w-5" />
-        {busy ? "Saving…" : `Add a ${DOC_LABEL[kind].toLowerCase()}`}
+        {busy ? "Saving…" : ADD_LABEL[kind]}
         <input
           type="file"
           accept="image/*"

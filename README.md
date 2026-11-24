@@ -2,7 +2,7 @@
 
 A phone-first field companion for telecom technicians who work at remote sites in Alaska. It's designed for outdoor use with gloves, so the tap targets are large. Anyone can use it: there's no sign-in, and nothing a technician types in leaves their phone unless they share it.
 
-**This is still being built.** Today you type in your own sites, plan trips to them with a loadout and checklists, and look up operators. Once it has been opened it works with no signal. A trip page that follows each step, travel directions and travel documents come next ([roadmap.md](roadmap.md), slice 4).
+**This is still being built.** Today you type in your own sites and plan trips to them step by step, from building and shipping the loadout, through travel with directions, lodging and travel documents, to the return checklist back home. You can also look up operators. Once it has been opened it works with no signal. It has been walked offline in a browser but not yet tested on a real phone.
 
 The operators are still invented sample data: the phone numbers are 555 numbers and the email addresses are example.com. They'll be replaced with real, public operators (slice 5). Screens that show operators carry a "Sample" badge until then. Your own sites, trips and qualification record are real and stay on your phone.
 
@@ -45,7 +45,7 @@ Every main control is at least 56 px tall and most are 64 px. The bottom bar (Ho
 
 ## Where it's headed
 
-It's an app for any technician, not one crew. Next is the whole trip as it's really worked: build and ship the loadout, travel out, make sure it arrived, pack it up and ship it home, travel home, and make sure it all came back, with directions, lodging and travel documents along the way. After that the sample operators are replaced with real ones. Live weather is off the list for now. [roadmap.md](roadmap.md) has the full plan and [CONTEXT.md](CONTEXT.md) the vocabulary.
+It's an app for any technician, not one crew. The whole trip is in place: build and ship the loadout, travel out, make sure it arrived, pack it up and ship it home, travel home, and make sure it all came back. Next, the sample operators are replaced with real, public ones, then it gets tested on real phones with gloves. Live weather is off the list for now. [roadmap.md](roadmap.md) has the full plan and [CONTEXT.md](CONTEXT.md) the vocabulary.
 
 ## Stack
 
