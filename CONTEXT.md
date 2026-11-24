@@ -38,6 +38,10 @@ _Avoid_: Admin, dispatcher, editor
 One outing by a technician from home base to one or more sites and back, with its own dates, loadout and checklists. The technician builds and ships the loadout, travels out, makes sure it arrived, does the work, packs up and ships it home, travels home, and makes sure it all came back.
 _Avoid_: Visit, job, run
 
+**Step**:
+One part of a trip, in order: get ready, build and ship the loadout, then for each site travel there, the arrival checklist, the job and the departure pre-loadout, then travel home and the return checklist. The technician marks each step done.
+_Avoid_: Phase, stage, leg
+
 **Checklist**:
 A list a technician ticks through at one point in a trip. Each trip carries its own. The maintainer writes the ones for arranging a trip beforehand; four more run over the trip's loadout: the pre-loadout, the arrival checklist, the departure pre-loadout and the return checklist.
 _Avoid_: Prep list, kit list

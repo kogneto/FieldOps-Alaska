@@ -11,6 +11,8 @@ import {
   STATUS_LABEL,
   tripStatus,
   tripTitle,
+  nextStep,
+  stepLabel,
   type Trip,
 } from "@/lib/trips";
 
@@ -124,6 +126,8 @@ function TripList({
       <div className="grid gap-2">
         {trips.map((trip) => {
           const { done, total } = checklistProgress(trip);
+          const next = tripStatus(trip, today) === "past" ? undefined : nextStep(trip);
+          const nextLabel = next ? stepLabel(trip, next, sites) : undefined;
           return (
             <Link
               key={trip.id}
@@ -136,6 +140,11 @@ function TripList({
                 <span className="block text-sm text-muted-foreground">
                   {dateRangeLabel(trip)} · {STATUS_LABEL[tripStatus(trip, today)]}
                 </span>
+                {nextLabel && (
+                  <span className="block break-words text-sm font-semibold">
+                    Next: {nextLabel.title} · {nextLabel.where}
+                  </span>
+                )}
                 <span className="block text-sm text-muted-foreground">
                   {trip.stops.length} site{trip.stops.length === 1 ? "" : "s"} · {done} of {total}{" "}
                   checklist items

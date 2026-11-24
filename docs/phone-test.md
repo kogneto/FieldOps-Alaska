@@ -50,25 +50,27 @@ Stay offline.
 1. Open Trips and tap **Plan a new trip**.
 2. Under "Type in the site", enter "Phone test site" with the village "Bethel", and tap **Add and continue**.
 3. On the dates screen, use + to make it three days, then tap **Start trip**.
-4. Check the trip page shows the site with a **Confidential** tag, a "Getting there" list (Drive yourself and the operators), and the checklists. Some lists may start skipped with a note saying when they're needed.
-5. Under "Getting there", tap **Drive yourself**. Check it collapses to that choice with a **Change** button.
-6. Tick two items on a checklist. Skip one whole checklist, then **Include** it again.
-7. Tap **Add a site**, type in "Second test site", and tap **Add to this trip**. Check the trip now lists both sites, then move the second one up with its ↑ button.
-8. Tap the first site's name to open its page. Set the kind to **Cell tower**, and tick **Tower climb cert** under "Qualifications needed". Go back to the trip and check the parts kit is now included and Tower climb cert is in the Qualifications list.
-9. Open Your qualifications and mark Tower climb cert as **I hold this**, with last month as its expiry month. Go back to the trip and check it's flagged as expired. (Expiring in the trip's last month counts as valid, so this month won't show a flag.)
-10. Close the app fully and reopen it, still offline. Check the trip, its two sites in their new order, the ticks and the qualification record are all still there.
-11. On the trip, tap **Share trip plan**. Pass if the share sheet opens with the plan as text (you can cancel it), starting with "CONFIDENTIAL — keep this plan with the technicians working these sites."
+4. Check the trip page says "Next: Get ready", and that the **Get ready** step is open with the prep checklists. Some lists may start skipped with a note saying when they're needed.
+5. Tick two items on a checklist. Skip one whole checklist, then **Include** it again.
+6. Under **Plan**, tap **Add a site**, type in "Second test site", and tap **Add to this trip**. Check both sites are listed with a **Confidential** tag, then move the second one up with its ↑ button.
+7. Tap the first site's name to open its page. Set the kind to **Cell tower**, and tick **Tower climb cert** under "Qualifications needed". Go back to the trip and check the parts kit is now included and Tower climb cert is in the Qualifications list under **Get ready**.
+8. Open Your qualifications and mark Tower climb cert as **I hold this**, with last month as its expiry month. Go back to the trip and check it's flagged as expired. (Expiring in the trip's last month counts as valid, so this month won't show a flag.)
+9. Close the app fully and reopen it, still offline. Check the trip, its two sites in their new order, the ticks and the qualification record are all still there.
+10. On the trip, tap **Share trip plan**. Pass if the share sheet opens with the plan as text (you can cancel it), starting with "CONFIDENTIAL — keep this plan with the technicians working these sites."
 
-## 3b. The loadout works offline (slice 4)
+## 3b. The loadout and steps work offline (slice 4)
 
 Stay offline, on the same trip.
 
-1. Under Loadout, tap **Add a tub**, then **Start from the tower site parts kit**. Check six items appear under "Not on a pallet or in a tub".
-2. In "Add a tool or part", choose **Tub 1**, type "Bear spray", tick **Dangerous goods**, and tap **Add to the loadout**. Check the form stays open and the summary says "7 items on 1 tub" with "1 to declare as dangerous goods".
-3. Under "Checklists, in order", open **Pre-loadout**. Check it warns to declare Bear spray. Tap **All packed** beside Tub 1, and type "027 1234" as the waybill number.
-4. Open the first **Arrival checklist**. Check it lists only Bear spray, and says "Shipped with waybill 027 1234".
-5. In that arrival checklist, add "Spare fuse" under "Picked something up?". Check it appears ticked.
-6. Close the app fully and reopen it, still offline. Check the loadout, the ticks and the waybill are all still there.
+1. Open **Get ready** and tap **Done · Next step**. Check **Build and ship the loadout** opens and the screen scrolls to it.
+2. In that step, tap **Add a tub**, then **Start from the tower site parts kit**. Check six items appear under "Not on a pallet or in a tub".
+3. In "Add a tool or part", choose **Tub 1**, type "Bear spray", tick **Dangerous goods**, and tap **Add to the loadout**. Check the form stays open and the summary says "7 items on 1 tub" with "1 to declare as dangerous goods".
+4. Under **Pre-loadout** in the same step, check it warns to declare Bear spray. Tap **All packed** beside Tub 1, type "027 1234" as the waybill number, and tap **Done · Next step**.
+5. In **Travel to** the first site, tap an operator. Check a **Call** button appears with its number. Tap **Done · Next step**.
+6. In the **Arrival checklist**, check it lists only Bear spray and says "Shipped with waybill 027 1234". Add "Spare fuse" under "Picked something up?", and check it appears ticked.
+7. Under **Plan**, tap − on "First day" until the trip's dates are in the past. Check the trip still says **Under way**.
+8. Close the app fully and reopen it, still offline. Check the trip opens on the step you were on, with the loadout, ticks and waybill all still there.
+9. Open **Return checklist** and tap **Done · Finish the trip**. Check the trip now says **Done**.
 
 ## 4. Feedback written offline sends later (slice 2)
 

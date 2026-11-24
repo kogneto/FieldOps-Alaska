@@ -343,6 +343,7 @@ describe("readTrips", () => {
       checklists: [],
       quals: [],
       loadout: { pieces: [], items: [], ticks: {}, waybills: {} },
+      done: [],
     });
   });
 
