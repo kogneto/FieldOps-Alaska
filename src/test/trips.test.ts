@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { addItem, emptyLoadout, setWaybill, toggleTick } from "@/lib/loadout";
 import {
   createSite,
   setConfidentiality,
@@ -36,6 +37,7 @@ import {
   tripsUsingSite,
   tripStatus,
   tripTitle,
+  tripChecks,
   TRIP_VERSION,
   type Trip,
 } from "@/lib/trips";
@@ -257,6 +259,33 @@ describe("checklists by site and season", () => {
   });
 });
 
+describe("the loadout on a trip", () => {
+  it("starts empty and drops a removed site's ticks", () => {
+    let t = addStop(trip("tower", "2026-07-10"), "hut", sites);
+    expect(t.loadout).toEqual(emptyLoadout());
+    t = {
+      ...t,
+      loadout: toggleTick(
+        toggleTick(addItem(t.loadout, { id: "a", name: "Tape" }), "pre", "a"),
+        "arrive:hut",
+        "a",
+      ),
+    };
+    expect(tripChecks(t).map((c) => c.key)).toContain("arrive:hut");
+    expect(Object.keys(removeStop(t, "hut").loadout.ticks)).toEqual(["pre"]);
+  });
+
+  it("is summed up in a shared plan, with each waybill", () => {
+    let t = trip("hut", "2026-07-10");
+    let l = addItem(t.loadout, { id: "a", name: "Fuel", dangerous: true });
+    l = setWaybill(addItem(l, { id: "b", name: "Tape" }), "pre", "027 1234");
+    t = { ...t, loadout: l };
+    const text = shareText(t, sites);
+    expect(text).toContain("Loadout: 2 items; 1 to declare as dangerous goods.");
+    expect(text).toContain("Shipped from home base: waybill 027 1234.");
+  });
+});
+
 describe("shareText", () => {
   it("warns when any site is confidential and says how to get there", () => {
     let t = addStop(trip("tower", "2026-07-10"), "hut", sites);
@@ -306,6 +335,7 @@ describe("readTrips", () => {
       stops: [],
       checklists: [],
       quals: [],
+      loadout: { pieces: [], items: [], ticks: {}, waybills: {} },
     });
   });
 
