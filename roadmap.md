@@ -99,7 +99,7 @@ Live since 16 Nov 2026, first from the PR #8 branch at `64d56e9`, and from `main
 
 Done when a technician can take a trip to a site they typed in, such as one in Bethel, from start to finish with no signal after the first open: type in the site, build and ship the loadout, travel out, make sure it arrived, pack up and ship it home, travel home, and make sure it all came back.
 
-Built in four pieces: typed-in sites, then the loadout and its checklists, then a trip page that follows the steps, then travel. Typed-in sites were built on 24 Nov 2026 and checked with `bun run check` and in a phone-sized browser. They aren't deployed or checked on a real phone yet.
+Built in four pieces: typed-in sites, then the loadout and its checklists, then a trip page that follows the steps, then travel. Typed-in sites are live since 24 Nov 2026, deployed from the PR #17 branch at `6d311f8`. Checked with `bun run check`, in a phone-sized browser, and live (every new page loads and is in the offline cache). Not yet checked on a real phone.
 
 This is how the work is really done, as Andy described it on 24 Nov 2026. It is built to be used, not tried out on testers first, and it replaces slice 3's guess at the trip model.
 
