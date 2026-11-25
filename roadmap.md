@@ -193,6 +193,7 @@ Defaults Claude chose, not yet confirmed by Andy:
 - A record holds only what was re-read by hand in a browser: contacts, addresses, hours, services and the villages each office lists. Schedules, weight limits and dangerous-goods rules stay out until they are re-read; Alaska Seaplanes' are in because they were.
 - A record lists the operator's offices: each place it names at a hub, with an address only where it publishes a street address. On a trip, where you meet the operator can be filled in from one of its offices with an address, while nothing has been typed there.
 - Where an operator's own pages disagree, the record says so: the ferry's Ketchikan terminal number, Alaska Seaplanes' Sunday cargo hours, and Alaska Marine Lines' Naknek address.
+- Choosing a different operator for a site leaves where you meet the operator as it was, since the technician may have typed it. Clearing both lines brings the office list back.
 
 To decide:
 
