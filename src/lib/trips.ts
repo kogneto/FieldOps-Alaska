@@ -26,6 +26,7 @@ import {
   type Check,
   type Loadout,
 } from "./loadout";
+import { placeOrNull, readPlace, type Place } from "./places";
 import type { Site } from "./sites";
 
 export const TRIP_VERSION = 2;
@@ -40,6 +41,10 @@ export type TripRoute = { by: "operator"; operatorId: string } | { by: "self" } 
 export interface TripStop {
   siteId: string;
   route: TripRoute;
+  /** Where the technician meets the operator on the way to this site: an airport, a port, a dog sled team. */
+  meet: Place | null;
+  /** The hotel or cabin they stay in while working this site. */
+  lodging: Place | null;
 }
 
 /** A trip's own copy of a checklist, taken when the trip is created. */
@@ -71,6 +76,8 @@ export interface Trip {
   quals: string[];
   /** The tools and parts the trip needs, and the ticks of the checklists that run over them. */
   loadout: Loadout;
+  /** Where the technician meets the operator for the trip home. */
+  homeMeet: Place | null;
   /** Keys of the steps the technician has marked done. */
   done: string[];
 }
@@ -210,6 +217,7 @@ export function createTrip(options: {
     checklists: (options.checklists ?? sampleChecklists).map(copyChecklist),
     quals: [],
     loadout: emptyLoadout(),
+    homeMeet: null,
     done: [],
   };
   // Decide what's needed once the first site is on the trip. This is the only
@@ -290,7 +298,10 @@ export function addStop(trip: Trip, siteId: string, sites: Site[]): Trip {
   if (!sites.some((s) => s.id === siteId) || trip.stops.some((s) => s.siteId === siteId)) {
     return trip;
   }
-  return includeNeeded({ ...trip, stops: [...trip.stops, { siteId, route: null }] }, sites);
+  return includeNeeded(
+    { ...trip, stops: [...trip.stops, { siteId, route: null, meet: null, lodging: null }] },
+    sites,
+  );
 }
 
 /** The loadout checks the trip runs, in order: pre-loadout, arrival and departure at each site, return. */
@@ -407,6 +418,24 @@ export function moveStop(trip: Trip, siteId: string, by: -1 | 1): Trip {
   return { ...trip, stops };
 }
 
+/** Where the operator is met on the way to a site, or for the trip home when `siteId` is null. */
+export function setMeet(trip: Trip, siteId: string | null, place: Place): Trip {
+  const meet = placeOrNull(place);
+  if (siteId === null) return { ...trip, homeMeet: meet };
+  return {
+    ...trip,
+    stops: trip.stops.map((s) => (s.siteId === siteId ? { ...s, meet } : s)),
+  };
+}
+
+export function setLodging(trip: Trip, siteId: string, place: Place): Trip {
+  const lodging = placeOrNull(place);
+  return {
+    ...trip,
+    stops: trip.stops.map((s) => (s.siteId === siteId ? { ...s, lodging } : s)),
+  };
+}
+
 export function setRoute(trip: Trip, siteId: string, route: TripRoute): Trip {
   return {
     ...trip,
@@ -509,8 +538,12 @@ export function routeLabel(route: TripRoute): string {
 export function shareText(trip: Trip, sites: Site[]): string {
   const stops = trip.stops.flatMap((stop) => {
     const site = sites.find((s) => s.id === stop.siteId);
-    return site ? [{ site, route: stop.route }] : [];
+    return site ? [{ site, route: stop.route, meet: stop.meet, lodging: stop.lodging }] : [];
   });
+  const placeLine = (label: string, place: Place | null) =>
+    place
+      ? [`   ${label}: ${[place.name.trim(), place.where.trim()].filter(Boolean).join(", ")}.`]
+      : [];
   const lines: string[] = [];
   if (stops.some(({ site }) => site.confidentiality === "confidential")) {
     lines.push("CONFIDENTIAL — keep this plan with the technicians working these sites.", "");
@@ -519,16 +552,19 @@ export function shareText(trip: Trip, sites: Site[]): string {
     `FieldOps trip: ${dateRangeLabel(trip)} (${trip.days} day${trip.days === 1 ? "" : "s"})`,
   );
   let namesOperator = false;
-  stops.forEach(({ site, route }, i) => {
+  stops.forEach(({ site, route, meet, lodging }, i) => {
     lines.push("", `${i + 1}. ${site.name}${site.community ? ` — ${site.community}` : ""}`);
     const operator = route?.by === "operator" ? getOperator(route.operatorId) : undefined;
     if (operator) {
       namesOperator = true;
       lines.push(`   Getting there: ${operator.name}, ${operator.phone}.`);
+      lines.push(...placeLine("Meeting the operator at", meet));
     } else if (route?.by === "self") {
       lines.push("   Getting there: drive yourself.");
     }
+    lines.push(...placeLine("Staying at", lodging));
   });
+  if (trip.homeMeet) lines.push("", ...placeLine("Home: meeting the operator at", trip.homeMeet));
   const quals = tripQualifications(trip, sites).map((id) => getQualification(id)?.name ?? id);
   if (quals.length > 0) lines.push("", `Qualifications: ${quals.join(", ")}.`);
   const { done, total } = checklistProgress(trip);
@@ -609,9 +645,14 @@ function readTrip(v: unknown): Trip | null {
   const stops: TripStop[] = [];
   for (const s of Array.isArray(t["stops"]) ? t["stops"] : []) {
     if (typeof s !== "object" || s === null) continue;
-    const { siteId, route } = s as Record<string, unknown>;
+    const { siteId, route, meet, lodging } = s as Record<string, unknown>;
     if (typeof siteId !== "string" || stops.some((x) => x.siteId === siteId)) continue;
-    stops.push({ siteId, route: readRoute(route) });
+    stops.push({
+      siteId,
+      route: readRoute(route),
+      meet: readPlace(meet),
+      lodging: readPlace(lodging),
+    });
   }
   const days = t["days"];
   const checklists = Array.isArray(t["checklists"]) ? t["checklists"] : [];
@@ -624,6 +665,7 @@ function readTrip(v: unknown): Trip | null {
     checklists: checklists.flatMap((c) => readChecklist(c) ?? []),
     quals: isStringArray(t["quals"]) ? t["quals"] : [],
     loadout: readLoadout(t["loadout"]),
+    homeMeet: readPlace(t["homeMeet"]),
     done: Array.isArray(t["done"])
       ? [...new Set(t["done"].filter((k): k is string => typeof k === "string"))]
       : [],

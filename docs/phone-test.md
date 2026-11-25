@@ -72,6 +72,18 @@ Stay offline, on the same trip.
 8. Close the app fully and reopen it, still offline. Check the trip opens on the step you were on, with the loadout, ticks and waybill all still there.
 9. Open **Return checklist** and tap **Done · Finish the trip**. Check the trip now says **Done**.
 
+## 3c. Travel works offline (slice 4)
+
+Stay offline, on the same trip.
+
+1. Open the first site's page from the trip. Under "Where it is", tap **Use where I am now**. Check coordinates fill in (allow location if the phone asks), then go back.
+2. Open the **Travel to** step for the first site. Choose an operator if you haven't. Under "Where you meet the operator", type "Bethel airport" with the address "Bethel Airport". Under "Lodging", type "Test Inn".
+3. Tap **Directions** under the meeting place. Pass if the maps app opens searching for Bethel Airport (it may not load offline). Come back to FieldOps.
+4. Tap **Directions to the site**. Pass if the maps app opens at the coordinates from step 1.
+5. Under "Travel documents", leave **Boarding pass** chosen and tap **Add a boarding pass**. Pick a screenshot from your photos. Check it says **Saved on this phone.** and a thumbnail appears.
+6. Tap the thumbnail. Check it opens full screen, then tap **Close**.
+7. Close the app fully and reopen it, still offline. Check the meeting place, lodging and boarding pass are all still there.
+
 ## 4. Feedback written offline sends later (slice 2)
 
 1. Still offline, on the Alaska Marine Highway operator page, tap **Send feedback**.

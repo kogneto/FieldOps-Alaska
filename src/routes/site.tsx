@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, CalendarPlus, Check, Lock, Plus, Trash2, Unlock } from "lucide-react";
 import { AppShell } from "@/components/fo";
+import { DirectionsLink, WhereInput } from "@/components/place-field";
 import { fieldLabel, inputClass } from "@/components/site-form";
 import { confidentialityRule, qualifications, siteKinds } from "@/lib/data";
 import { useHydrated, useToday } from "@/lib/offline";
@@ -12,6 +13,7 @@ import {
   renameSite,
   setConfidentiality,
   setKind,
+  setSiteWhere,
   toggleSiteQualification,
   type Site,
 } from "@/lib/sites";
@@ -127,6 +129,18 @@ function SiteDetail({ site }: { site: Site }) {
             className={inputClass}
           />
         </label>
+      </div>
+
+      <div className="mt-3 grid gap-2">
+        <WhereInput
+          label="Where it is"
+          value={site.where}
+          onChange={(where) => updateSite(site.id, (s) => setSiteWhere(s, where))}
+        />
+        <DirectionsLink where={site.where} label="Directions to the site" />
+        <p className="text-xs text-muted-foreground">
+          Directions send only this line to your maps app, never the site's name.
+        </p>
       </div>
 
       <TripAction siteId={site.id} />

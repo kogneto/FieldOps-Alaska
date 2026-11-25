@@ -23,6 +23,7 @@ describe("typing in a site", () => {
       kind: null,
       qualificationIds: [],
       confidentiality: "confidential",
+      where: "",
     });
   });
 
@@ -98,6 +99,7 @@ describe("readSites", () => {
         kind: null,
         qualificationIds: [],
         confidentiality: "confidential",
+        where: "",
       },
       {
         id: "c",
@@ -106,6 +108,7 @@ describe("readSites", () => {
         kind: null,
         qualificationIds: ["q-medical"],
         confidentiality: "confidential",
+        where: "",
       },
     ]);
   });
