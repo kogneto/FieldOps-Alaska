@@ -218,7 +218,8 @@ Read on 24 Nov 2026
 Re-read in a browser on 24 Nov 2026 (Alaska time). This settles the conflicts above where it says so.
 
 - **Alaska Airlines reservations:** on https://www.alaskaair.com/content/about-us/help-contact/contact-us the "Reservations / pre-flight questions department" block holds 1-800-252-7522 (1-800-ALASKAAIR), "Available 24/7". The pairing is certain.
-- **Alaska Air Cargo, Juneau:** the station page shows 1-800-225-2752 as its only phone.
+- **Alaska Air Cargo stations:** Juneau (1899 Alex Holden Way), Ketchikan (1200 Airport Terminal Way, with "Shipper declaration required: Yes / Fully regulated: Yes" for dangerous goods) and Sitka (600 Airport Road) all match, including hours. Each shows 1-800-225-2752 as its only phone.
+- **Taquan Air:** 907-225-8800 is on the home page. The 4085 Tongass Avenue terminal address wasn't found on re-reading the home or freight page, so re-check it.
 - **Alaska Seaplanes cargo (settled):** the cargo page gives "Alaska Seaplanes Cargo, 1871 Shell Simmons Dr. (Adjacent to North Terminal)" and "Sunday Closed", with Mon-Fri 8:00am-5:00pm and Saturday 8:00am-4:00pm. 1873 Shell Simmons Dr. is the Juneau International Airport mailing address on the get-in-touch page. For freight, use 1871 and Sunday closed. Also on the cargo page:
   - 150 lb single-piece maximum.
   - $50 pallet breakdown fee.
@@ -237,7 +238,7 @@ Re-read in a browser on 24 Nov 2026 (Alaska time). This settles the conflicts ab
 - **Taquan Air freight:** "Call (907) 225-8800" on the freight page.
 - **Lynden Air Cargo schedules page:** no text mentions Juneau, Ketchikan or Sitka. The only phone on it is 907-243-7248, in the site header. The fetcher's "for Juneau, Ketchikan, or Sitka" line is not on the page, so drop it.
 
-Not re-read: Alaska Air Cargo Ketchikan and Sitka hours, Alaska Seaplanes schedules, Taquan's destination table, AMHS routes, seasons and rules, and AML's details.
+Not re-read: Alaska Seaplanes schedules, Taquan's destination table, AMHS routes, seasons and rules, and AML's details.
 
 ## Pages that failed
 

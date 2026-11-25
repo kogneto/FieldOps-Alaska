@@ -229,6 +229,8 @@ Re-read in a browser on 24 Nov 2026 (Alaska time):
   - Dillingham (Seasonal): City Dock, 111 A Street West, 907-842-4666, no hours.
   - Naknek (Seasonal): #1 Dock Street. Its numbers are labelled inline (Main 907-246-6667, Toll Free 1-800-426-3113, LCL Dock Office 907-246-0121, Fax 907-246-6855), so the pairing is certain. Hours mid-April to mid-October, Mon-Sun 8am-6pm.
 - **Katmai Air:** 1-800-544-0551 and 6400 S Airpark Pl, Suite 1, Anchorage, match.
+- **Alaska Airlines seasonality:** the Anchorage–Dillingham page has month fares for every month from November 2026 to April 2027 (from $232). The Anchorage–King Salmon page has one-way fares departing in December 2026. So neither is sold as summer-only on these pages. The "seasonal jet" lead may mean a change of aircraft, which these pages don't show.
+- **Antler Aviation:** the home page reads "Charter flights out of Dillingham, AK — Serving Bristol Bay, Kuskokwim, Nushagak and Yukon Delta regions year-round", aimed at "Construction, Maintenance and survey work to the remote Villages". The email wasn't re-read.
 
 Not re-read: the NAC schedule, Island Air's schedule PDFs, the AMHS Kodiak details and winter plan, the Crowley page, and Antler Aviation.
 

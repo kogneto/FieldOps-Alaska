@@ -15,17 +15,18 @@ Read on 24 Nov 2026
 
 ## Summary
 
-| Operator                                                 | Mode      | People / freight | Anchorage-Bethel / Bethel-villages                                    | Status              |
-| -------------------------------------------------------- | --------- | ---------------- | --------------------------------------------------------------------- | ------------------- |
-| Alaska Air Cargo (GoldStreak Package Express)            | air       | freight          | Anchorage-Bethel: yes (both stations listed) / villages: no           | confirmed           |
-| Northern Air Cargo (NAC)                                 | air       | freight          | Anchorage-Bethel: yes / villages: not published                       | confirmed           |
-| Lynden Air Cargo                                         | air       | freight          | Anchorage-Bethel: yes / villages: not published                       | confirmed           |
-| Alaska Airlines                                          | air       | people           | Anchorage-Bethel: sells the route / villages: no                      | confirmed (partial) |
-| Yute Commuter Service                                    | air       | both             | Anchorage-Bethel: no (Anchorage not mentioned) / Bethel-villages: yes | confirmed           |
-| Ryan Air                                                 | air       | both             | Anchorage-Bethel: not on its schedules / Bethel-villages: yes         | confirmed           |
-| Grant Aviation                                           | air       | both             | Anchorage-Bethel: not on its scheduled routes / Bethel-villages: yes  | confirmed           |
-| Everts Air Cargo (Bethel office: Dependable Freight)     | air       | freight          | Anchorage-Bethel: office listed / villages: "via downline carriers"   | confirmed           |
-| Barge to Bethel (Delta Western, Crowley, Lynden, others) | sea/river | freight          | not confirmed                                                         | lead                |
+| Operator                                                              | Mode      | People / freight | Anchorage-Bethel / Bethel-villages                                    | Status                |
+| --------------------------------------------------------------------- | --------- | ---------------- | --------------------------------------------------------------------- | --------------------- |
+| Alaska Air Cargo (GoldStreak Package Express)                         | air       | freight          | Anchorage-Bethel: yes (both stations listed) / villages: no           | confirmed             |
+| Northern Air Cargo (NAC)                                              | air       | freight          | Anchorage-Bethel: yes / villages: not published                       | confirmed             |
+| Lynden Air Cargo                                                      | air       | freight          | Anchorage-Bethel: yes / villages: not published                       | confirmed             |
+| Alaska Airlines                                                       | air       | people           | Anchorage-Bethel: sells the route / villages: no                      | confirmed (partial)   |
+| Yute Commuter Service                                                 | air       | both             | Anchorage-Bethel: no (Anchorage not mentioned) / Bethel-villages: yes | confirmed             |
+| Ryan Air                                                              | air       | both             | Anchorage-Bethel: not on its schedules / Bethel-villages: yes         | confirmed             |
+| Grant Aviation                                                        | air       | both             | Anchorage-Bethel: not on its scheduled routes / Bethel-villages: yes  | confirmed             |
+| Everts Air Cargo (Bethel office: Dependable Freight)                  | air       | freight          | Anchorage-Bethel: office listed / villages: "via downline carriers"   | confirmed             |
+| Alaska Marine Lines (barge, April to October)                         | sea       | freight          | Bethel named a major hub port                                         | confirmed (see below) |
+| Other barge to Bethel (Delta Western, Crowley, Bering Marine, others) | sea/river | freight          | not confirmed                                                         | lead                  |
 
 ---
 
@@ -163,7 +164,7 @@ Read in a browser on 24 Nov 2026; the automated fetcher was refused (403).
 | Alaska Logistics (barge)                               | https://alaskapublic.org/news/2019-11-08/kuskokwim-river-freeze-up-causes-complications-for-bethel-barge-service (news)                                                                                                                             | own site not read                                                                                          |
 | Lynden hovercraft (lower Kuskokwim)                    | https://magazine.inboundlogistics.com/view/1024252346/48/ (Inbound Logistics, 2022, third-party search result)                                                                                                                                      | own page                                                                                                   |
 
-Barge: no operator's own page read confirmed general freight barge service to Bethel or a season. Only third-party notes, e.g. Alaska Air Cargo's own Bethel page says "summer barge service is possible when the ocean thaws" (https://public.alaskacargo.com/cargo-news/people-of-cargo-bethel). So barge season is Not published by any barge operator on pages read.
+Barge, updated after a browser read on 24 Nov 2026: Alaska Marine Lines' own Western Alaska page says its seasonal barge service (April through October) calls on "the major hub ports of Naknek, Dillingham, Nome, Bethel, and Kotzebue". https://www.lynden.com/aml/solutions/western-alaska/ . So Alaska Marine Lines is confirmed for Bethel, with that season. It publishes no Bethel service center (its Dillingham, Naknek and Kodiak ones are in the Southwest note); customer service is 1-800-426-3113. The other barge names in the table above are still leads.
 
 ## Bethel's region
 

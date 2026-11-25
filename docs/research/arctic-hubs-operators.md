@@ -17,20 +17,20 @@ Read on 24 Nov 2026
 
 ## Summary
 
-| Operator                      | Mode | People / freight | Anchorage to hub                                                        | Hub to villages                                          | Hubs                         | Status              |
-| ----------------------------- | ---- | ---------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- | ---------------------------- | ------------------- |
-| Alaska Air Cargo (GoldStreak) | air  | freight          | yes, own station at each hub                                            | no                                                       | OME, OTZ, BRW                | confirmed           |
-| Alaska Airlines               | air  | people           | Nome and Kotzebue: sells the route; Utqiaġvik: not confirmed            | no                                                       | OME, OTZ (BRW not confirmed) | confirmed (partial) |
-| Northern Air Cargo (NAC)      | air  | freight          | yes, scheduled                                                          | Utqiaġvik onward via Wright Air Service (Nov 2024 offer) | OME, OTZ, BRW                | confirmed           |
-| Lynden Air Cargo              | air  | freight          | Nome and Kotzebue scheduled; Utqiaġvik: no                              | village connections: Not published                       | OME, OTZ                     | confirmed           |
-| Everts Air Cargo              | air  | freight          | listed with stations at Nome and Kotzebue; own flights there not stated | via downline carriers                                    | OME, OTZ                     | confirmed (partial) |
-| Bering Air                    | air  | both             | not on its pages                                                        | yes, scheduled and charter                               | OME, OTZ                     | confirmed           |
-| Ryan Air                      | air  | both             | not on its schedules                                                    | yes, scheduled                                           | OME, OTZ                     | confirmed           |
-| Wright Air Service            | air  | both             | not on its pages (Fairbanks based)                                      | yes, from Utqiaġvik                                      | BRW                          | confirmed           |
-| Alaska Marine Lines (Lynden)  | sea  | freight          | sealift from Seattle                                                    | n/a                                                      | OME, OTZ, BRW                | confirmed           |
-| Ravn Alaska                   | air  | both             | Kotzebue (search snippet only)                                          | search snippet only                                      | OTZ (BRW, OME unclear)       | lead                |
-| Crowley (barge)               | sea  | fuel, some cargo | n/a                                                                     | n/a                                                      | OTZ (Kobuk River)            | lead                |
-| Bowhead Transport             | sea  | freight          | n/a                                                                     | n/a                                                      | North Slope                  | lead                |
+| Operator                      | Mode | People / freight | Anchorage to hub                                                        | Hub to villages                                          | Hubs                   | Status              |
+| ----------------------------- | ---- | ---------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- | ---------------------- | ------------------- |
+| Alaska Air Cargo (GoldStreak) | air  | freight          | yes, own station at each hub                                            | no                                                       | OME, OTZ, BRW          | confirmed           |
+| Alaska Airlines               | air  | people           | sells all three routes (Barrow checked by hand)                         | no                                                       | OME, OTZ, BRW          | confirmed (partial) |
+| Northern Air Cargo (NAC)      | air  | freight          | yes, scheduled                                                          | Utqiaġvik onward via Wright Air Service (Nov 2024 offer) | OME, OTZ, BRW          | confirmed           |
+| Lynden Air Cargo              | air  | freight          | Nome and Kotzebue scheduled; Utqiaġvik: no                              | village connections: Not published                       | OME, OTZ               | confirmed           |
+| Everts Air Cargo              | air  | freight          | listed with stations at Nome and Kotzebue; own flights there not stated | via downline carriers                                    | OME, OTZ               | confirmed (partial) |
+| Bering Air                    | air  | both             | not on its pages                                                        | yes, scheduled and charter                               | OME, OTZ               | confirmed           |
+| Ryan Air                      | air  | both             | not on its schedules                                                    | yes, scheduled                                           | OME, OTZ               | confirmed           |
+| Wright Air Service            | air  | both             | not on its pages (Fairbanks based)                                      | yes, from Utqiaġvik                                      | BRW                    | confirmed           |
+| Alaska Marine Lines (Lynden)  | sea  | freight          | sealift from Seattle                                                    | n/a                                                      | OME, OTZ, BRW          | confirmed           |
+| Ravn Alaska                   | air  | both             | Kotzebue (search snippet only)                                          | search snippet only                                      | OTZ (BRW, OME unclear) | lead                |
+| Crowley (barge)               | sea  | fuel, some cargo | n/a                                                                     | n/a                                                      | OTZ (Kobuk River)      | lead                |
+| Bowhead Transport             | sea  | freight          | n/a                                                                     | n/a                                                      | North Slope            | lead                |
 
 ---
 
@@ -65,7 +65,7 @@ Website: https://www.alaskaair.com/ . Mode: air; people.
 
 - **Nome:** it sells Anchorage (ANC) to Nome (OME), with dated one-way fares. https://www.alaskaair.com/en/flights-to-nome . Nonstop status, frequency, flight time: Not published on that page.
 - **Kotzebue:** it sells Anchorage to Kotzebue, with dated fares. https://www.alaskaair.com/en/flights-from-anchorage-to-kotzebue . Nonstop status, frequency, flight time: Not published on that page.
-- **Utqiaġvik / Barrow:** https://www.alaskaair.com/en/flights-to-barrow links to "Flights from Anchorage to Barrow" but its fare table was empty ("There are no fares that match your filter criteria"). Whether the route is sold now: not confirmed. https://www.alaskaair.com/en/flights-from-anchorage-to-utqiagvik returned 404.
+- **Utqiaġvik / Barrow:** https://www.alaskaair.com/en/flights-to-barrow links to "Flights from Anchorage to Barrow" but its fare table was empty ("There are no fares that match your filter criteria"). https://www.alaskaair.com/en/flights-from-anchorage-to-utqiagvik returned 404. **Checked by hand:** https://www.alaskaair.com/en/flights-from-anchorage-to-barrow shows "Lowest fares from Anchorage to Barrow" with one-way Saver fares departing in December 2026 and May 2027, so the route is sold. Nonstop status and schedule: Not published.
 - Phone, hours, baggage limits, village service, where the technician meets it at each hub: Not published on pages read.
 
 ## Northern Air Cargo (NAC)
