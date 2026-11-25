@@ -13,7 +13,7 @@ import {
   WifiOff,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { confidenceAdvice, dateDaysBefore, isStale, type Mode, type Source } from "@/lib/data";
+import { confidenceAdvice, isStale, type Mode, type Source } from "@/lib/data";
 import { RECORDS_AS_OF, useNow, useOnline } from "@/lib/offline";
 import { useSaved } from "@/lib/store";
 import { Button } from "@/components/ui/button";
@@ -24,16 +24,10 @@ export function AppShell({
   back,
   recordId,
   hideFeedback = false,
-  sample = false,
 }: {
   title: string;
   children: ReactNode;
   back?: ReactNode;
-  /**
-   * Marks a screen that shows the invented operators. A technician's own
-   * sites, trips and records are real, so their screens never carry it.
-   */
-  sample?: boolean;
   /** The operator this screen shows, so feedback sent from it is tied to that record. Never a site. */
   recordId?: string;
   hideFeedback?: boolean;
@@ -42,16 +36,7 @@ export function AppShell({
     <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background shadow-2xl">
       <header className="sticky top-0 z-10 border-b-4 border-primary bg-background/95 px-5 py-4 backdrop-blur">
         {back}
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-          <h1 className="min-w-0 font-display text-2xl uppercase leading-tight text-foreground">
-            {title}
-          </h1>
-          {sample && (
-            <span className="shrink-0 rounded-md border border-border bg-secondary px-2 py-1.5 font-mono text-xs uppercase text-muted-foreground">
-              Sample
-            </span>
-          )}
-        </div>
+        <h1 className="font-display text-2xl uppercase leading-tight text-foreground">{title}</h1>
         <ConnectionStatus />
       </header>
       <main className="flex-1 px-5 pb-32 pt-5">
@@ -140,10 +125,9 @@ export function SourceTag({
   source: Source;
   showAdvice?: boolean;
 }) {
-  // The verified date depends on today, so it waits for hydration (useNow);
-  // whether a record is stale doesn't, since it's stored as days ago.
+  // Whether a record is stale depends on today, so it waits for hydration (useNow).
   const now = useNow();
-  const stale = isStale(source);
+  const stale = isStale(source, now);
   const tone =
     source.confidence === "high"
       ? "bg-ok text-ok-foreground"
@@ -156,7 +140,7 @@ export function SourceTag({
         {source.confidence}
       </span>
       <span className="text-muted-foreground">
-        {source.label} · verified {dateDaysBefore(now, source.verifiedDaysAgo)}
+        {source.label} · verified {source.verified}
       </span>
       {stale && (
         <span className="rounded-sm border border-destructive px-1.5 py-0.5 font-mono uppercase text-destructive">

@@ -182,8 +182,8 @@ describe("getting there", () => {
   it("is chosen by hand: an operator, driving yourself, or nothing yet", () => {
     let t = trip("tower", "2026-07-10");
     expect(routeLabel(t.stops[0]!.route)).toBe("");
-    t = setRoute(t, "tower", { by: "operator", operatorId: "op-yukon-air" });
-    expect(routeLabel(t.stops[0]!.route)).toBe("Yukon Flats Air");
+    t = setRoute(t, "tower", { by: "operator", operatorId: "op-grant-aviation" });
+    expect(routeLabel(t.stops[0]!.route)).toBe("Grant Aviation");
     t = setRoute(t, "tower", { by: "self" });
     expect(routeLabel(t.stops[0]!.route)).toBe("Drive yourself");
   });
@@ -296,21 +296,21 @@ describe("the loadout on a trip", () => {
 describe("shareText", () => {
   it("warns when any site is confidential and says how to get there", () => {
     let t = addStop(trip("tower", "2026-07-10"), "hut", sites);
-    t = setRoute(setRoute(t, "tower", { by: "operator", operatorId: "op-yukon-air" }), "hut", {
+    t = setRoute(setRoute(t, "tower", { by: "operator", operatorId: "op-grant-aviation" }), "hut", {
       by: "self",
     });
     const text = shareText(t, sites);
     expect(text.startsWith("CONFIDENTIAL — keep this plan with the technicians")).toBe(true);
     expect(text).toContain("1. Bethel cell tower — Bethel");
-    expect(text).toContain("Getting there: Yukon Flats Air, 907-555-0166");
+    expect(text).toContain("Getting there: Grant Aviation, 1-888-359-4726");
     expect(text).toContain("Getting there: drive yourself.");
-    expect(text).toContain("Operator details are sample data for now.");
+    expect(text).not.toMatch(/sample/i);
   });
 
-  it("has no warning for open sites, and no sample line without an operator", () => {
+  it("has no warning for open sites", () => {
     const text = shareText(setRoute(trip("hut", "2026-07-10"), "hut", { by: "self" }), sites);
     expect(text).not.toContain("CONFIDENTIAL");
-    expect(text).not.toContain("sample");
+    expect(text).not.toMatch(/sample/i);
     expect(text).not.toContain("crew");
   });
 });

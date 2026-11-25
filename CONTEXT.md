@@ -11,7 +11,7 @@ A place with telecom equipment that technicians travel to and work at, such as a
 _Avoid_: Location, facility, jobsite
 
 **Region**:
-A named part of Alaska used to group operators. An operator serves one or more.
+A named part of Alaska used to group operators: Southeast, Southwest, Yukon-Kuskokwim Delta or Northwest, after the State's transportation plan areas. An operator serves one or more.
 _Avoid_: Area, district
 
 ### People and organizations
@@ -23,6 +23,10 @@ _Avoid_: User, crew member, tech
 **Operator**:
 A business that moves technicians or freight by air, sea or land.
 _Avoid_: Carrier, transport provider, charter (as a name for the business)
+
+**Office**:
+One place an operator lists in a community: a cargo station, a terminal, a counter. It may have its own phone and hours, and may be run by another company. One with a street address is somewhere a technician can meet the operator.
+_Avoid_: Station, location, branch (as the general term)
 
 **Client**:
 The organization the work is done for. It sets a site's confidentiality and holds its access secrets.

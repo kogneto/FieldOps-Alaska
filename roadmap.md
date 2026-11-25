@@ -1,6 +1,6 @@
 # Roadmap
 
-FieldOps Alaska is for any telecom technician who travels to remote sites in Alaska. It was aimed at one crew until 24 Nov 2026, when Andy made it an app for anyone. There is no sign-in and nothing is asked of a technician, and their trips, typed-in sites and travel documents stay on their phone. It runs on iPhone and Android. Slices 4 and 5 make the records real, public operators that Andy keeps current, with every site typed in by its technician. Until then the records are an invented sample set.
+FieldOps Alaska is for any telecom technician who travels to remote sites in Alaska. It was aimed at one crew until 24 Nov 2026, when Andy made it an app for anyone. There is no sign-in and nothing is asked of a technician, and their trips, typed-in sites and travel documents stay on their phone. It runs on iPhone and Android. The records are real, public operators that Andy keeps current (slice 5), and every site is typed in by its technician (slice 4).
 
 Vocabulary is in [CONTEXT.md](CONTEXT.md). Decisions that need their reasons kept are in [docs/adr](docs/adr).
 
@@ -8,7 +8,7 @@ Vocabulary is in [CONTEXT.md](CONTEXT.md). Decisions that need their reasons kep
 
 - The code is edited here, not in Lovable. Commits still sync to Lovable, so pushed history is never rewritten.
 - Cloudflare hosts it. Deployments run from Andy's PC with a command, not from GitHub Actions.
-- No site ever enters this repo ([ADR 0001](docs/adr/0001-real-data-stays-out-of-the-repo.md)). The records it holds are real, public operators ([ADR 0003](docs/adr/0003-real-operators-are-public-and-sites-stay-on-the-phone.md)). Until slice 5 lands they are still the invented sample set.
+- No site ever enters this repo ([ADR 0001](docs/adr/0001-real-data-stays-out-of-the-repo.md)). The records it holds are real, public operators ([ADR 0003](docs/adr/0003-real-operators-are-public-and-sites-stay-on-the-phone.md)).
 - Nothing in the app asks a technician who they are. They may keep their own travel documents with a trip, such as a boarding pass with their name on it; those stay on their phone.
 - Logic gets automated tests: the record-format check, staleness, the trip roll-up. Screens are checked by hand on a phone.
 - Every pull request runs the checks (typecheck, lint, formatting, tests, build) on GitHub's machines, which cost nothing for a public repository. Deploys still run from the PC.
@@ -182,18 +182,27 @@ Done when no invented record is left: every operator in the app is a real busine
 Decided (Andy):
 
 - The records are real, public operators, and Andy keeps them current as the maintainer ([ADR 0003](docs/adr/0003-real-operators-are-public-and-sites-stay-on-the-phone.md)).
+- The first records are the 18 operators that serve the ten busiest Alaska hubs you can't drive to from Anchorage, researched by Claude on 24 and 25 Nov 2026 ([docs/research](docs/research/README.md)). They replace the nine invented ones.
+- The regions are the four State transportation plan areas those hubs fall in: Southeast, Southwest, Yukon-Kuskokwim Delta and Northwest.
+
+Defaults Claude chose, not yet confirmed by Andy:
+
+- Every record is medium confidence, since it was read on the operator's own pages: confirm by phone before committing travel or money. High would be a record the maintainer has confirmed by phone, and low a lead.
+- Every record's verified date is 24 Nov 2026, the oldest day any of its facts was read, so all 18 go stale together after 23 Jan 2027.
+- Hubs you can drive to from Anchorage were left out, though Fairbanks would rank first and Deadhorse fourth. Wright Air Service is in for Utqiaġvik, so its one office is in Fairbanks.
+- A record holds only what was re-read by hand in a browser: contacts, addresses, hours, services and the villages each office lists. Schedules, weight limits and dangerous-goods rules stay out until they are re-read; Alaska Seaplanes' are in because they were.
+- A record lists the operator's offices: each place it names at a hub, with an address only where it publishes a street address. On a trip, where you meet the operator can be filled in from one of its offices with an address, while nothing has been typed there.
+- Where an operator's own pages disagree, the record says so: the ferry's Ketchikan terminal number, Alaska Seaplanes' Sunday cargo hours, and Alaska Marine Lines' Naknek address.
 
 To decide:
 
-- Who gathers the first operators, and which come first.
-- The region list. The three pilot regions don't cover Bethel.
 - What the invented checklists and qualification list become. They are the maintainer's but aren't records, and once "Sample" comes off they read as real. They still speak of a crew ("Second crew member confirmed", a Crew category).
 
 To build:
 
-- [ ] Replace the invented operators with real ones.
-- [ ] An operator's record says where the operator is met, so a trip can give directions there.
-- [ ] Take "Sample" off the header, the shared plan and the README.
+- [x] Replace the invented operators with real ones.
+- [x] An operator's record says where the operator is met, so a trip can give directions there.
+- [x] Take "Sample" off the header, the shared plan and the README.
 
 ## Shelved: one crew's real data behind sign-in
 

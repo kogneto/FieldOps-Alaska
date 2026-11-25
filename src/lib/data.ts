@@ -1,8 +1,15 @@
-// SAMPLE DATA ONLY — invented for the prototype. Not verified, not for field use.
+// The maintainer's data: the record format, the operator records (in
+// operators.ts), and the checklists and qualification list. The operators are
+// real; the checklists and qualifications are still the prototype's own lists.
 //
 // vite.config.ts imports this file to list the pages to build, so keep it free
 // of `@/` imports and build-time constants.
-export type Region = "Southeast" | "Southcentral" | "Interior";
+import { operators } from "./operators";
+
+export { operators };
+
+/** The State's transportation area plans that cover the hubs. */
+export type Region = "Southeast" | "Southwest" | "Northwest" | "Yukon-Kuskokwim Delta";
 export type Mode = "air" | "sea" | "land";
 export type Confidence = "high" | "medium" | "low";
 export type Confidentiality = "open" | "confidential";
@@ -19,14 +26,31 @@ export const siteKinds = [
 export type SiteKind = (typeof siteKinds)[number];
 
 export interface Source {
+  /** Where the record was read, such as "Operator's website". */
   label: string;
-  /**
-   * Sample data only: how many days before the app is opened the record was
-   * verified, so the demo always shows a mix of fresh and stale records. Real
-   * records will carry a verified date.
-   */
-  verifiedDaysAgo: number;
+  /** The verified date: the local date (YYYY-MM-DD) the whole record was last confirmed. */
+  verified: string;
   confidence: Confidence;
+}
+
+/**
+ * One place an operator lists in a community: a cargo station, a terminal, an
+ * office. One with an address is somewhere a technician can meet the operator.
+ */
+export interface Office {
+  community: string;
+  /** What it is, in the operator's words, such as "Cargo station" or "Terminal 1". */
+  name: string;
+  /** The company that runs it for the operator, when it isn't the operator itself. */
+  runBy?: string;
+  /** A street address for directions. Absent when the operator publishes none. */
+  where?: string;
+  phone?: string;
+  email?: string;
+  hours?: string;
+  /** The communities the operator lists as reached from here. */
+  onTo?: string[];
+  note?: string;
 }
 
 export interface Operator {
@@ -35,13 +59,19 @@ export interface Operator {
   mode: Mode;
   /** Every region the operator serves. */
   regions: Region[];
-  community: string;
+  /** The hubs and towns it works from, Anchorage first when it starts there. */
+  communities: string[];
   phone: string;
   email?: string;
-  website?: string;
-  hours: string;
-  seasonal: string;
+  website: string;
+  /** Hours for the main phone line. Absent when the operator publishes none. */
+  hours?: string;
+  /** Absent when the operator publishes no seasonal limits. */
+  seasonal?: string;
   services: string[];
+  /** Anything else a technician should know, in a sentence or two. */
+  note?: string;
+  offices: Office[];
   source: Source;
 }
 
@@ -84,122 +114,6 @@ export const confidentialityRule: Record<Confidentiality, string> = {
   confidential:
     "Stays with the technicians working it. An operator may be told the place and date needed to get there, never what the site is or who the client is.",
 };
-
-export const operators: Operator[] = [
-  {
-    id: "op-tongass-air",
-    name: "Tongass Float Air",
-    mode: "air",
-    regions: ["Southeast"],
-    community: "Ketchikan",
-    phone: "907-555-0141",
-    email: "dispatch@example.com",
-    website: "https://example.com",
-    hours: "Daily 7:00–19:00 (summer), 9:00–16:00 (winter)",
-    seasonal: "Float ops pause during freeze-up; wheel charters only Dec–Feb.",
-    services: ["Charter", "Freight to 600 lb", "Tower drop-offs"],
-    source: { label: "Operator phone call", verifiedDaysAgo: 10, confidence: "high" },
-  },
-  {
-    id: "op-revilla-rotor",
-    name: "Revilla Rotor Services",
-    mode: "air",
-    regions: ["Southeast"],
-    community: "Ketchikan",
-    phone: "907-555-0148",
-    hours: "Daily 8:00–17:00",
-    seasonal: "Winter flights weather-dependent; book ahead Dec–Mar.",
-    services: ["Helicopter sling", "Ridge-top crew moves"],
-    source: { label: "Operator phone call", verifiedDaysAgo: 24, confidence: "medium" },
-  },
-  {
-    id: "op-inside-barge",
-    name: "Inside Passage Barge Co.",
-    mode: "sea",
-    regions: ["Southeast"],
-    community: "Juneau",
-    phone: "907-555-0177",
-    hours: "Mon–Fri 8:00–17:00",
-    seasonal: "Weekly sailing Apr–Oct, biweekly Nov–Mar.",
-    services: ["Heavy freight", "Shelter & generator moves"],
-    source: { label: "Published schedule", verifiedDaysAgo: 32, confidence: "medium" },
-  },
-  {
-    id: "op-amhs",
-    name: "Alaska Marine Highway (AMHS)",
-    mode: "sea",
-    regions: ["Southeast", "Southcentral"],
-    community: "Statewide",
-    phone: "800-555-0100",
-    website: "https://dot.alaska.gov/amhs/",
-    hours: "Reservations Mon–Fri 8:00–17:00",
-    seasonal: "Reduced winter schedule; check official site.",
-    services: ["Vehicle ferry", "Passenger"],
-    source: { label: "Official site", verifiedDaysAgo: 3, confidence: "high" },
-  },
-  {
-    id: "op-chugach-heli",
-    name: "Chugach Rotor Services",
-    mode: "air",
-    regions: ["Southcentral"],
-    community: "Valdez",
-    phone: "907-555-0122",
-    email: "ops@example.com",
-    hours: "On call 24/7, office 8:00–17:00",
-    seasonal: "Ridge sites weather-limited Nov–Mar.",
-    services: ["Helicopter sling", "Ridge-top crew moves"],
-    source: { label: "Operator email", verifiedDaysAgo: 19, confidence: "high" },
-  },
-  {
-    id: "op-matsu-haul",
-    name: "Mat-Su Hotshot Hauling",
-    mode: "land",
-    regions: ["Southcentral"],
-    community: "Wasilla",
-    phone: "907-555-0189",
-    hours: "Mon–Sat 6:00–20:00",
-    seasonal: "Hatcher Pass road closed in winter.",
-    services: ["Hotshot freight", "Snow-machine trailer"],
-    source: { label: "Crew report", verifiedDaysAgo: 89, confidence: "low" },
-  },
-  {
-    id: "op-kenai-air",
-    name: "Kenai Bush Air",
-    mode: "air",
-    regions: ["Southcentral"],
-    community: "Soldotna",
-    phone: "907-555-0133",
-    hours: "Daily 8:00–18:00",
-    seasonal: "Ski ops Jan–Mar.",
-    services: ["Charter", "Freight"],
-    source: { label: "Operator phone call", verifiedDaysAgo: 29, confidence: "medium" },
-  },
-  {
-    id: "op-dalton-freight",
-    name: "Dalton Line Freight",
-    mode: "land",
-    regions: ["Interior"],
-    community: "Fairbanks",
-    phone: "907-555-0155",
-    hours: "Mon–Fri 7:00–18:00",
-    seasonal: "Chain law Oct–Apr on Dalton Hwy.",
-    services: ["Haul road freight", "Fuel drums"],
-    source: { label: "Operator phone call", verifiedDaysAgo: 6, confidence: "high" },
-  },
-  {
-    id: "op-yukon-air",
-    name: "Yukon Flats Air",
-    mode: "air",
-    regions: ["Interior"],
-    community: "Fairbanks",
-    phone: "907-555-0166",
-    website: "https://example.com",
-    hours: "Daily 7:30–17:30",
-    seasonal: "Breakup (late Apr–May) closes gravel strips intermittently.",
-    services: ["Scheduled village runs", "Charter"],
-    source: { label: "Published schedule", verifiedDaysAgo: 13, confidence: "medium" },
-  },
-];
 
 export const checklists: Checklist[] = [
   {
@@ -261,7 +175,7 @@ export const checklists: Checklist[] = [
   },
 ];
 
-export const regions: Region[] = ["Southeast", "Southcentral", "Interior"];
+export const regions: Region[] = ["Southeast", "Southwest", "Yukon-Kuskokwim Delta", "Northwest"];
 
 /** The one named list sites pick their qualifications from. */
 export const qualifications: Qualification[] = [
@@ -328,26 +242,61 @@ export const getOperator = (id: string) => operators.find((o) => o.id === id);
 /** Records verified longer ago than this are stale. */
 export const STALE_AFTER_DAYS = 60;
 
-export const isStale = (source: Source) => source.verifiedDaysAgo > STALE_AFTER_DAYS;
+const DAY_MS = 86_400_000;
 
-/** The local date (YYYY-MM-DD) a number of days before `now`. */
-export function dateDaysBefore(now: number, days: number): string {
-  const date = new Date(now);
-  date.setDate(date.getDate() - days);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+/** Midday on a local calendar date, so whole days count the same across daylight saving. */
+const middayOf = (year: number, month: number, day: number) =>
+  new Date(year, month - 1, day, 12).getTime();
+
+/** Calendar days from a local date (YYYY-MM-DD) to the local date of `now`. */
+export function daysSince(date: string, now: number): number {
+  const [year = 0, month = 1, day = 1] = date.split("-").map(Number);
+  const today = new Date(now);
+  const todayMidday = middayOf(today.getFullYear(), today.getMonth() + 1, today.getDate());
+  return Math.round((todayMidday - middayOf(year, month, day)) / DAY_MS);
 }
 
+/** Whether a record's verified date is more than STALE_AFTER_DAYS before `now`. */
+export const isStale = (source: Source, now: number) =>
+  daysSince(source.verified, now) > STALE_AFTER_DAYS;
+
+/** Lower case with accents dropped, so "utqiagvik" finds "Utqiaġvik". */
+const fold = (text: string) => text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+
 const matches = (query: string, fields: string[]) => {
-  const q = query.trim().toLowerCase();
-  return q === "" || fields.some((field) => field.toLowerCase().includes(q));
+  const q = fold(query.trim());
+  return q === "" || fields.some((field) => fold(field).includes(q));
 };
 
-/** Operators serving a region (or any region) whose name, community or a service contains the query. */
+/** Every community a record names: where it works from, its offices, and where they reach. */
+export const operatorCommunities = (o: Operator) => [
+  ...o.communities,
+  ...o.offices.flatMap((office) => [office.community, ...(office.onTo ?? [])]),
+];
+
+/**
+ * Operators serving a region (or any region) whose name, a community it
+ * names, a company running one of its offices, or a service contains the query.
+ */
 export function filterOperators(list: Operator[], region: Region | undefined, query: string) {
   return list.filter(
     (o) =>
       (!region || o.regions.includes(region)) &&
-      matches(query, [o.name, o.community, ...o.services]),
+      matches(query, [
+        o.name,
+        ...operatorCommunities(o),
+        ...o.offices.flatMap((office) => (office.runBy ? [office.runBy] : [])),
+        ...o.services,
+      ]),
   );
 }
+
+/** "Anchorage, Bethel, Nome" or, past `max`, "Anchorage, Juneau, Ketchikan and 8 more". */
+export function communitiesLabel(communities: string[], max = 4): string {
+  if (communities.length <= max) return communities.join(", ");
+  const shown = communities.slice(0, max - 1);
+  return `${shown.join(", ")} and ${communities.length - shown.length} more`;
+}
+
+/** The offices a technician can get directions to: those with an address. */
+export const meetingPlaces = (o: Operator) => o.offices.filter((office) => office.where);

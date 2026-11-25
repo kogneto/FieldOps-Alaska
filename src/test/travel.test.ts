@@ -97,7 +97,7 @@ describe("travel on a trip", () => {
   });
 
   it("puts them in a shared plan", () => {
-    let t = setRoute(trip(), "a", { by: "operator", operatorId: "op-yukon-air" });
+    let t = setRoute(trip(), "a", { by: "operator", operatorId: "op-grant-aviation" });
     t = setMeet(t, "a", typedPlace("Bethel airport", "Bethel Airport"));
     t = setLodging(t, "a", typedPlace("Kuskokwim Inn", ""));
     const text = shareText(t, sites);
