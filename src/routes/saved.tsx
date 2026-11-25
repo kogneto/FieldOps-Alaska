@@ -20,10 +20,11 @@ export const Route = createFileRoute("/saved")({
 
 function Saved() {
   const { saved } = useSaved();
-  // Older versions could star sample sites too; only operators are shown.
+  // Older versions could star sites and the invented operators too; only
+  // operators still in the records are shown.
   const list = operators.filter((x) => saved.includes(x.id));
   return (
-    <AppShell title="Saved" sample>
+    <AppShell title="Saved">
       <div className="flex gap-3 rounded-lg border-2 border-border bg-card p-4 text-base">
         <Star className="h-6 w-6 shrink-0 text-accent" />
         <p>

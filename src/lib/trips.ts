@@ -524,7 +524,7 @@ export function currentTrip(trips: Trip[], today: string): Trip | undefined {
     .sort((a, b) => a.start.localeCompare(b.start))[0];
 }
 
-/** "Yukon Flats Air" or "Drive yourself"; empty until chosen. */
+/** "Grant Aviation" or "Drive yourself"; empty until chosen. */
 export function routeLabel(route: TripRoute): string {
   if (route?.by === "self") return "Drive yourself";
   if (route?.by === "operator") return getOperator(route.operatorId)?.name ?? "";
@@ -551,12 +551,10 @@ export function shareText(trip: Trip, sites: Site[]): string {
   lines.push(
     `FieldOps trip: ${dateRangeLabel(trip)} (${trip.days} day${trip.days === 1 ? "" : "s"})`,
   );
-  let namesOperator = false;
   stops.forEach(({ site, route, meet, lodging }, i) => {
     lines.push("", `${i + 1}. ${site.name}${site.community ? ` — ${site.community}` : ""}`);
     const operator = route?.by === "operator" ? getOperator(route.operatorId) : undefined;
     if (operator) {
-      namesOperator = true;
       lines.push(`   Getting there: ${operator.name}, ${operator.phone}.`);
       lines.push(...placeLine("Meeting the operator at", meet));
     } else if (route?.by === "self") {
@@ -584,14 +582,6 @@ export function shareText(trip: Trip, sites: Site[]): string {
       const site = check.siteId ? sites.find((s) => s.id === check.siteId) : undefined;
       lines.push(`Shipped from ${site?.name ?? "home base"}: waybill ${waybill.trim()}.`);
     }
-  }
-  // The operators are still an invented sample set. Say so only when the plan
-  // names one; the technician's own sites and dates are real.
-  if (namesOperator) {
-    lines.push(
-      "",
-      "Operator details are sample data for now. Confirm them before relying on them.",
-    );
   }
   return lines.join("\n");
 }

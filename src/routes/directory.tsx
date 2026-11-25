@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, ModeIcon, SaveButton, SourceTag } from "@/components/fo";
-import { filterOperators, operators, regions, type Region } from "@/lib/data";
+import { communitiesLabel, filterOperators, operators, regions, type Region } from "@/lib/data";
 import { useHydrated } from "@/lib/offline";
 import { Button } from "@/components/ui/button";
 
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/directory")({
       { title: "Operators — FieldOps Alaska" },
       {
         name: "description",
-        content: "Search Alaska air, sea and land operators by region.",
+        content: "Search Alaska air and sea operators by region, hub or village.",
       },
       { property: "og:title", content: "Operators — FieldOps Alaska" },
       {
@@ -42,11 +42,11 @@ function Directory() {
   const list = filterOperators(operators, region, q);
 
   return (
-    <AppShell title="Operators" sample>
+    <AppShell title="Operators">
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Operator, community, service…"
+        placeholder="Operator, hub, village, service…"
         aria-label="Search operators"
         className="h-16 w-full rounded-lg border-2 border-border bg-card px-5 text-lg text-foreground placeholder:text-muted-foreground focus:border-accent focus:outline-none"
       />
@@ -79,7 +79,7 @@ function Directory() {
                     {o.name}
                   </div>
                   <div className="mt-1 text-base text-muted-foreground">
-                    {o.community} · {o.services.join(", ")}
+                    {communitiesLabel(o.communities)} · {o.services.join(", ")}
                   </div>
                 </div>
                 <SaveButton id={o.id} />

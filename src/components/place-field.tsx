@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { LocateFixed, MapPin } from "lucide-react";
 import { fieldLabel, inputClass } from "@/components/site-form";
 import { platformFrom } from "@/lib/maps";
@@ -89,22 +89,26 @@ export function WhereInput({
 }
 
 // A place typed in for directions: a name, where it is, and a Directions button.
+// Anything passed as children shows under the title, such as a way to fill it in.
 export function PlaceField({
   title,
   namePlaceholder,
   place,
   onChange,
+  children,
 }: {
   title: string;
   namePlaceholder: string;
   place: Place | null;
   onChange: (place: Place) => void;
+  children?: ReactNode;
 }) {
   const name = place?.name ?? "";
   const where = place?.where ?? "";
   return (
     <div className="grid gap-2 rounded-lg border-2 border-border p-3">
       <div className="font-bold">{title}</div>
+      {children}
       <label className="grid gap-1">
         <span className={fieldLabel}>Name</span>
         <input

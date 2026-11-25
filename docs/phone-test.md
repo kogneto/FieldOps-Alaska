@@ -35,7 +35,7 @@ Pass if it opens full screen, with no browser address bar, and the status line u
    - Home
    - Trips, and Your qualifications and Your sites under it
    - Sites
-   - Find: search for "ferry", then clear it and filter by each region chip (Southeast, Southcentral, Interior, All regions)
+   - Find: search for "Hooper Bay", then clear it and filter by each region chip (Southeast, Southwest, Yukon-Kuskokwim Delta, Northwest, All regions)
    - Three different operator pages, including the ferry system
    - Saved
    - Send feedback

@@ -5,6 +5,7 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
+  Building2,
   Car,
   Check,
   ChevronDown,
@@ -22,10 +23,18 @@ import { DirectionsLink, PlaceField } from "@/components/place-field";
 import { NewSiteForm } from "@/components/site-form";
 import { TravelDocs } from "@/components/travel-docs";
 import { deleteDocsForTrip, sweepOrphanDocs } from "@/lib/doc-store";
-import { typedPlace } from "@/lib/places";
+import { typedPlace, type Place } from "@/lib/places";
 import { Stepper } from "@/components/stepper";
 import { Button } from "@/components/ui/button";
-import { getOperator, getQualification, operators } from "@/lib/data";
+import {
+  communitiesLabel,
+  confidenceAdvice,
+  getOperator,
+  getQualification,
+  meetingPlaces,
+  operators,
+  type Operator,
+} from "@/lib/data";
 import { useHydrated, useToday } from "@/lib/offline";
 import { currentSites, useSites } from "@/lib/site-store";
 import { siteSummary, type Site } from "@/lib/sites";
@@ -435,7 +444,14 @@ function StepBody({
               namePlaceholder="e.g. Bethel airport, freight counter"
               place={stop.meet}
               onChange={(p) => change((t) => setMeet(t, stop.siteId, typedPlace(p.name, p.where)))}
-            />
+            >
+              {stop.meet === null && stop.route?.by === "operator" && (
+                <OfficePicker
+                  operator={getOperator(stop.route.operatorId)}
+                  onPick={(p) => change((t) => setMeet(t, stop.siteId, p))}
+                />
+              )}
+            </PlaceField>
           )}
           <PlaceField
             title="Lodging"
@@ -514,8 +530,7 @@ function TravelTo({ route, onChoose }: { route: TripRoute; onChoose: (route: Tri
             Call {operator.phone}
           </a>
           <p className="mt-1 text-sm text-muted-foreground">
-            {operator.name}. Operator details are sample data for now; confirm them before relying
-            on them.
+            {operator.name}. {confidenceAdvice[operator.source.confidence]}
           </p>
           <Link
             to="/operators/$id"
@@ -599,7 +614,9 @@ function RoutePicker({
                 <ModeIcon mode={o.mode} className="h-5 w-5 shrink-0 text-accent" />
                 <span className="min-w-0 flex-1">
                   <span className="block font-semibold">{o.name}</span>
-                  <span className="block text-sm text-muted-foreground">{o.community}</span>
+                  <span className="block text-sm text-muted-foreground">
+                    {communitiesLabel(o.communities)}
+                  </span>
                 </span>
                 {selected && <Check className="h-5 w-5 shrink-0 text-primary" />}
               </button>
@@ -607,6 +624,57 @@ function RoutePicker({
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+// The chosen operator's offices that have an address, so where the technician
+// meets it fills in with one tap. Shown only while nothing has been typed there,
+// so it never replaces what the technician wrote.
+function OfficePicker({
+  operator,
+  onPick,
+}: {
+  operator: Operator | undefined;
+  onPick: (place: Place) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const offices = operator ? meetingPlaces(operator) : [];
+  if (!operator || offices.length === 0) return null;
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex min-h-14 items-center justify-center gap-2 rounded-lg border-2 border-accent px-4 font-semibold active:bg-secondary"
+      >
+        <Building2 className="h-5 w-5 shrink-0" />
+        {offices.length === 1 ? "Use its office" : `Pick one of its ${offices.length} offices`}
+      </button>
+    );
+  }
+  return (
+    <div className="grid gap-2">
+      {offices.map((office) => (
+        <button
+          key={`${office.community}-${office.name}`}
+          type="button"
+          onClick={() =>
+            onPick(
+              typedPlace(
+                `${operator.name}, ${office.community} ${office.name.toLowerCase()}`,
+                office.where ?? "",
+              ),
+            )
+          }
+          className="flex min-h-14 w-full flex-col justify-center rounded-lg border-2 border-border bg-background px-3 py-2 text-left active:bg-secondary"
+        >
+          <span className="font-semibold">
+            {office.community} · {office.name}
+          </span>
+          <span className="text-sm text-muted-foreground">{office.where}</span>
+        </button>
+      ))}
     </div>
   );
 }

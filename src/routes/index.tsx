@@ -39,7 +39,7 @@ function Index() {
   const sites = useSites();
   const savedOperators = operators.filter((o) => saved.includes(o.id)).length;
   return (
-    <AppShell title="FieldOps Alaska" sample>
+    <AppShell title="FieldOps Alaska">
       <div className="mb-6">
         <p className="text-sm font-bold uppercase text-muted-foreground">Remote field companion</p>
         <p className="font-display text-4xl uppercase leading-tight text-primary">Alaska</p>
