@@ -95,7 +95,7 @@ Read on 24 Nov 2026
 - **Mode / carries:** air; passengers, freight and mail, charter. https://yutebethel.com/
 - **Home base:** Bethel hub, "Serving the Yukon-Kuskokwim Delta." https://yutebethel.com/about/
 - **Serves:** primary routes from Bethel: Hooper Bay, Scammon Bay, Chevak, Goodnews Bay, Mountain Village, Kotlik, Kipnuk; also scheduled and charter to Aniak, Russian Mission, Marshall, Pilot Station, Emmonak, Alakanuk, Nunam Iqua, Tuntutuliak, Eek, Akiachak. https://yutebethel.com/routes/ . Its contact page lists station phones for roughly 40 villages (not copied here). https://yutebethel.com/contact-us/ . Anchorage: not mentioned.
-- **Phone:** main office 1-888-FLY-YUTE (1-888-359-9883); Bethel Station (907) 543-4378; Bethel Freight (907) 438-6466. https://yutebethel.com/contact-us/
+- **Phone:** under "Bethel Main Office", each number is captioned beneath it: 1-888-FLY-YUTE (1-888-359-9883), Bethel Station; (907) 543-4378, Bethel Freight. (907) 438-6466 is St. Mary's Station, not Bethel. https://yutebethel.com/contact-us/ (layout checked on a screenshot, 24 Nov 2026)
 - **Email:** fly@yutebethel.com. https://yutebethel.com/contact-us/
 - **Hours:** contact page: Mon-Sat 7:00am to 9:30pm, Sun 9:00am to 7:00pm, not tied to a specific office ("not tied to a specific location"). https://yutebethel.com/contact-us/ . Check-in about 45 minutes before departure. https://yutebethel.com/travel-info/
 - **Seasonal limits:** only Chevak described as year-round; "Sometimes We Cancel" for safety; delays usually about 20 minutes. https://yutebethel.com/ . No other seasonal notes.
@@ -170,11 +170,16 @@ On 24 Nov 2026 these were re-read in a browser and match the sections above:
 - Alaska Air Cargo, Bethel station: address, phone, pick-up and drop-off hours, services list. https://public.alaskacargo.com/network-locations/bethel
 - NAC contact: (907) 243-3331, 1-800-727-2141, customerserviceagents@nac.aero, 3900 Old International Airport Road. Hours not re-read. https://nac.aero/contact/
 - Lynden Air Cargo locations: every Anchorage and Bethel address, phone, email and hour. https://www.lynden.com/lac/about/locations/
-- Yute contact: 1-888-359-9883, Bethel Station (907) 543-4378, Bethel Freight (907) 438-6466, 3551 Chief Eddie Hoffman. Email and hours not re-read. https://yutebethel.com/contact-us/
+- Yute contact: corrected on this check. Bethel Station 1-888-359-9883, Bethel Freight (907) 543-4378, address 3551 Chief Eddie Hoffman; (907) 438-6466 is St. Mary's. The first reading had the captions one number off. Email and hours not re-read. https://yutebethel.com/contact-us/
 - Ryan Air contacts: 6400 Carl Brady Drive and 907-562-2227; Bethel P.O. Box 732 and 907-885-3190. https://ryanalaska.com/contacts/
 - Grant Aviation: written from pages read by hand (section above).
 
-Not re-read: the schedules (NAC, Lynden), the dangerous-goods and limits pages, Alaska Airlines, and the region sources. Re-read those before they go into a record.
+Not re-read: the schedules (NAC, Lynden), the dangerous-goods and limits pages, and the region sources. Re-read those before they go into a record.
+
+Still open after a browser try:
+
+- Alaska Airlines: the Anchorage-Bethel route page loads and sells the route, but shows no nonstop status, schedule or reservations number. Its "flight schedule page" link was not followed. https://www.alaskaair.com/en/flights-from-anchorage-to-bethel
+- DCRA region label: the State's community database now lives at https://dcra-cdo-dcced.opendata.arcgis.com/ (loads in a browser), but Bethel's community page and its region label were not reached.
 
 ## Pages that failed
 
