@@ -83,10 +83,14 @@ export interface Qualification {
   name: string;
 }
 
+export const checklistCategories = ["Comms", "PPE", "Parts", "Paperwork"] as const;
+export type ChecklistCategory = (typeof checklistCategories)[number];
+
 export interface Checklist {
+  /** Kept when a list is reworded, since trips on a phone refer to it. "cl-crew" is the comms list. */
   id: string;
   title: string;
-  category: "Crew" | "PPE" | "Parts" | "Paperwork";
+  category: ChecklistCategory;
   items: string[];
   /**
    * When the list is needed. Without this it is always needed; with it, the
@@ -118,13 +122,13 @@ export const confidentialityRule: Record<Confidentiality, string> = {
 export const checklists: Checklist[] = [
   {
     id: "cl-crew",
-    title: "Crew & comms before wheels-up",
-    category: "Crew",
+    title: "Comms & safety before wheels-up",
+    category: "Comms",
     items: [
-      "Travel plan left with dispatcher",
+      "Trip plan shared with someone at home base",
       "Satellite messenger charged & tested",
       "Escalation contact confirmed",
-      "Second crew member confirmed (climbs)",
+      "Second person confirmed for any climb",
       "Weather window reviewed (NWS)",
     ],
   },

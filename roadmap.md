@@ -105,7 +105,7 @@ The loadout and its four checklists are live since 24 Nov 2026, deployed from th
 
 - Each checklist lists what was ticked at the checklist before it, plus anything added at it, which starts ticked. This extends the confirmed return-checklist rule to every checklist. If nothing was ticked at the one before, it lists what that one listed, and says so.
 - One waybill number per shipment: at the pre-loadout and at each departure. It shows on the next arrival or return checklist.
-- A new trip's loadout can start as a copy of the last trip's (no ticks or waybills), or from the tower site parts kit. The parts kit is still also a prep checklist; slice 5 decides what it becomes.
+- A new trip's loadout can start as a copy of the last trip's (no ticks or waybills), or from the tower site parts kit. The parts kit stays a prep checklist too (Andy, 25 Nov 2026).
 - Unticked items are counted as "not ticked yet", never called missing or lost.
 - Dangerous goods are flagged per item. The app says to check with the operator, and doesn't state any operator's rules.
 
@@ -179,13 +179,14 @@ To build:
 
 Done when no invented record is left: every operator in the app is a real business with a source, a verified date and a confidence, and nothing is labelled "Sample".
 
-The 18 real operators are live since 25 Nov 2026, deployed from the PR #21 branch at `6f4c3ab`. Checked with `bun run check`, in a phone-sized browser (a search for a village, an operator page with its offices, and a trip filling in where you meet the operator from one), as the built app on a local Cloudflare server with the server stopped, and live (every operator page loads and is in the offline cache). Not yet checked on a real phone. The slice stays open until the checklists and qualification list below are decided.
+The 18 real operators are live since 25 Nov 2026, deployed from the PR #21 branch at `6f4c3ab`. Checked with `bun run check`, in a phone-sized browser (a search for a village, an operator page with its offices, and a trip filling in where you meet the operator from one), as the built app on a local Cloudflare server with the server stopped, and live (every operator page loads and is in the offline cache). Not yet checked on a real phone.
 
 Decided (Andy):
 
 - The records are real, public operators, and Andy keeps them current as the maintainer ([ADR 0003](docs/adr/0003-real-operators-are-public-and-sites-stay-on-the-phone.md)).
 - The first records are the 18 operators that serve the ten busiest Alaska hubs you can't drive to from Anchorage, researched by Claude on 24 and 25 Nov 2026 ([docs/research](docs/research/README.md)). They replace the nine invented ones.
 - The regions are the four State transportation plan areas those hubs fall in: Southeast, Southwest, Yukon-Kuskokwim Delta and Northwest.
+- The four prep checklists and the qualification list stay as the maintainer's lists, with the crew wording taken out (25 Nov 2026). The crew and comms list is now "Comms & safety before wheels-up", in a Comms category, and asks for the trip plan to be shared with someone at home base and a second person for any climb. A trip already on a phone gets the new wording for those lines, with its ticks kept.
 
 Defaults Claude chose, not yet confirmed by Andy:
 
@@ -197,15 +198,12 @@ Defaults Claude chose, not yet confirmed by Andy:
 - Where an operator's own pages disagree, the record says so: the ferry's Ketchikan terminal number, Alaska Seaplanes' Sunday cargo hours, and Alaska Marine Lines' Naknek address.
 - Choosing a different operator for a site leaves where you meet the operator as it was, since the technician may have typed it. Clearing both lines brings the office list back.
 
-To decide:
-
-- What the invented checklists and qualification list become. They are the maintainer's but aren't records, and once "Sample" comes off they read as real. They still speak of a crew ("Second crew member confirmed", a Crew category).
-
 To build:
 
 - [x] Replace the invented operators with real ones.
 - [x] An operator's record says where the operator is met, so a trip can give directions there.
 - [x] Take "Sample" off the header, the shared plan and the README.
+- [x] Take the crew wording out of the checklists.
 
 ## Shelved: one crew's real data behind sign-in
 
