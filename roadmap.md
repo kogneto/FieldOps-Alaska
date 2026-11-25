@@ -186,7 +186,7 @@ Decided (Andy):
 - The records are real, public operators, and Andy keeps them current as the maintainer ([ADR 0003](docs/adr/0003-real-operators-are-public-and-sites-stay-on-the-phone.md)).
 - The first records are the 18 operators that serve the ten busiest Alaska hubs you can't drive to from Anchorage, researched by Claude on 24 and 25 Nov 2026 ([docs/research](docs/research/README.md)). They replace the nine invented ones.
 - The regions are the four State transportation plan areas those hubs fall in: Southeast, Southwest, Yukon-Kuskokwim Delta and Northwest.
-- The four prep checklists and the qualification list stay as the maintainer's lists, with the crew wording taken out (25 Nov 2026). The crew and comms list is now "Comms & safety before wheels-up", in a Comms category, and asks for the trip plan to be shared with someone at home base and a second person for any climb. A trip already on a phone gets the new wording for those lines, with its ticks kept.
+- The four prep checklists and the qualification list stay as the maintainer's lists, with the crew wording taken out (25 Nov 2026). The crew and comms list is now "Comms & safety before wheels-up", in a Comms category, and asks for the trip plan to be shared with someone at home base and a second person for any climb. A trip already on a phone gets the new wording for those lines, with its ticks kept. Live since 25 Nov 2026, deployed from the `claude/checklist-wording` branch at `31e63b3`; checked with `bun run check` and on the dev server with a trip saved in the old wording. Not yet checked on a real phone.
 
 Defaults Claude chose, not yet confirmed by Andy:
 
