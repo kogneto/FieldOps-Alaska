@@ -365,6 +365,35 @@ describe("readTrips", () => {
     ]);
   });
 
+  it("rewords a comms list saved while it still spoke of a crew, keeping its ticks", () => {
+    const t = trip("tower", "2026-11-16");
+    const old = {
+      id: "cl-crew",
+      title: "Crew & comms before wheels-up",
+      category: "Crew",
+      items: [
+        "Travel plan left with dispatcher",
+        "Satellite messenger charged & tested",
+        "Second crew member confirmed (climbs)",
+        "Extra line I added",
+      ],
+      ticks: [true, false, true, false],
+      skipped: false,
+    };
+    const [read] = readTrips(JSON.stringify([{ ...t, checklists: [old] }]));
+    expect(read?.checklists[0]).toEqual({
+      ...old,
+      title: "Comms & safety before wheels-up",
+      category: "Comms",
+      items: [
+        "Trip plan shared with someone at home base",
+        "Satellite messenger charged & tested",
+        "Second person confirmed for any climb",
+        "Extra line I added",
+      ],
+    });
+  });
+
   it("survives empty or broken storage", () => {
     expect(readTrips(null)).toEqual([]);
     expect(readTrips("{not json")).toEqual([]);

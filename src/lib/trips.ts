@@ -8,12 +8,14 @@
 // parsed with `new Date("YYYY-MM-DD")`, which reads them as UTC midnight and
 // lands on the previous day in Alaska.
 import {
+  checklistCategories,
   checklists as sampleChecklists,
   getOperator,
   getQualification,
   monthName,
   monthsLabel,
   type Checklist,
+  type ChecklistCategory,
   type Month,
 } from "./data";
 import {
@@ -591,21 +593,30 @@ export function shareText(trip: Trip, sites: Site[]): string {
 const isStringArray = (v: unknown): v is string[] =>
   Array.isArray(v) && v.every((x) => typeof x === "string");
 
+// The comms list once spoke of a crew. A trip saved before it was reworded
+// gets the new wording for these exact lines; the order and ticks are kept.
+const REWORDED: Record<string, string> = {
+  "Crew & comms before wheels-up": "Comms & safety before wheels-up",
+  "Travel plan left with dispatcher": "Trip plan shared with someone at home base",
+  "Second crew member confirmed (climbs)": "Second person confirmed for any climb",
+};
+const reworded = (text: string) => REWORDED[text] ?? text;
+
 function readChecklist(v: unknown): TripChecklist | null {
   if (typeof v !== "object" || v === null) return null;
   const c = v as Record<string, unknown>;
   if (typeof c["id"] !== "string" || typeof c["title"] !== "string") return null;
   if (!isStringArray(c["items"]) || !Array.isArray(c["ticks"])) return null;
-  const items = c["items"];
+  const items = c["items"].map(reworded);
   const ticks = items.map((_, i) => (c["ticks"] as unknown[])[i] === true);
   const category = c["category"];
   return {
     id: c["id"],
-    title: c["title"],
-    category:
-      category === "Crew" || category === "PPE" || category === "Parts" || category === "Paperwork"
-        ? category
-        : "Crew",
+    title: reworded(c["title"]),
+    // "Crew" was the comms list's category before it was reworded.
+    category: checklistCategories.includes(category as ChecklistCategory)
+      ? (category as ChecklistCategory)
+      : "Comms",
     items,
     ticks,
     skipped: c["skipped"] === true,
