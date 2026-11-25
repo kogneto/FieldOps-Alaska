@@ -24,6 +24,7 @@ Read on 24 Nov 2026
 | Yute Commuter Service                                    | air       | both             | Anchorage-Bethel: no (Anchorage not mentioned) / Bethel-villages: yes | confirmed           |
 | Ryan Air                                                 | air       | both             | Anchorage-Bethel: not on its schedules / Bethel-villages: yes         | confirmed           |
 | Grant Aviation                                           | air       | both             | Anchorage-Bethel: not on its scheduled routes / Bethel-villages: yes  | confirmed           |
+| Everts Air Cargo (Bethel office: Dependable Freight)     | air       | freight          | Anchorage-Bethel: office listed / villages: "via downline carriers"   | confirmed           |
 | Barge to Bethel (Delta Western, Crowley, Lynden, others) | sea/river | freight          | not confirmed                                                         | lead                |
 
 ---
@@ -118,6 +119,15 @@ Read on 24 Nov 2026
 - **Dangerous goods:** only a $30.00 surcharge on hazmat shipments originating on Ryan Air is listed; no acceptance rules. https://ryanalaska.com/rates-rules/freight-rules/
 - **Waybill:** "Track Ryan AWB" / "Airbill Tracking" page. https://ryanalaska.com/ ; number format Not published.
 - **Where the technician meets it:** Anchorage 6400 Carl Brady Drive (office address; counter use Not published). Bethel: mailing address only, P.O. Box 732, Bethel, AK 99559. https://ryanalaska.com/contacts/
+
+## Everts Air Cargo, Bethel office (added by hand)
+
+Read in a browser on 24 Nov 2026 from https://evertsair.com/cargo/destinations-map ; the Arctic and Southwest notes have Everts' Anchorage details.
+
+- **Bethel office:** run by "Dependable Freight". Each number is labelled on the page: phone (907) 543-3737, fax (907) 543-3738, email everts@dependablefreight.com.
+- **Hours:** Mon-Fri 9:00 am-5:00 pm, Sat 9:00 am-1:00 pm, Sun closed. Street address: Not published.
+- **Connects to, "via downline carriers":** Akiachak, Akiak, Atmautluak, Chefornak, Chevak, Eek, Goodnews Bay, Hooper Bay, Kasigluk, Kipnuk, Kongiganak, Kwethluk, Kwigillingok, Marshall (Fortuna Lodge), Mekoryuk, Napakiak, Napaskiak, Newtok, Nightmute, Nunapitchuk, Platinum, Quinhagak, Scammon Bay, Toksook Bay, Tuluksak, Tuntutuliak, Tununak. Which operator flies those legs: Not published.
+- **Waybill:** "Airway bill numbers are 11 digits beginning with 840-" (Southwest note, https://evertsair.com/cargo/cargo-faq ).
 
 ## Grant Aviation
 
