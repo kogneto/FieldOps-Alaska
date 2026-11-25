@@ -179,6 +179,8 @@ To build:
 
 Done when no invented record is left: every operator in the app is a real business with a source, a verified date and a confidence, and nothing is labelled "Sample".
 
+The 18 real operators are live since 25 Nov 2026, deployed from the PR #21 branch at `6f4c3ab`. Checked with `bun run check`, in a phone-sized browser (a search for a village, an operator page with its offices, and a trip filling in where you meet the operator from one), as the built app on a local Cloudflare server with the server stopped, and live (every operator page loads and is in the offline cache). Not yet checked on a real phone. The slice stays open until the checklists and qualification list below are decided.
+
 Decided (Andy):
 
 - The records are real, public operators, and Andy keeps them current as the maintainer ([ADR 0003](docs/adr/0003-real-operators-are-public-and-sites-stay-on-the-phone.md)).
